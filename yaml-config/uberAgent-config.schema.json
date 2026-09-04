@@ -1,0 +1,2249 @@
+{
+  "$defs": {
+    "azure-event-hubs-configuration": {
+      "additionalProperties": false,
+      "description": "Azure Event Hubs credential and endpoint blocks. Referenced from receivers via azure-event-hubs-configuration-id.",
+      "properties": {
+        "authentication-url": {
+          "description": "Azure AD token endpoint URL.",
+          "format": "uri",
+          "type": "string"
+        },
+        "client-id": {
+          "description": "Azure AD application (client) ID.",
+          "type": "string"
+        },
+        "client-secret": {
+          "description": "Azure AD client secret.",
+          "type": "string"
+        },
+        "hub-name": {
+          "description": "Event Hub name.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique identifier (GUID) for this configuration block.",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Event Hubs namespace.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this configuration to specific platforms."
+        },
+        "send-data-url": {
+          "description": "Event Hubs data plane endpoint URL.",
+          "format": "uri",
+          "type": "string"
+        },
+        "tenant-id": {
+          "description": "Azure AD tenant ID.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "browser-web-app-url-component-detail-entry": {
+      "additionalProperties": false,
+      "description": "Browser web app URL component detail configuration.",
+      "properties": {
+        "component": {
+          "description": "URL component name.",
+          "type": "string"
+        },
+        "regex": {
+          "description": "URL regex pattern.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "regex",
+        "component"
+      ],
+      "type": "object"
+    },
+    "browser-web-app-url-filter-entry": {
+      "additionalProperties": false,
+      "description": "Filter for browser web app metrics and SessionFgBrowserActiveTabHost. URLs can be allowed or denied.",
+      "properties": {
+        "action": {
+          "description": "Filter action.",
+          "enum": [
+            "allow",
+            "deny"
+          ],
+          "type": "string"
+        },
+        "regex": {
+          "description": "URL regex pattern.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "regex",
+        "action"
+      ],
+      "type": "object"
+    },
+    "citrix-adc-config": {
+      "additionalProperties": false,
+      "description": "Citrix NetScaler / ADC configuration (Windows-only). One entry per ADC pair.",
+      "properties": {
+        "collect-adc-information": {
+          "description": "ADC information collection scope.",
+          "enum": [
+            "true",
+            "false",
+            "none",
+            "DDCOnly",
+            "MachineList",
+            true,
+            false
+          ],
+          "type": [
+            "string",
+            "boolean"
+          ]
+        },
+        "collect-adc-information-machines": {
+          "description": "Machine list for ADC information collection (when scope is MachineList).",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "https": {
+          "description": "Use HTTPS for NetScaler communication.",
+          "type": "boolean"
+        },
+        "password": {
+          "description": "NetScaler password.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict to specific platforms."
+        },
+        "servers": {
+          "description": "NetScaler server endpoints.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "username": {
+          "description": "NetScaler username.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "citrix-cloud-config": {
+      "additionalProperties": false,
+      "description": "Citrix Cloud configuration (Windows-only).",
+      "properties": {
+        "api-endpoint": {
+          "description": "Citrix Cloud API endpoint URL.",
+          "type": "string"
+        },
+        "client-id": {
+          "description": "Citrix Cloud API client ID.",
+          "type": "string"
+        },
+        "client-secret": {
+          "description": "Citrix Cloud API client secret.",
+          "type": "string"
+        },
+        "collect-citrix-cloud-information": {
+          "description": "Citrix Cloud information collection scope.",
+          "enum": [
+            "true",
+            "false",
+            "none",
+            "DDCOnly",
+            "MachineList",
+            true,
+            false
+          ],
+          "type": [
+            "string",
+            "boolean"
+          ]
+        },
+        "collect-citrix-cloud-information-machines": {
+          "description": "Machine list for Citrix Cloud information collection.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "customer-id": {
+          "description": "Citrix Cloud customer ID.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict to specific platforms."
+        }
+      },
+      "type": "object"
+    },
+    "configuration-settings": {
+      "additionalProperties": false,
+      "description": "Configuration management settings.",
+      "properties": {
+        "config-cache-poll-interval": {
+          "$ref": "#/$defs/duration",
+          "description": "Interval at which the configuration cache is polled for changes."
+        },
+        "config-change-restart-timeout": {
+          "$ref": "#/$defs/duration",
+          "description": "Delay before restarting the agent after a configuration change."
+        },
+        "license-cache-poll-interval": {
+          "$ref": "#/$defs/duration",
+          "description": "Interval at which the license cache is polled for changes."
+        },
+        "version": {
+          "description": "Configuration version identifier.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "duration": {
+      "description": "A duration value. A unit suffix is required: 'w' (weeks), 'd' (days), 'h' (hours), 'm' (minutes), 's' (seconds), 'ms' (milliseconds), in strictly descending order and each unit used at most once. Compound durations like '4m20s' are supported. A bare integer is rejected because its meaning would depend on the field's native unit; the sole exception is 0, which is unit-independent. Examples: '30s', '5m', '2h', '500ms', '1d', '1w', '1w2d3h', 0.",
+      "oneOf": [
+        {
+          "const": 0,
+          "type": "integer"
+        },
+        {
+          "pattern": "^(?=.)(([0-9]+w)?([0-9]+d)?([0-9]+h)?([0-9]+m)?([0-9]+s)?([0-9]+ms)?|0+)$",
+          "type": "string"
+        }
+      ]
+    },
+    "event-data-filter": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "clear"
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          "then": {
+            "required": [
+              "field"
+            ]
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              {
+                "properties": {
+                  "action": {
+                    "const": "allow"
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              },
+              {
+                "properties": {
+                  "action": {
+                    "const": "deny"
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              },
+              {
+                "properties": {
+                  "action": {
+                    "const": "defer"
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              }
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "field"
+              ]
+            }
+          }
+        }
+      ],
+      "description": "Per-sourcetype event-shaping filters. Each entry drops, allows, redacts, or defers events whose payload matches a uAQL query.",
+      "properties": {
+        "action": {
+          "description": "Filter action: allow, deny, clear, or defer.",
+          "enum": [
+            "allow",
+            "deny",
+            "clear",
+            "defer"
+          ],
+          "type": "string"
+        },
+        "comment": {
+          "description": "Optional human-readable comment.",
+          "type": "string"
+        },
+        "field": {
+          "description": "Field name to clear. Required when action is 'clear'.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this filter to specific platforms."
+        },
+        "query": {
+          "description": "Optional uAQL query. When set, the action applies only to matching events.",
+          "type": "string"
+        },
+        "sourcetypes": {
+          "description": "One or more sourcetypes this filter applies to.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sourcetypes",
+        "action",
+        "query"
+      ],
+      "type": "object"
+    },
+    "event-log": {
+      "description": "Event log forwarding entries. Each entry configures platform-specific event log collection (Windows Event Log or macOS Unified Log).",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "channel": {
+              "description": "Windows Event Log channel to subscribe to, e.g. Security or Application.",
+              "type": "string"
+            },
+            "event-filter-xpaths": {
+              "description": "Additional XPath filter expressions applied to the channel subscription.",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "event-ids": {
+              "description": "Restrict collection to these Windows event IDs.",
+              "oneOf": [
+                {
+                  "type": [
+                    "string",
+                    "integer"
+                  ]
+                },
+                {
+                  "items": {
+                    "type": [
+                      "string",
+                      "integer"
+                    ]
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "levels": {
+              "description": "Restrict collection to events of these severity levels.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "critical",
+                    "error",
+                    "warning",
+                    "information",
+                    "verbose"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "enum": [
+                      "critical",
+                      "error",
+                      "warning",
+                      "information",
+                      "verbose"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "name": {
+              "description": "Event log name. Referenced from a timer's event-logs field.",
+              "type": "string"
+            },
+            "platform": {
+              "description": "Platform this entry applies to. Selects the entry's key set: windows collects from the Windows Event Log, macos from the macOS Unified Log.",
+              "enum": [
+                "windows"
+              ],
+              "type": "string"
+            },
+            "providers": {
+              "description": "Restrict collection to events from these Windows event providers.",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "platform",
+            "channel"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "max-message-length-bytes": {
+              "description": "Truncate collected log messages to this many bytes.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "name": {
+              "description": "Event log name. Referenced from a timer's event-logs field.",
+              "type": "string"
+            },
+            "platform": {
+              "description": "Platform this entry applies to. Selects the entry's key set: windows collects from the Windows Event Log, macos from the macOS Unified Log.",
+              "enum": [
+                "macos"
+              ],
+              "type": "string"
+            },
+            "predicate": {
+              "description": "macOS Unified Log predicate string.",
+              "type": "string"
+            },
+            "rate-limit": {
+              "description": "Maximum number of messages collected per interval.",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "platform",
+            "predicate"
+          ],
+          "type": "object"
+        }
+      ],
+      "type": "object"
+    },
+    "event-trigger": {
+      "additionalProperties": false,
+      "description": "Event triggers that can additionally trigger timers on specific events.",
+      "properties": {
+        "name": {
+          "description": "Event trigger name. Referenced by timers via the event-trigger field.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this event trigger to specific platforms."
+        },
+        "query": {
+          "description": "Optional uAQL filter query. The trigger fires only when the query matches.",
+          "type": "string"
+        },
+        "types": {
+          "description": "Event types that fire this trigger.",
+          "oneOf": [
+            {
+              "enum": [
+                "user-logon",
+                "session-connection-state-change",
+                "session-roaming"
+              ],
+              "type": "string"
+            },
+            {
+              "items": {
+                "enum": [
+                  "user-logon",
+                  "session-connection-state-change",
+                  "session-roaming"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "types"
+      ],
+      "type": "object"
+    },
+    "filesystem-monitoring": {
+      "additionalProperties": false,
+      "description": "Filesystem monitoring settings (ESA).",
+      "properties": {
+        "enable-bypass-io": {
+          "description": "Allow Windows BypassIO for filesystem monitoring. When disabled, uberAgentFilter blocks BypassIO requests so that file events keep being reported. Applies to Windows only.",
+          "type": "boolean"
+        },
+        "enabled": {
+          "description": "Enable filesystem monitoring.",
+          "type": "boolean"
+        },
+        "hotplug": {
+          "description": "Monitor hotplug filesystem events.",
+          "type": "boolean"
+        },
+        "monitor": {
+          "description": "Filesystem object types to monitor.",
+          "oneOf": [
+            {
+              "enum": [
+                "disks",
+                "network-shares",
+                "named-pipes",
+                "mailslots"
+              ],
+              "type": "string"
+            },
+            {
+              "items": {
+                "enum": [
+                  "disks",
+                  "network-shares",
+                  "named-pipes",
+                  "mailslots"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "include-entry": {
+      "additionalProperties": false,
+      "description": "Additional configuration files to include. Replaces the legacy @ConfigInclude directive.",
+      "properties": {
+        "path": {
+          "description": "Path to the configuration file to include.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this include to specific platforms."
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
+    "miscellaneous": {
+      "additionalProperties": false,
+      "description": "General agent settings and implementation-defined flags.",
+      "properties": {
+        "browser-data-collection": {
+          "description": "Enable or disable data collection of uberAgent's browser extensions.",
+          "enum": [
+            "do-nothing",
+            "enable",
+            "disable"
+          ],
+          "type": "string"
+        },
+        "config-flags": {
+          "additionalProperties": false,
+          "description": "Implementation-defined flags. Boolean flags default to false; parameterized flags are typed.",
+          "properties": {
+            "app-name-is-app-id": {
+              "type": "boolean"
+            },
+            "azure-event-hubs-max-event-size-kb": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "boot-detail-timeout": {
+              "$ref": "#/$defs/duration"
+            },
+            "citrix-odata-api-maximum-attempts": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "citrix-sdk-max-record-count": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "credential-store-service-name": {
+              "type": "string"
+            },
+            "disable-browser-integrity-check": {
+              "type": "boolean"
+            },
+            "disable-set-file-permissions-on-exec": {
+              "type": "boolean"
+            },
+            "disable-user-input-delay": {
+              "type": "boolean"
+            },
+            "enable-system-log": {
+              "type": "boolean"
+            },
+            "force-citrix-metrics-determination": {
+              "type": "boolean"
+            },
+            "ie-ignore-frames": {
+              "type": "boolean"
+            },
+            "internal-script-timeout": {
+              "$ref": "#/$defs/duration"
+            },
+            "lock-enter-max-wait": {
+              "$ref": "#/$defs/duration"
+            },
+            "lock-held-max-wait": {
+              "$ref": "#/$defs/duration"
+            },
+            "max-libraries-batch-size": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "max-library-event-queue-size": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "max-process-batch-size": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "max-process-event-queue-size": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "max-registry-event-queue-size": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "max-thread-event-queue-size": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "network-communication-timeout": {
+              "$ref": "#/$defs/duration"
+            },
+            "network-driver-maximum-connection-limit": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "no-gateway-check": {
+              "type": "boolean"
+            },
+            "no-interpreted-vm": {
+              "type": "boolean"
+            },
+            "poq-send-wait-delay": {
+              "$ref": "#/$defs/duration"
+            },
+            "poq-timeout": {
+              "$ref": "#/$defs/duration"
+            },
+            "reg-data-max-length": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "reg-mon-svc-debug-output": {
+              "type": "boolean"
+            },
+            "registry-events-cache-size": {
+              "description": "Applies to Windows only.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "registry-events-cache-ttl": {
+              "$ref": "#/$defs/duration",
+              "description": "Applies to Windows only."
+            },
+            "session-helper-query-delay": {
+              "$ref": "#/$defs/duration"
+            },
+            "tls-revocation-checks-best-effort": {
+              "description": "Best-effort TLS certificate revocation checks (Windows).",
+              "type": "boolean"
+            },
+            "tls-revocation-checks-disabled": {
+              "description": "Disable TLS certificate revocation checks (Windows).",
+              "type": "boolean"
+            },
+            "tls-verify-host-disabled": {
+              "type": "boolean"
+            },
+            "tls-verify-peer-disabled": {
+              "type": "boolean"
+            },
+            "trace-locking": {
+              "type": "boolean"
+            },
+            "trace-log-filter-expression": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "debug-mode": {
+          "description": "When enabled, uberAgent's log file is more verbose.",
+          "type": "boolean"
+        },
+        "encrypt-user-names": {
+          "description": "Obfuscate user and domain names in the agent before sending.",
+          "type": "boolean"
+        },
+        "license-file-path": {
+          "description": "Path to a directory where uberAgent searches for license files. Supports environment variable expansion.",
+          "type": "string"
+        },
+        "log-file-count": {
+          "description": "Number of log files to keep (current + historical). When exceeded, the oldest log file is deleted.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "no-telemetry": {
+          "description": "Disables uberAgent self-telemetry.",
+          "type": "boolean"
+        },
+        "register-ie-addon": {
+          "description": "Register or deregister uberAgent's Internet Explorer add-on through the service.",
+          "enum": [
+            "do-nothing",
+            "register",
+            "deregister"
+          ],
+          "type": "string"
+        },
+        "registry-monitoring": {
+          "description": "Enable registry monitoring. Requires ESA and Threat Detection Engine.",
+          "type": "boolean"
+        },
+        "remote-thread-monitoring": {
+          "description": "Enable remote thread monitoring. Requires ESA and Threat Detection Engine.",
+          "type": "boolean"
+        },
+        "telemetry-staging": {
+          "description": "Sends self-telemetry to the staging endpoint instead of production.",
+          "type": "boolean"
+        },
+        "wmi-provider": {
+          "description": "Specifies the WMI query provider.",
+          "enum": [
+            "wmic",
+            "powershell",
+            "uberAgent"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "network-target-performance-process-config": {
+      "additionalProperties": false,
+      "description": "Network target performance process-level configuration.",
+      "properties": {
+        "ignore-loopback-traffic": {
+          "description": "Ignore loopback traffic.",
+          "type": "boolean"
+        },
+        "ignore-low-activity": {
+          "description": "Ignore processes with low network activity.",
+          "type": "boolean"
+        },
+        "key": {
+          "description": "Process name or regex key for targeting.",
+          "type": "string"
+        },
+        "network-driver-enabled": {
+          "description": "Enable network driver for this process.",
+          "type": "boolean"
+        },
+        "network-driver-legacy-api": {
+          "description": "Use legacy network driver API.",
+          "type": "boolean"
+        },
+        "test-compare-network-driver-and-etw": {
+          "description": "Compare network driver and ETW data (diagnostic).",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "nutanix-frame": {
+      "additionalProperties": false,
+      "description": "Nutanix Frame virtual desktop integration settings.",
+      "properties": {
+        "enable-integration": {
+          "description": "Enable Nutanix Frame integration.",
+          "type": "boolean"
+        },
+        "frame-agent-detection-path": {
+          "description": "Path to the Frame agent detection file.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "on-demand": {
+      "additionalProperties": false,
+      "description": "On-demand metrics configuration. Metrics collected outside periodic timer intervals.",
+      "properties": {
+        "receivers": {
+          "description": "Receivers for on-demand metric results.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "ua-metrics": {
+          "description": "Metrics to collect on demand.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ua-metric-name"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/ua-metric-name"
+              },
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "platform": {
+      "description": "Platform restriction. A single platform string or a list of platforms. Omit for all platforms.",
+      "oneOf": [
+        {
+          "enum": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "type": "string"
+        },
+        {
+          "items": {
+            "enum": [
+              "windows",
+              "macos",
+              "linux"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        }
+      ]
+    },
+    "process-detail-send-commandline-entry": {
+      "additionalProperties": false,
+      "description": "Optionally add the command line to the ProcessDetail metrics. Use allow/deny lists to control which processes include command lines.",
+      "properties": {
+        "action": {
+          "description": "Filter action.",
+          "enum": [
+            "allow",
+            "deny"
+          ],
+          "type": "string"
+        },
+        "regex": {
+          "description": "Process name regex pattern.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "regex",
+        "action"
+      ],
+      "type": "object"
+    },
+    "process-startup-duration-wait-interval-override": {
+      "additionalProperties": false,
+      "description": "Override the default wait intervals for process startup duration measurement.",
+      "properties": {
+        "dll-load-wait-duration-global": {
+          "$ref": "#/$defs/duration",
+          "description": "Global DLL load wait duration override."
+        },
+        "iops-dropoff-duration-global": {
+          "$ref": "#/$defs/duration",
+          "description": "Global IOPS dropoff duration override."
+        },
+        "per-process": {
+          "description": "Per-process wait interval overrides.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "dll-load-wait-duration": {
+                "$ref": "#/$defs/duration",
+                "description": "DLL load wait duration for this process."
+              },
+              "executable": {
+                "description": "Executable name for the per-process override.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "executable",
+              "dll-load-wait-duration"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "process-startup-settings": {
+      "additionalProperties": false,
+      "description": "Process startup monitoring and hashing settings (ESA).",
+      "properties": {
+        "authenticode-cache-max-size": {
+          "description": "Maximum entries in the Authenticode cache.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "authenticode-image-types": {
+          "description": "Image types for Authenticode validation.",
+          "enum": [
+            "processes",
+            "libraries",
+            "processes-and-libraries"
+          ],
+          "type": "string"
+        },
+        "enable-authenticode": {
+          "description": "Validate Authenticode signatures (Windows only).",
+          "type": "boolean"
+        },
+        "enable-blocked-execs": {
+          "description": "Detect blocked executable launches. Applies to macOS only.",
+          "type": "boolean"
+        },
+        "enable-calculate-hash": {
+          "description": "Calculate file hashes for process images.",
+          "type": "boolean"
+        },
+        "enable-cd-hash": {
+          "description": "Calculate code directory hashes. Applies to macOS only.",
+          "type": "boolean"
+        },
+        "enable-extended-info": {
+          "description": "Collect extended process startup information.",
+          "type": "boolean"
+        },
+        "enable-process-tampering": {
+          "description": "Detect process tampering (Windows only).",
+          "type": "boolean"
+        },
+        "hash-algorithm": {
+          "description": "Hash algorithm for process image hashing.",
+          "enum": [
+            "sha-1",
+            "sha-256",
+            "md5",
+            "imphash"
+          ],
+          "type": "string"
+        },
+        "hash-image-types": {
+          "description": "Image types to hash.",
+          "enum": [
+            "processes",
+            "libraries",
+            "processes-and-libraries"
+          ],
+          "type": "string"
+        },
+        "hashes-cache-max-size": {
+          "description": "Maximum number of entries in the hash cache.",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "process-to-application-mapping-entry": {
+      "additionalProperties": false,
+      "description": "Override uberAgent's automatic application identification. Each entry maps a regex pattern (matched against the full executable path) to an application name.",
+      "properties": {
+        "name": {
+          "description": "Application name to assign to matching processes.",
+          "type": "string"
+        },
+        "regex": {
+          "description": "Regex pattern matched against the full executable path.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "regex",
+        "name"
+      ],
+      "type": "object"
+    },
+    "product-components": {
+      "additionalProperties": false,
+      "description": "Product component toggles.",
+      "properties": {
+        "enable-esa": {
+          "description": "Enable the Endpoint Security Analytics (ESA) component. ESA requires UXM.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "proxy": {
+      "additionalProperties": false,
+      "description": "Proxy settings for receiver communication.",
+      "properties": {
+        "honor-environment-proxy": {
+          "description": "Honor proxy settings from environment variables (macOS/Linux).",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "proxy-credential": {
+      "additionalProperties": false,
+      "description": "Proxy authentication credentials. Each entry maps a proxy endpoint to a credential (plaintext, XOR/Base64, or platform credential store reference).",
+      "properties": {
+        "credential": {
+          "description": "Proxy credential (plaintext, XOR/Base64, or credential store reference).",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this credential to specific platforms."
+        },
+        "proxy": {
+          "description": "Proxy endpoint this credential applies to.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "proxy",
+        "credential"
+      ],
+      "type": "object"
+    },
+    "proxy-route": {
+      "additionalProperties": false,
+      "description": "Proxy routing rules. Each entry maps a hostname regex to a proxy endpoint. Evaluated in declaration order; first match wins.",
+      "properties": {
+        "host-pattern": {
+          "description": "Hostname regex pattern to match.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this route to specific platforms."
+        },
+        "proxy": {
+          "description": "Proxy endpoint in host:port format.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "host-pattern",
+        "proxy"
+      ],
+      "type": "object"
+    },
+    "receiver": {
+      "additionalProperties": false,
+      "description": "Data receivers. uberAgent sends data to each configured receiver. Override per timer with the timer-level 'receivers' field.",
+      "properties": {
+        "azure-event-hubs-configuration-id": {
+          "description": "Reference to an azure-event-hubs-configurations entry by its id GUID.",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "type": "string"
+        },
+        "elastic-ingest-pipeline": {
+          "description": "Elasticsearch ingest pipeline name.",
+          "type": "string"
+        },
+        "enable-extended-info": {
+          "description": "Send extended event information to this receiver. Overrides the global process-startup-settings enable-extended-info for this receiver only.",
+          "type": "boolean"
+        },
+        "etw-provider-guid": {
+          "description": "ETW provider GUID for the ETW receiver type.",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "type": "string"
+        },
+        "host": {
+          "description": "Override the host field value sent to the receiver.",
+          "type": "string"
+        },
+        "index": {
+          "description": "Destination index name (Splunk or Elasticsearch).",
+          "type": "string"
+        },
+        "kafka-topic-name": {
+          "description": "Kafka topic name for the receiver.",
+          "type": "string"
+        },
+        "max-events-per-send-operation": {
+          "description": "Maximum events per send operation.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "max-queue-size-ram-mb": {
+          "description": "Maximum RAM queue size in megabytes.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "name": {
+          "description": "A human-readable name for this receiver. Used to reference the receiver from timers.",
+          "type": "string"
+        },
+        "persistent-output-queue": {
+          "additionalProperties": false,
+          "description": "Persistent output queue settings for this receiver.",
+          "properties": {
+            "backend": {
+              "description": "POQ backend implementation.",
+              "type": "string"
+            },
+            "error-handling": {
+              "description": "Error handling strategy for the POQ.",
+              "type": "string"
+            },
+            "max-age": {
+              "$ref": "#/$defs/duration",
+              "description": "Maximum age of events in the POQ before discard."
+            },
+            "max-in-memory-bulk-operations": {
+              "description": "Maximum number of in-memory bulk operations for the POQ.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "max-size-mb": {
+              "description": "Maximum size of the POQ in megabytes.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "next-send-attempt": {
+              "$ref": "#/$defs/duration",
+              "description": "Delay before retrying a failed send operation."
+            },
+            "path-linux": {
+              "description": "POQ storage path on Linux.",
+              "type": "string"
+            },
+            "path-macos": {
+              "description": "POQ storage path on macOS.",
+              "type": "string"
+            },
+            "path-windows": {
+              "description": "POQ storage path on Windows.",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "rest-token": {
+          "description": "Splunk HEC authentication token (splunk-http only).",
+          "type": "string"
+        },
+        "servers": {
+          "description": "One or more server endpoints in host:port format. Use an array for failover or load distribution.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "source": {
+          "description": "Override the source field value sent to the receiver.",
+          "type": "string"
+        },
+        "tls-client-certificate": {
+          "description": "Path to TLS client certificate (PEM on macOS/Linux, thumbprint on Windows).",
+          "type": "string"
+        },
+        "type": {
+          "description": "The backend this receiver sends to, including its network protocol where there is a choice. Splunk offers both, so pick splunk-tcp or splunk-http; every other backend has exactly one transport.",
+          "enum": [
+            "splunk-tcp",
+            "splunk-http",
+            "elasticsearch",
+            "kafka",
+            "azure-event-hubs",
+            "uaes",
+            "etw"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "remote-configuration": {
+      "additionalProperties": false,
+      "description": "Remote configuration settings.",
+      "properties": {
+        "config-file-path": {
+          "description": "Path to the remote configuration file.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "script-interpreter": {
+      "additionalProperties": false,
+      "description": "Script interpreter definitions for Security & Compliance Inventory test execution. Each entry maps a name to an executable and an argv template.",
+      "properties": {
+        "args-template": {
+          "description": "Argument template. Use {script} as placeholder for the script path.",
+          "type": "string"
+        },
+        "executable": {
+          "description": "Path to the interpreter executable.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Interpreter name. Referenced from security-inventory-test entries.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict to specific platforms."
+        }
+      },
+      "required": [
+        "name",
+        "executable"
+      ],
+      "type": "object"
+    },
+    "security-inventory-test": {
+      "additionalProperties": false,
+      "description": "Security & Compliance Inventory test definitions.",
+      "properties": {
+        "category": {
+          "description": "Test category.",
+          "type": "string"
+        },
+        "integrity-level": {
+          "description": "Required integrity level (Windows only).",
+          "type": "string"
+        },
+        "interpreter": {
+          "description": "Script interpreter name.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Test name.",
+          "type": "string"
+        },
+        "output-format": {
+          "description": "Expected output format.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict to specific platforms."
+        },
+        "script-commandline": {
+          "description": "Script command line.",
+          "type": "string"
+        },
+        "script-context": {
+          "description": "Execution context. Windows: session-0-as-system, user-session-as-system, user-session-as-user. macOS and Linux: root, user.",
+          "enum": [
+            "session-0-as-system",
+            "user-session-as-system",
+            "user-session-as-user",
+            "root",
+            "user"
+          ],
+          "type": "string"
+        },
+        "script-id": {
+          "description": "Script identifier.",
+          "type": "string"
+        },
+        "script-timeout": {
+          "$ref": "#/$defs/duration",
+          "description": "Maximum script execution time."
+        }
+      },
+      "type": "object"
+    },
+    "session-detail-config": {
+      "additionalProperties": false,
+      "description": "Session detail metric configuration.",
+      "properties": {
+        "session-fg-window-title-max-length": {
+          "description": "Maximum number of characters of the foreground window title to include in SessionDetail.",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "threat-detection-expression": {
+      "additionalProperties": false,
+      "description": "Reusable named uAQL functions referenced from threat-detection-rules and other expressions (ESA only).",
+      "properties": {
+        "name": {
+          "description": "Expression name. Referenced from detection rules.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this expression to specific platforms."
+        },
+        "query": {
+          "description": "uAQL expression body.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "query"
+      ],
+      "type": "object"
+    },
+    "threat-detection-rule": {
+      "additionalProperties": false,
+      "description": "Threat detection engine rules. Each entry is a uAQL-based detection over a specific event type (ESA only).",
+      "properties": {
+        "annotation": {
+          "description": "Human-readable annotation for triggered detections.",
+          "type": "string"
+        },
+        "event-type": {
+          "description": "Primary event type this rule detects.",
+          "enum": [
+            "Process.Start",
+            "ProcessStart",
+            "Process.Stop",
+            "ProcessStop",
+            "Image.Load",
+            "ImageLoad",
+            "Net.Connect",
+            "NetConnect",
+            "Net.Receive",
+            "NetReceive",
+            "Net.Reconnect",
+            "NetReconnect",
+            "Net.Retransmit",
+            "NetRetransmit",
+            "Net.Send",
+            "NetSend",
+            "Net.Any",
+            "NetAny",
+            "Reg.Key.Create",
+            "Reg.Value.Write",
+            "Reg.Delete",
+            "Reg.Key.Delete",
+            "Reg.Value.Delete",
+            "Reg.Key.SecurityChange",
+            "Reg.Key.Rename",
+            "Reg.Key.SetInformation",
+            "Reg.Key.Load",
+            "Reg.Key.Unload",
+            "Reg.Key.Restore",
+            "Reg.Key.Save",
+            "Reg.Key.Replace",
+            "Reg.Any",
+            "Dns.Query",
+            "DnsQuery",
+            "Process.CreateRemoteThread",
+            "Process.TamperingEvent",
+            "File.ChangeCreationTime",
+            "File.RawAccessRead",
+            "File.Create",
+            "File.CreateStream",
+            "File.PipeCreate",
+            "File.PipeConnected",
+            "File.Delete",
+            "File.Rename",
+            "File.Write",
+            "File.Read",
+            "File.SecurityChange",
+            "Driver.Load",
+            "DriverLoad"
+          ],
+          "type": "string"
+        },
+        "event-types": {
+          "description": "Additional event types (when a rule covers multiple types).",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "generic-properties": {
+          "description": "Additional properties to extract from matching events.",
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "propertyNames": {
+                "pattern": "^([1-9]|10)$"
+              },
+              "type": "object"
+            }
+          ]
+        },
+        "hive": {
+          "description": "Registry hive filter for registry-based detections.",
+          "oneOf": [
+            {
+              "enum": [
+                "HKLM",
+                "HKCU",
+                "HKU",
+                "HKCR",
+                "HKCC"
+              ],
+              "type": "string"
+            },
+            {
+              "items": {
+                "enum": [
+                  "HKLM",
+                  "HKCU",
+                  "HKU",
+                  "HKCR",
+                  "HKCC"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this rule to specific platforms."
+        },
+        "query": {
+          "description": "uAQL detection query.",
+          "type": "string"
+        },
+        "risk-score": {
+          "description": "Numeric risk score (0–100) assigned to detections from this rule.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "rule-id": {
+          "description": "Unique rule identifier (GUID).",
+          "type": "string"
+        },
+        "rule-name": {
+          "description": "Human-readable rule name.",
+          "type": "string"
+        },
+        "tag": {
+          "description": "Classification tag (e.g. MITRE ATT&CK technique ID).",
+          "type": "string"
+        },
+        "verbose-logging": {
+          "description": "Enable verbose logging for this rule.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "rule-id",
+        "rule-name",
+        "query"
+      ],
+      "type": "object"
+    },
+    "threat-detection-rule-extension": {
+      "additionalProperties": false,
+      "description": "Per-rule overrides and exclusions for threat detection rules. Each entry targets a rule by id, event-type, or tag and refines its outcome (ESA only).",
+      "properties": {
+        "altitude": {
+          "description": "Rule priority altitude.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "event-type": {
+          "description": "Event type override.",
+          "type": "string"
+        },
+        "event-types": {
+          "description": "Event types override.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "name": {
+          "description": "Extension name.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this extension to specific platforms."
+        },
+        "query": {
+          "description": "Override uAQL query.",
+          "type": "string"
+        },
+        "rule-id": {
+          "description": "Rule ID (GUID) of the rule to extend.",
+          "type": "string"
+        },
+        "tag": {
+          "description": "Tag override.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "query"
+      ],
+      "type": "object"
+    },
+    "threat-detection-rule-filter-entry": {
+      "additionalProperties": false,
+      "description": "Filter for threat detection rules. Allow or deny rules by regex pattern on rule name.",
+      "properties": {
+        "action": {
+          "description": "Filter action.",
+          "enum": [
+            "allow",
+            "deny"
+          ],
+          "type": "string"
+        },
+        "regex": {
+          "description": "Rule name regex pattern.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "regex",
+        "action"
+      ],
+      "type": "object"
+    },
+    "timer": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "required": [
+                "interval"
+              ]
+            },
+            {
+              "required": [
+                "event-trigger"
+              ]
+            }
+          ]
+        }
+      ],
+      "description": "Collection timers. Each timer wakes up periodically, computes configured metrics, and sends results to receivers.",
+      "properties": {
+        "comment": {
+          "description": "Optional human-readable comment.",
+          "type": "string"
+        },
+        "event-logs": {
+          "description": "One or more event-log names to forward on this timer's schedule (overrides the default event log timer).",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "event-trigger": {
+          "description": "Name of an event-trigger that additionally fires this timer.",
+          "type": "string"
+        },
+        "interval": {
+          "$ref": "#/$defs/duration",
+          "description": "Collection interval. Specifies how often the timer collects metrics."
+        },
+        "name": {
+          "description": "Timer name. Must be unique across all timers.",
+          "type": "string"
+        },
+        "perf-counters": {
+          "description": "One or more performance counter paths (Windows-only).",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "persist-interval": {
+          "description": "When true, the timer interval is persisted across agent restarts so that collections resume on schedule.",
+          "type": "boolean"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict this timer to specific platforms."
+        },
+        "receivers": {
+          "description": "Override the default receiver list for this timer. Specify one or more receiver names.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ]
+        },
+        "script-context": {
+          "description": "Execution context for all scripts of this timer. Windows: session-0-as-system, user-session-as-system, user-session-as-user. macOS and Linux: root, user.",
+          "enum": [
+            "session-0-as-system",
+            "user-session-as-system",
+            "user-session-as-user",
+            "root",
+            "user"
+          ],
+          "type": "string"
+        },
+        "script-timeout": {
+          "$ref": "#/$defs/duration",
+          "description": "Maximum execution time before a script is terminated. Applies to all scripts of this timer."
+        },
+        "scripts": {
+          "description": "Scripts to execute on each timer tick.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "description": "Script command line to execute.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "command"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "start-delay": {
+          "$ref": "#/$defs/duration",
+          "description": "Delay before the timer starts after agent launch."
+        },
+        "ua-metrics": {
+          "description": "One or more uberAgent metric names to collect.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ua-metric-name"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/ua-metric-name"
+              },
+              "type": "array"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "ua-metric-name": {
+      "description": "A valid uberAgent metric name.",
+      "oneOf": [
+        {
+          "const": "ActivityMonitoring",
+          "description": "User and process activity monitoring for endpoint security"
+        },
+        {
+          "const": "AppNameIdMapping",
+          "description": "Maps application process IDs to application names for lookups"
+        },
+        {
+          "const": "ApplicationErrors",
+          "description": "Detects application crashes, hangs, and error events"
+        },
+        {
+          "const": "ApplicationInventory",
+          "description": "Software inventory including name, version, and installation info"
+        },
+        {
+          "const": "ApplicationUIDelay",
+          "description": "Detects application UI unresponsiveness and input delays"
+        },
+        {
+          "const": "BootDetail",
+          "description": "Computer startup duration and phase timing breakdown"
+        },
+        {
+          "const": "BrowserPerformanceChrome",
+          "description": "Chrome process performance, memory, and resource attribution"
+        },
+        {
+          "const": "BrowserPerformanceEdge",
+          "description": "Edge process performance, memory, and resource attribution"
+        },
+        {
+          "const": "BrowserPerformanceFirefox",
+          "description": "Firefox process performance, memory, and resource attribution"
+        },
+        {
+          "const": "BrowserPerformanceIE",
+          "description": "Internet Explorer process performance and resource usage"
+        },
+        {
+          "const": "CitrixADCGateways",
+          "description": "Citrix NetScaler gateway performance and configuration metrics"
+        },
+        {
+          "const": "CitrixADCInventory",
+          "description": "NetScaler appliance inventory including model and firmware info"
+        },
+        {
+          "const": "CitrixADCPerformance",
+          "description": "NetScaler appliance CPU, memory, and disk performance metrics"
+        },
+        {
+          "const": "CitrixADCvServer",
+          "description": "NetScaler virtual server performance and throughput metrics"
+        },
+        {
+          "const": "CitrixConnectionFailureLogs",
+          "description": "Session connection failures recorded by the Citrix Virtual Apps & Desktops site"
+        },
+        {
+          "const": "CitrixDCApplication",
+          "description": "Published applications in Citrix Virtual Apps & Desktops site"
+        },
+        {
+          "const": "CitrixDCCatalog",
+          "description": "Machine catalogs in Citrix Virtual Apps & Desktops site"
+        },
+        {
+          "const": "CitrixDCDesktopGroup",
+          "description": "Delivery groups in Citrix Virtual Apps & Desktops site"
+        },
+        {
+          "const": "CitrixDCGeneralInformation",
+          "description": "Citrix site configuration including database and licensing info"
+        },
+        {
+          "const": "CitrixDCHypervisor",
+          "description": "Hypervisors registered in Citrix Virtual Apps & Desktops site"
+        },
+        {
+          "const": "CitrixDCLicenseInformation",
+          "description": "License information and usage from Citrix site"
+        },
+        {
+          "const": "CitrixDCMachine",
+          "description": "Machines registered in Citrix Virtual Apps & Desktops site"
+        },
+        {
+          "const": "CitrixDCPublishedDesktops",
+          "description": "Published desktops in Citrix Virtual Apps & Desktops site"
+        },
+        {
+          "const": "CitrixSessionConfig",
+          "description": "Citrix session configuration, HDX policies, and settings"
+        },
+        {
+          "const": "CitrixSessionVirtualChannelDetail",
+          "description": "Citrix virtual channel data volumes per session"
+        },
+        {
+          "const": "DnsMonitoring",
+          "description": "DNS queries, responses, and threat indicators (ESA)"
+        },
+        {
+          "const": "GpuUsage",
+          "description": "GPU compute and memory utilization per graphics adapter"
+        },
+        {
+          "const": "HostTags",
+          "description": "Custom machine tags from AD, environment, or registry"
+        },
+        {
+          "const": "LogonDetail",
+          "description": "User logon timing, group policies, and process performance data"
+        },
+        {
+          "const": "LogonProcesses",
+          "description": "Process performance and I/O during user logon"
+        },
+        {
+          "const": "MachineInventory",
+          "description": "OS, hardware, BIOS, and Active Directory information"
+        },
+        {
+          "const": "NetworkConfigInformation",
+          "description": "Network interfaces, IP addresses, DNS, and SSID configuration"
+        },
+        {
+          "const": "NetworkTargetPerformanceProcess",
+          "description": "Process network communication performance and latency metrics"
+        },
+        {
+          "const": "OutlookPerformanceEvents",
+          "description": "Outlook plugin load duration and performance metrics"
+        },
+        {
+          "const": "ProcessDetailFull",
+          "description": "Full process CPU, memory, I/O, network, and GPU metrics"
+        },
+        {
+          "const": "ProcessDetailTop",
+          "description": "Top N processes by CPU/memory with performance metrics"
+        },
+        {
+          "const": "ProcessStartup",
+          "description": "Process launch performance including duration and I/O metrics"
+        },
+        {
+          "const": "ProcessStatistics",
+          "description": "Process handles, threads, and priority information"
+        },
+        {
+          "const": "ProcessStop",
+          "description": "Process termination details and lifetime measurement (ESA)"
+        },
+        {
+          "const": "ScheduledTaskMonitoring",
+          "description": "Scheduled task configuration, triggers, and actions (ESA)"
+        },
+        {
+          "const": "SecurityInventory",
+          "description": "Security configuration compliance tests and risk scores (ESA)"
+        },
+        {
+          "const": "SessionDetail",
+          "description": "User session ID, protocol, latency, and application metrics"
+        },
+        {
+          "const": "SessionProfile",
+          "description": "User session profile information and attributes"
+        },
+        {
+          "const": "ShutdownDetail",
+          "description": "Computer shutdown duration and phase timing breakdown"
+        },
+        {
+          "const": "SMBClientSharePerformance",
+          "description": "SMB share I/O performance, latency, and throughput metrics"
+        },
+        {
+          "const": "SoftwareUpdateInventory",
+          "description": "Installed patches, updates, and software inventory"
+        },
+        {
+          "const": "StandbyDetail",
+          "description": "Standby/resume timing, wake sources, and duration metrics"
+        },
+        {
+          "const": "SystemPerformanceSummary",
+          "description": "CPU, memory, disk, network, and system-wide performance summary"
+        },
+        {
+          "const": "UserTags",
+          "description": "Custom user tags from AD, environment, or registry"
+        },
+        {
+          "description": "Top N processes by CPU/memory with performance metrics; the trailing number is N, where 0 means all processes",
+          "pattern": "^ProcessDetailTop[0-9]+$",
+          "type": "string"
+        },
+        {
+          "description": "A single Security Inventory category, e.g. SecurityInventory.Firewall; only the tests of that category run in this timer (ESA)",
+          "pattern": "^SecurityInventory\\.[A-Za-z0-9_-]+$",
+          "type": "string"
+        }
+      ],
+      "type": "string"
+    },
+    "user-host-tag": {
+      "additionalProperties": false,
+      "description": "Company-defined metadata tags for hosts or users (Windows-only).",
+      "properties": {
+        "name": {
+          "description": "Tag name.",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform",
+          "description": "Restrict to specific platforms."
+        },
+        "source": {
+          "description": "Tag source.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Tag type.",
+          "type": "string"
+        },
+        "value": {
+          "description": "Tag value.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "$id": "https://uberagent.com/schemas/uberAgent-config.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "JSON Schema for uberAgent YAML configuration files. Generated from the configuration contract.",
+  "properties": {
+    "application-mapping-ignored-processes": {
+      "description": "List of regex patterns for processes to ignore in application lookup.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "azure-event-hubs-configurations": {
+      "description": "Azure Event Hubs credential and endpoint blocks. Referenced from receivers via azure-event-hubs-configuration-id.",
+      "items": {
+        "$ref": "#/$defs/azure-event-hubs-configuration"
+      },
+      "type": "array"
+    },
+    "browser-web-app-url-component-detail": {
+      "description": "Browser web app URL component detail configuration.",
+      "items": {
+        "$ref": "#/$defs/browser-web-app-url-component-detail-entry"
+      },
+      "type": "array"
+    },
+    "browser-web-app-url-filter": {
+      "description": "Filter for browser web app metrics and SessionFgBrowserActiveTabHost. URLs can be allowed or denied.",
+      "items": {
+        "$ref": "#/$defs/browser-web-app-url-filter-entry"
+      },
+      "type": "array"
+    },
+    "citrix-adc-configs": {
+      "description": "Citrix NetScaler / ADC configuration (Windows-only). One entry per ADC pair.",
+      "items": {
+        "$ref": "#/$defs/citrix-adc-config"
+      },
+      "type": "array"
+    },
+    "citrix-cloud-configs": {
+      "description": "Citrix Cloud configuration (Windows-only).",
+      "items": {
+        "$ref": "#/$defs/citrix-cloud-config"
+      },
+      "type": "array"
+    },
+    "config-version": {
+      "description": "The configuration format version this file is written against. Currently 1. Required in the top-level configuration file; an included file may omit it, but must match when it declares one.",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "configuration-settings": {
+      "$ref": "#/$defs/configuration-settings"
+    },
+    "event-data-filters": {
+      "description": "Per-sourcetype event-shaping filters. Each entry drops, allows, redacts, or defers events whose payload matches a uAQL query.",
+      "items": {
+        "$ref": "#/$defs/event-data-filter"
+      },
+      "type": "array"
+    },
+    "event-logs": {
+      "description": "Event log forwarding entries. Each entry configures platform-specific event log collection (Windows Event Log or macOS Unified Log).",
+      "items": {
+        "$ref": "#/$defs/event-log"
+      },
+      "type": "array"
+    },
+    "event-triggers": {
+      "description": "Event triggers that can additionally trigger timers on specific events.",
+      "items": {
+        "$ref": "#/$defs/event-trigger"
+      },
+      "type": "array"
+    },
+    "filesystem-monitoring": {
+      "$ref": "#/$defs/filesystem-monitoring"
+    },
+    "ignore-logon-monitoring-processes": {
+      "description": "List of process name patterns to ignore during logon monitoring (Windows-only).",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "includes": {
+      "description": "Additional configuration files to include. Replaces the legacy @ConfigInclude directive.",
+      "items": {
+        "$ref": "#/$defs/include-entry"
+      },
+      "type": "array"
+    },
+    "miscellaneous": {
+      "$ref": "#/$defs/miscellaneous"
+    },
+    "network-target-performance-process-config": {
+      "$ref": "#/$defs/network-target-performance-process-config"
+    },
+    "nutanix-frame": {
+      "$ref": "#/$defs/nutanix-frame"
+    },
+    "on-demand": {
+      "$ref": "#/$defs/on-demand"
+    },
+    "process-detail-send-commandline": {
+      "description": "Optionally add the command line to the ProcessDetail metrics. Use allow/deny lists to control which processes include command lines.",
+      "items": {
+        "$ref": "#/$defs/process-detail-send-commandline-entry"
+      },
+      "type": "array"
+    },
+    "process-startup-duration-wait-interval-override": {
+      "$ref": "#/$defs/process-startup-duration-wait-interval-override"
+    },
+    "process-startup-settings": {
+      "$ref": "#/$defs/process-startup-settings"
+    },
+    "process-to-application-mapping": {
+      "description": "Override uberAgent's automatic application identification. Each entry maps a regex pattern (matched against the full executable path) to an application name.",
+      "items": {
+        "$ref": "#/$defs/process-to-application-mapping-entry"
+      },
+      "type": "array"
+    },
+    "product-components": {
+      "$ref": "#/$defs/product-components"
+    },
+    "proxy": {
+      "$ref": "#/$defs/proxy"
+    },
+    "proxy-credentials": {
+      "description": "Proxy authentication credentials. Each entry maps a proxy endpoint to a credential (plaintext, XOR/Base64, or platform credential store reference).",
+      "items": {
+        "$ref": "#/$defs/proxy-credential"
+      },
+      "type": "array"
+    },
+    "proxy-routes": {
+      "description": "Proxy routing rules. Each entry maps a hostname regex to a proxy endpoint. Evaluated in declaration order; first match wins.",
+      "items": {
+        "$ref": "#/$defs/proxy-route"
+      },
+      "type": "array"
+    },
+    "receivers": {
+      "description": "Data receivers. uberAgent sends data to each configured receiver. Override per timer with the timer-level 'receivers' field.",
+      "items": {
+        "$ref": "#/$defs/receiver"
+      },
+      "type": "array"
+    },
+    "remote-configuration": {
+      "$ref": "#/$defs/remote-configuration"
+    },
+    "script-interpreters": {
+      "description": "Script interpreter definitions for Security & Compliance Inventory test execution. Each entry maps a name to an executable and an argv template.",
+      "items": {
+        "$ref": "#/$defs/script-interpreter"
+      },
+      "type": "array"
+    },
+    "security-inventory-tests": {
+      "description": "Security & Compliance Inventory test definitions.",
+      "items": {
+        "$ref": "#/$defs/security-inventory-test"
+      },
+      "type": "array"
+    },
+    "session-detail-config": {
+      "$ref": "#/$defs/session-detail-config"
+    },
+    "threat-detection-expressions": {
+      "description": "Reusable named uAQL functions referenced from threat-detection-rules and other expressions (ESA only).",
+      "items": {
+        "$ref": "#/$defs/threat-detection-expression"
+      },
+      "type": "array"
+    },
+    "threat-detection-rule-extensions": {
+      "description": "Per-rule overrides and exclusions for threat detection rules. Each entry targets a rule by id, event-type, or tag and refines its outcome (ESA only).",
+      "items": {
+        "$ref": "#/$defs/threat-detection-rule-extension"
+      },
+      "type": "array"
+    },
+    "threat-detection-rule-filter": {
+      "description": "Filter for threat detection rules. Allow or deny rules by regex pattern on rule name.",
+      "items": {
+        "$ref": "#/$defs/threat-detection-rule-filter-entry"
+      },
+      "type": "array"
+    },
+    "threat-detection-rules": {
+      "description": "Threat detection engine rules. Each entry is a uAQL-based detection over a specific event type (ESA only).",
+      "items": {
+        "$ref": "#/$defs/threat-detection-rule"
+      },
+      "type": "array"
+    },
+    "timers": {
+      "description": "Collection timers. Each timer wakes up periodically, computes configured metrics, and sends results to receivers.",
+      "items": {
+        "$ref": "#/$defs/timer"
+      },
+      "type": "array"
+    },
+    "user-host-tags": {
+      "description": "Company-defined metadata tags for hosts or users (Windows-only).",
+      "items": {
+        "$ref": "#/$defs/user-host-tag"
+      },
+      "type": "array"
+    }
+  },
+  "title": "uberAgent YAML Configuration",
+  "type": "object"
+}
