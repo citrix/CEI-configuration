@@ -1,4 +1,3 @@
-config-version: 9.0
 includes:
   - path: uberAgent-ESA-eventlog-windows.yaml
     platform: windows

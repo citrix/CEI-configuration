@@ -1,4 +1,3 @@
-config-version: 9.0
 threat-detection-rules:
   - platform: windows
     rule-id: b1decb61-ed83-4339-8e95-53ea51901720

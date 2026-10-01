@@ -1,4 +1,3 @@
-config-version: 9.0
 includes:
   - path: uberAgent-ESA-am-citrix.yaml
   - path: Sigma rules/uberAgent-ESA-am-sigma-critical-common.yaml

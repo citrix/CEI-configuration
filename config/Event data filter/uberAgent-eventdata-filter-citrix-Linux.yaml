@@ -1,4 +1,3 @@
-config-version: 9.0
 event-data-filters:
   - action: deny
     query: ProcName in ["base64", "basename", "bc", "cat", "chmod", "cmp", "comm", "cp", "cut", "date", "dirname", "du", "echo", "env", "expr", "file", "find", "flock", "gawk", "getent", "getopt", "grep", "groups", "gzip", "head", "hostname", "id", "ln", "locale", "logger", "ls", "mkdir", "mktemp", "mv", "od", "pidof", "readlink", "rm", "sed", "sleep", "sort", "stat", "stty", "tail", "test", "timeout", "touch", "tput", "tr", "tty", "uname", "wc", "which", "who", "whoami", "xargs"]

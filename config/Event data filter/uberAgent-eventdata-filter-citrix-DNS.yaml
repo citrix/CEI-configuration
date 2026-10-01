@@ -1,4 +1,3 @@
-config-version: 9.0
 event-data-filters:
   - action: deny
     query: not contains(DnsRequest, ".")

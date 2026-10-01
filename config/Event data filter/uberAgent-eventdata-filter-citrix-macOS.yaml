@@ -1,4 +1,3 @@
-config-version: 9.0
 event-data-filters:
   - action: deny
     query: ProcName in ["Google Chrome", "Google Chrome Helper", "Microsoft Edge", "Microsoft Edge Helper", "Safari", "com.apple.Safari.SafeBrowsing.Service", "com.apple.WebKit.Networking", "com.apple.Safari.SearchHelper", "firefox"]

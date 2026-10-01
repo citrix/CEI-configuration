@@ -1,4 +1,3 @@
-config-version: 9.0
 event-data-filters:
   - action: deny
     query: ProcName in ["chrome.exe", "iexplore.exe", "firefox.exe", "msedge.exe", "opera.exe"]

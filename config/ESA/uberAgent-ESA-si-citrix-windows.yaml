@@ -1,4 +1,3 @@
-config-version: 9.0
 timers:
   - name: "Security & Compliance Inventory timer"
     interval: 24h

@@ -1,4 +1,3 @@
-config-version: 9.0
 threat-detection-rules:
   - platform: macos
     rule-id: 7c3b43d8-d794-47d2-800a-d277715aa460

@@ -1,4 +1,3 @@
-config-version: 9.0
 threat-detection-expressions:
   - platform: windows
     name: ParentIsMsOffice

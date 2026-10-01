@@ -1,4 +1,3 @@
-config-version: 9.0
 threat-detection-rules:
   - rule-id: 881834a4-6659-4773-821e-1c151789d873
     rule-name: Equation Group C2 Communication
