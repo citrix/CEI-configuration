@@ -1,0 +1,118 @@
+config-version: 9.0
+threat-detection-rules:
+  - platform: macos
+    rule-id: 53821412-17b0-4147-ade0-14faae67d54b
+    rule-name: System Integrity Protection (SIP) Enumeration
+    tag: proc-start-system-integrity-protection-(sip)-enumeration
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1518.001\"], \"author\": \"Joseliyo Sanchez, @Joseliyo_Jstnk\"}"
+    query: iendswith(Process.Path, "/csrutil") and icontains(Process.CommandLine, "status")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: b6e2a2e3-2d30-43b1-a4ea-071e36595690
+    rule-name: Space After Filename - macOS
+    tag: proc-start-space-after-filename-macos
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1036.006\"], \"author\": \"remotephone\"}"
+    query: iendswith(Process.CommandLine, " ") or iendswith(Process.Path, " ")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: ddf36b67-e872-4507-ab2e-46bda21b842c
+    rule-name: Local System Accounts Discovery - MacOs
+    tag: proc-start-local-system-accounts-discovery-macos
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1087.001\"], \"author\": \"Alejandro Ortuno, oscd.community\"}"
+    query: iendswith(Process.Path, "/dscl") and icontains(Process.CommandLine, "list") and icontains(Process.CommandLine, "/users") or iendswith(Process.Path, "/dscacheutil") and icontains(Process.CommandLine, "-q") and icontains(Process.CommandLine, "user") or Process.CommandLine like r"%'%:0:'%" or (iendswith(Process.Path, "/cat") or iendswith(Process.Path, "/awk") or iendswith(Process.Path, "/grep")) and (icontains(Process.CommandLine, "/etc/passwd") or icontains(Process.CommandLine, "/etc/sudoers")) or iendswith(Process.Path, "/id") or iendswith(Process.Path, "/lsof") and icontains(Process.CommandLine, "-u") or iendswith(Process.Path, "/who") or iendswith(Process.Path, "/w") or iendswith(Process.Path, "/users") or iendswith(Process.Path, "/last") or iendswith(Process.Path, "/ls") and (iendswith(Process.CommandLine, "/Users") or iendswith(Process.CommandLine, "/Users'") or iendswith(Process.CommandLine, "/Users\"")) or (iendswith(Process.Path, "/defaults") or iendswith(Process.Path, "/plutil")) and icontains(Process.CommandLine, "com.apple.loginwindow")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 719c22d7-c11a-4f2c-93a6-2cfdd5412f68
+    rule-name: Decode Base64 Encoded Text -MacOs
+    tag: proc-start-decode-base64-encoded-text-macos
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1027\"], \"author\": \"Daniil Yugoslavskiy, oscd.community\"}"
+    query: Process.Path == "/usr/bin/base64" and icontains(Process.CommandLine, "-d")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 51719bf5-e4fd-4e44-8ba8-b830e7ac0731
+    rule-name: Creation Of A Local User Account
+    tag: proc-start-creation-of-a-local-user-account
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1136.001\"], \"author\": \"Alejandro Ortuno, oscd.community\"}"
+    query: iendswith(Process.Path, "/dscl") and icontains(Process.CommandLine, "create") or iendswith(Process.Path, "/sysadminctl") and icontains(Process.CommandLine, "addUser")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 84bae5d4-b518-4ae0-b331-6d4afd34d00f
+    rule-name: MacOS Network Service Scanning
+    tag: proc-start-macos-network-service-scanning
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1046\"], \"author\": \"Alejandro Ortuno, oscd.community\"}"
+    query: (iendswith(Process.Path, "/nc") or iendswith(Process.Path, "/netcat")) and not icontains(Process.CommandLine, "l") or iendswith(Process.Path, "/nmap") or iendswith(Process.Path, "/telnet")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: be2e3a5c-9cc7-4d02-842a-68e9cb26ec49
+    rule-name: JAMF MDM Execution
+    tag: proc-start-jamf-mdm-execution
+    risk-score: 25
+    annotation: "{\"author\": \"Jay Pandit\"}"
+    query: iendswith(Process.Path, "/jamf") and (icontains(Process.CommandLine, "createAccount") or icontains(Process.CommandLine, "manage") or icontains(Process.CommandLine, "removeFramework") or icontains(Process.CommandLine, "removeMdmProfile") or icontains(Process.CommandLine, "resetPassword") or icontains(Process.CommandLine, "setComputerName"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 60f1ce20-484e-41bd-85f4-ac4afec2c541
+    rule-name: GUI Input Capture - macOS
+    tag: proc-start-gui-input-capture-macos
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1056.002\"], \"author\": \"remotephone, oscd.community\"}"
+    query: iendswith(Process.Path, "/osascript") and icontains(Process.CommandLine, "-e") and icontains(Process.CommandLine, "display") and icontains(Process.CommandLine, "dialog") and icontains(Process.CommandLine, "answer") and (icontains(Process.CommandLine, "admin") or icontains(Process.CommandLine, "administrator") or icontains(Process.CommandLine, "authenticate") or icontains(Process.CommandLine, "authentication") or icontains(Process.CommandLine, "credentials") or icontains(Process.CommandLine, "pass") or icontains(Process.CommandLine, "password") or icontains(Process.CommandLine, "unlock"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: dfe8b941-4e54-4242-b674-6b613d521962
+    rule-name: Startup Item File Created - MacOS
+    tag: startup-item-file-created-macos
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1037.005\"], \"author\": \"Alejandro Ortuno, oscd.community\"}"
+    query: (istartswith(File.Path, "/Library/StartupItems/") or istartswith(File.Path, "/System/Library/StartupItems")) and iendswith(File.Path, ".plist")
+    event-type: File.Create
+    generic-properties:
+      - File.Path
+  - platform: macos
+    rule-id: f459ccb4-9805-41ea-b5b2-55e279e2424a
+    rule-name: Remote Access Tool - Team Viewer Session Started On MacOS Host
+    tag: proc-start-remote-access-tool-team-viewer-session-started-on-macos-host
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1133\"], \"author\": \"Josh Nickels, Qi Nan\"}"
+    query: iendswith(Parent.Path, "/TeamViewer\_Service") and iendswith(Process.Path, "/TeamViewer\_Desktop") and iendswith(Process.CommandLine, "/TeamViewer\_Desktop --IPCport 5939 --Module 1")
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: 7f2bb9d5-6395-4de5-969c-70c11fbe6b12
+    rule-name: Split A File Into Pieces
+    tag: proc-start-split-a-file-into-pieces
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1030\"], \"author\": \"Igor Fits, Mikhail Larin, oscd.community\"}"
+    query: iendswith(Process.Path, "/split")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 0877ed01-da46-4c49-8476-d49cdd80dfa7
+    rule-name: Screen Capture - macOS
+    tag: proc-start-screen-capture-macos
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1113\"], \"author\": \"remotephone, oscd.community\"}"
+    query: Process.Path == "/usr/sbin/screencapture"
+    event-type: Process.Start
+  - platform: macos
+    rule-id: d7329412-13bd-44ba-a072-3387f804a106
+    rule-name: Guest Account Enabled Via Sysadminctl
+    tag: proc-start-guest-account-enabled-via-sysadminctl
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1078\", \"T1078.001\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: iendswith(Process.Path, "/sysadminctl") and icontains(Process.CommandLine, " -guestAccount") and icontains(Process.CommandLine, " on")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: f5141b6d-9f42-41c6-a7bf-2a780678b29b
+    rule-name: Gatekeeper Bypass via Xattr
+    tag: proc-start-gatekeeper-bypass-via-xattr
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1553.001\"], \"author\": \"Daniil Yugoslavskiy, oscd.community\"}"
+    query: iendswith(Process.Path, "/xattr") and icontains(Process.CommandLine, "-d") and icontains(Process.CommandLine, "com.apple.quarantine")
+    event-type: Process.Start

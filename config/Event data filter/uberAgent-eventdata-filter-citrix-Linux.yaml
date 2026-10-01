@@ -1,0 +1,86 @@
+config-version: 9.0
+event-data-filters:
+  - action: deny
+    query: ProcName in ["base64", "basename", "bc", "cat", "chmod", "cmp", "comm", "cp", "cut", "date", "dirname", "du", "echo", "env", "expr", "file", "find", "flock", "gawk", "getent", "getopt", "grep", "groups", "gzip", "head", "hostname", "id", "ln", "locale", "logger", "ls", "mkdir", "mktemp", "mv", "od", "pidof", "readlink", "rm", "sed", "sleep", "sort", "stat", "stty", "tail", "test", "timeout", "touch", "tput", "tr", "tty", "uname", "wc", "which", "who", "whoami", "xargs"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName regex r"^systemd-.*"
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["apt-config", "apt-extracttemplates", "apt-helper", "dpkg", "dpkg-deb", "dpkg-query", "dpkg-split", "dpkg-trigger", "ischroot"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["dash", "bash", "sh"] AND ProcParentName in ["anacron", "apt-get", "bash", "cron", "crond", "ctxaudio", "ctxclipboard", "ctxmonitord", "ctxwcamsd", "dash", "dpkg", "gpgv", "less", "logrotate", "nm-dispatcher", "perl", "platform-python3.6", "python3.10", "python3.12", "python3.9", "run-parts", "sh", "tar", "timeout", "uberAgent", "udevadm", "wdavdaemon", "Xorg"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["gpg", "gpg-agent", "gpg-connect-agent", "gpgconf", "gpgsm", "gpgv", "scdaemon"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["cdrom_id", "dmi_memory_id", "probe-bcache", "scsi_id", "sg_inq", "v4l_id"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["cifs.upcall", "key.dns_resolver", "ldconfig", "ldconfig.real", "run-parts", "xtables-nft-multi"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["gpo_child", "krb5_child", "ldap_child", "nsupdate", "sssd_be", "sssd_check_socket_activated_responders", "sssd_pac", "unix_chkpwd"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["appstreamcli", "mandb", "plocate", "sadc", "updatedb", "updatedb.plocate"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["snap-device-helper", "snap-seccomp", "snap-update-ns", "snapd-env-generator", "snapd-generator"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName == "request-key"
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["base64", "basename", "bc", "cat", "chmod", "cmp", "comm", "cp", "cut", "date", "dirname", "du", "echo", "env", "expr", "file", "find", "flock", "gawk", "getent", "getopt", "grep", "groups", "gzip", "head", "hostname", "id", "ln", "locale", "logger", "ls", "mkdir", "mktemp", "mv", "od", "pidof", "readlink", "rm", "sed", "sleep", "sort", "stat", "stty", "tail", "test", "timeout", "touch", "tput", "tr", "tty", "uname", "wc", "which", "who", "whoami", "xargs"]
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName in ["dash", "bash", "sh"]
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName in ["apt-config", "apt-helper", "dpkg", "dpkg-deb", "dpkg-query", "gpg", "gpg-agent", "gpg-connect-agent", "gpgconf", "gpgv"]
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName in ["cifs.upcall", "key.dns_resolver", "run-parts", "sg_inq", "unix_chkpwd", "xtables-nft-multi"]
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName == "request-key"
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName == "uberAgent" OR ProcParentName == "uberAgent"
+    sourcetypes:
+      - ActivityMonitoring:ProcessTagging

@@ -5,14 +5,20 @@
 # Call this function to initialize the variables required to run the utilities
 vlInit()
 {
-  # The application bundle was renamed from "uberAgent.app" to "Citrix Experience Insights.app" along with
-  # the product; the executable inside it is still named uberAgent. The configuration is versioned
-  # independently of the agent, so this script can run against an agent from either side of that rename -
-  # probe both names instead of hardcoding one.
-  JQ="/Library/uberAgent/Citrix Experience Insights.app/Contents/MacOS/jq-universal"
-  if [ ! -x "$JQ" ]; then
-    JQ="/Library/uberAgent/uberAgent.app/Contents/MacOS/jq-universal"
-  fi
+  # jq ships inside the agent's application bundle. The bundle name has already changed once
+  # ("uberAgent.app" -> "Citrix Experience Insights.app") and the configuration is versioned
+  # independently of the agent, so the name is resolved rather than hardcoded. The install
+  # directory is the stable anchor: it stayed /Library/uberAgent across the rename.
+  #
+  # Deliberately not a PATH lookup - these scripts run as root, and only root can write below
+  # /Library/uberAgent, so globbing there cannot be hijacked the way $PATH can.
+  #
+  # Glob qualifiers: (N) empty instead of an error when nothing matches, (-) follow symlinks
+  # while testing, (.) regular files only, (om) newest first so a half-finished upgrade that
+  # still has both bundles on disk prefers the one just installed.
+  local -a jqCandidates
+  jqCandidates=( /Library/uberAgent/*.app/Contents/MacOS/jq-universal(N-*om) )
+  JQ="${jqCandidates[1]}"
 
   JQFLAGS="-M"
 

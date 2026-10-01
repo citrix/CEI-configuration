@@ -1,0 +1,509 @@
+config-version: 9.0
+threat-detection-expressions:
+  - platform: windows
+    name: ParentIsMsOffice
+    query: istartswith(Parent.Company, "Microsoft") and Parent.Name in ["excel.exe", "msaccess.exe", "onenote.exe", "outlook.exe", "powerpnt.exe", "winword.exe"]
+  - name: ProcessIsBrowserWindows
+    query: Process.Name in ["chrome.exe", "iexplore.exe", "firefox.exe", "msedge.exe", "msedgewebview2.exe", "opera.exe"]
+  - name: ProcessIsBrowserMacOS
+    query: Process.Name == "Google Chrome" or (Parent.Name == "Google Chrome" and Process.Name like "%Google Chrome%") or Process.Name == "Firefox" or (Parent.Name == "Firefox" and Process.Name like "%Firefox%") or Process.Name == "Microsoft Edge" or (Parent.Name == "Microsoft Edge" and Process.Name like "%Microsoft Edge%") or Process.Name == "Opera" or (Parent.Name == "Opera" and Process.Name like "%Opera%") or Process.Name == "Safari" or (Parent.Name == "Safari" and Process.Name like "%Safari%")
+  - name: ProcessIsBrowser
+    query: ProcessIsBrowserWindows or ProcessIsBrowserMacOS
+  - name: ProcessIsPowerShell
+    query: Process.Name in ["powershell.exe", "pwsh.exe", "pwsh"]
+  - name: TargetIsPrivateNetworkIP
+    query: istartswith(Net.Target.Ip, "127.") or istartswith(Net.Target.Ip, "192.") or istartswith(Net.Target.Ip, "172.") or istartswith(Net.Target.Ip, "10.") or istartswith(Net.Target.Ip, "fe80") or istartswith(Net.Target.Ip, "fc00") or istartswith(Net.Target.Ip, "fd00")
+  - platform: windows
+    name: ProcessIsKnownRDPSoftware
+    query: Process.Name in ["mstsc.exe", "RTSApp.exe", "RTSApp2.exe", "RDCMan.exe", "ws_tunnelservice.exe", "RSSensor.exe", "RemoteDesktopManagerFree.exe", "RemoteDesktopManager.exe", "RemoteDesktopManager64.exe", "mRemoteNG.exe", "mRemote.exe", "Terminals.exe", "spiceworks-finder.exe", "FSDiscovery.exe", "FSAssessment.exe", "MobaRTE.exe", "chrome.exe", "thor.exe", "thor64.exe", "RoyalTS.exe"]
+  - platform: windows
+    name: ProcessPathIsSystem32
+    query: Process.Path iregex_envvars r"^%SystemRoot%\\System32\\.*$"
+  - platform: windows
+    name: ProcessPathIsSysWOW64
+    query: Process.Path iregex_envvars r"^%SystemRoot%\\SysWOW64\\.*$"
+  - platform: windows
+    name: ProcessPathIsSystemDirectory
+    query: ProcessPathIsSystem32 or ProcessPathIsSysWOW64
+  - platform: windows
+    name: RegistryValueOfficeMacroSettings
+    query: Reg.Key.Path like r"%\\Security" and Reg.Value.Name == "VBAWarnings"
+  - name: ProcessPathIsWindowsDefender
+    query: Process.Path iregex_envvars r"^%ProgramData%\\Microsoft\\Windows Defender\\Platform\\[^\\]*\\(MsMpEng|MpDefenderCoreService)\.exe"
+  - name: ProcessPathIsKnownWindows
+    query: Process.Path iregex_envvars r"^(%ProgramFiles%|%ProgramFiles(x86)%)\\Citrix\\online plugin\\ica client\\Receiver\\FeatureFlag\\CWAFeatureFlagUpdater\.exe$" or Process.Path iregex_envvars r"^(%ProgramFiles%|%ProgramFiles(x86)%)\\Citrix\\ConfigSync\\ConfigSyncRun\.exe$" or Process.Path iregex_envvars r"^(%ProgramFiles%|%ProgramFiles(x86)%)\\Google\\Update\\GoogleUpdate\.exe$" or Process.Path iregex_envvars r"^%WinDir%\\system32\\svchost\.exe" or Process.Path iregex_envvars r"^%WinDir%\\system32\\smartscreen\.exe" or Process.Path iregex_envvars r"^%WinDir%\\system32\\CompatTelRunner\.exe" or Process.Path iregex_envvars r"^%WinDir%\\system32\\taskhostw\.exe" or ProcessPathIsWindowsDefender
+  - name: ProcessPathIsKnownMacOS
+    query: Process.Path in /* Known macOS paths */ ["/usr/sbin/mDNSResponder", "/usr/libexec/mobileassetd", "/System/Library/PrivateFrameworks/ApplePushService.framework/apsd", "/System/Library/CoreServices/Software Update.app/Contents/Resources/softwareupdated", "/System/Library/PrivateFrameworks/GeoServices.framework/Versions/A/XPCServices/com.apple.geod.xpc/Contents/MacOS/com.apple.geod", "/System/Library/CoreServices/Software Update.app/Contents/Resources/softwareupdated", "/System/Library/PrivateFrameworks/ApplePushService.framework/apsd", "/usr/libexec/mobileassetd", "/usr/libexec/rtcreportingd", "/usr/sbin/mDNSResponder"]
+  - name: NetworkTargetIsKnown
+    query: Net.Target.Name == "download.apps.cloud.com" or Net.Target.Ip in [ /* Cloudflare */ "1.1.1.1", "1.0.0.1", /* Google */ "8.8.4.4", "8.8.8.8", /* Quad9 */ "208.67.222.222", "208.67.220.220"]
+threat-detection-rule-extensions:
+  - rule-id: bdc64095-d59a-42a2-8588-71fd9c9d9abc
+    name: Exclude Splunk in rule bdc64095-d59a-42a2-8588-71fd9c9d9abc
+    query: Rule.Result and not Parent.Path iregex_envvars r"^(%ProgramFiles%|%ProgramFiles(x86)%)\\Splunk\\bin\\splunkd\.exe$"
+  - rule-id: 37774c23-25a1-4adb-bb6d-8bb9fd59c0f8
+    name: Exclude valid system processes in rule 37774c23-25a1-4adb-bb6d-8bb9fd59c0f8
+    query: Rule.Result and Process.Path != "C:\\windows\\servicing\\TrustedInstaller.exe"
+  - rule-id: 48bfd177-7cf2-412b-ad77-baf923489e82
+    name: Exclude valid system processes in rule 48bfd177-7cf2-412b-ad77-baf923489e82
+    query: Rule.Result and Process.Path != "C:\\windows\\servicing\\TrustedInstaller.exe"
+  - rule-id: 71158e3f-df67-472b-930e-7d287acaa3e1
+    name: Exclude valid system processes in rule 71158e3f-df67-472b-930e-7d287acaa3e1
+    query: Rule.Result and not (Parent.Name == "System" and Process.Name in  ["Secure System", "Memory Compression"])
+  - rule-id: c09dad97-1c78-4f71-b127-7edb2b8e491a
+    name: Exclude valid system processes in rule c09dad97-1c78-4f71-b127-7edb2b8e491a
+    query: Rule.Result and not (Parent.Name == "System" and Process.Name in  ["Secure System", "Memory Compression"])
+  - rule-id: e4b6d2a7-d8a4-4f19-acbd-943c16d90647
+    name: Exclude valid scripts by uberAgent in rule e4b6d2a7-d8a4-4f19-acbd-943c16d90647
+    query: Rule.Result and not icontains(Parent.CommandLine, "\\WindowsConfiguration\\WindowsConfiguration-User.ps1\" uberAgent-SCI")
+  - name: Exclude uberAgent activity
+    query: Rule.Result and (Process.Id != uberAgent.Pid and Parent.Id != uberAgent.Pid)
+    altitude: 100
+threat-detection-rules:
+  - platform: windows
+    rule-id: 84fae5e2-fae0-427e-b9e4-1c6a371b9913
+    rule-name: Detect process starts from directories with a low mandatory integrity label
+    tag: proc-start-dir-low-integrity
+    annotation: "{\"mitre_attack\": [\"T1548\"], \"author\": \"Citrix\"}"
+    query: Process.DirectorySdSddl iregex r"\(ML;.*?;.*?;.*?;.*?;LW;?.*?\)"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 7a16b05d-7d9d-4b83-8dab-3b294ef39d90
+    rule-name: Detect processes started from directories that are user-writeable
+    tag: proc-start-dir-user-writeable
+    annotation: "{\"mitre_attack\": [\"T1548\"], \"author\": \"Citrix\"}"
+    query: Process.DirectoryUserWriteable == true
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 67c7f3a2-daa6-4606-9954-9d1ca1531747
+    rule-name: Detect script child processes of Microsoft Office applications
+    tag: proc-start-msoffice-child
+    risk-score: 100
+    annotation: "{\"mitre_attack\": [\"T1204.002\"], \"author\": \"Citrix\"}"
+    query: ParentIsMsOffice and (Process.Name in ["cmd.exe", "cscript.exe", "wscript.exe", "ftp.exe"] or ProcessIsPowerShell)
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 32951151-cb3c-435f-bb2d-5043802fc055
+    rule-name: Detect child processes of Microsoft Office applications
+    tag: proc-start-msoffice-child
+    annotation: "{\"mitre_attack\": [\"T1204.002\"], \"author\": \"Citrix\"}"
+    query: ParentIsMsOffice and not ProcessIsBrowser and Process.Name != "onenotem.exe" and Process.Name != "winword.exe"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: cef6a5fc-2b0d-462b-9ab4-37556546390a
+    rule-name: "Registry change to Office trust records: macro execution allowed (might still be blocked depending on macro settings, e.g. \"disable all macros without notification\")"
+    hive:
+      - HKLM
+      - HKU
+    annotation: "{\"mitre_attack\": [\"T1204.002\"], \"author\": \"Citrix\"}"
+    query: Reg.Key.Path like r"%\\Security\\Trusted Documents\\TrustRecords" and registry_read_binary(Reg.Key.Hive, Reg.Key.Path, Reg.Value.Name) like "%7F"
+    tag: reg-value-write-office-macro-execution-allowed
+    risk-score: 100
+    event-type: Reg.Value.Write
+    generic-properties:
+      - Reg.Key.Path
+      - Reg.Value.Name
+  - platform: windows
+    rule-id: 786b309b-b322-4ffa-aa03-12381d30ca4e
+    rule-name: "Registry change to Office macro settings, new value: enable all macros"
+    hive:
+      - HKLM
+      - HKU
+    annotation: "{\"mitre_attack\": [\"T1137\"], \"author\": \"Citrix\"}"
+    query: RegistryValueOfficeMacroSettings and registry_read_number(Reg.Key.Hive, Reg.Key.Path, Reg.Value.Name) == 1
+    tag: reg-value-write-office-macro-settings-enable-macros
+    risk-score: 100
+    event-type: Reg.Value.Write
+    generic-properties:
+      1: Reg.Key.Path
+      4: Reg.Value.Name
+      6: Reg.Key.Sddl
+  - platform: windows
+    rule-id: c096c5ef-6869-4d7d-bba0-b1b362e58f19
+    rule-name: "Registry change to Office macro settings, new value: disable all macros with notification"
+    hive:
+      - HKLM
+      - HKU
+    annotation: "{\"mitre_attack\": [\"T1137\"], \"author\": \"Citrix\"}"
+    query: RegistryValueOfficeMacroSettings and registry_read_number(Reg.Key.Hive, Reg.Key.Path, Reg.Value.Name) == 2
+    tag: reg-value-write-office-macro-settings-disable-notification
+    risk-score: 75
+    event-type: Reg.Value.Write
+    generic-properties:
+      1: Reg.Key.Path
+      4: Reg.Value.Name
+      6: Reg.Key.Sddl
+  - platform: windows
+    rule-id: 8a09d6fe-3ad9-4c48-bda9-fe13348f3545
+    rule-name: "Registry change to Office macro settings, new value: disable all macros except those digitally signed"
+    hive:
+      - HKLM
+      - HKU
+    annotation: "{\"mitre_attack\": [\"T1137\"], \"author\": \"Citrix\"}"
+    query: RegistryValueOfficeMacroSettings and registry_read_number(Reg.Key.Hive, Reg.Key.Path, Reg.Value.Name) == 3
+    tag: reg-value-write-office-macro-settings-disable-except-signed
+    risk-score: 30
+    event-type: Reg.Value.Write
+    generic-properties:
+      1: Reg.Key.Path
+      4: Reg.Value.Name
+      6: Reg.Key.Sddl
+  - platform: windows
+    rule-id: be015cf6-b8ab-4d1c-836b-6ee83d113362
+    rule-name: "Registry change to Office macro settings, new value: disable all macros without notification"
+    hive:
+      - HKLM
+      - HKU
+    annotation: "{\"mitre_attack\": [\"T1137\"], \"author\": \"Citrix\"}"
+    query: RegistryValueOfficeMacroSettings and registry_read_number(Reg.Key.Hive, Reg.Key.Path, Reg.Value.Name) == 4
+    tag: reg-value-write-office-macro-settings-disable-all
+    risk-score: 0
+    event-type: Reg.Value.Write
+    generic-properties:
+      1: Reg.Key.Path
+      4: Reg.Value.Name
+      6: Reg.Key.Sddl
+  - platform: windows
+    rule-id: 18c13aea-501b-45ac-b1b1-10eb3a3b794a
+    rule-name: Registry change to Office macro security
+    hive:
+      - HKLM
+      - HKU
+    annotation: "{\"mitre_attack\": [\"T1137\"], \"author\": \"Citrix\"}"
+    query: Reg.Key.Path like r"%\\Security\\AccessVBOM" or Reg.Key.Path like r"%\\Security\\Trusted Locations\\%"
+    tag: reg-value-write-office-macro-settings
+    risk-score: 75
+    event-type: Reg.Value.Write
+    generic-properties:
+      - Reg.Key.Path
+      - Reg.Key.Name
+      - Reg.Parent.Key.Path
+      - Reg.Value.Name
+      - Reg.File.Name
+      - Reg.Key.Sddl
+      - Reg.Key.Hive
+      - Reg.Key.Target
+  - platform: windows
+    rule-id: 7098a059-4191-4a9e-973c-8976d61cddc0
+    rule-name: Registry delete to Office macro settings
+    hive:
+      - HKLM
+      - HKU
+    annotation: "{\"mitre_attack\": [\"T1137\"], \"author\": \"Citrix\"}"
+    query: Reg.Key.Path like r"%\\Security\\Trusted Documents\\TrustRecords" or Reg.Key.Path like r"%\\Security\\AccessVBOM" or Reg.Key.Path like r"%\\Security\\VBAWarnings" or Reg.Key.Path like r"%\\Security\\Trusted Locations\\%"
+    tag: reg-value-delete-office-macro-settings
+    risk-score: 100
+    event-type: Reg.Value.Delete
+    generic-properties:
+      - Reg.Key.Path
+      - Reg.Key.Name
+      - Reg.Parent.Key.Path
+      - Reg.Value.Name
+      - Reg.File.Name
+      - Reg.Key.Sddl
+      - Reg.Key.Hive
+      - Reg.Key.Target
+  - platform: windows
+    rule-id: 35b69884-90d6-4000-a017-b3e3be5c1026
+    rule-name: Detect Microsoft Office download operations (LOLBAS)
+    tag: proc-start-lolbas-download
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Citrix\"}"
+    query: ParentIsMsOffice and Process.CommandLine iregex r"(http|https)"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 0a1bbfbc-e0d9-4c49-953e-e31c3aa3fc91
+    rule-name: Detect child processes of the WMI service
+    tag: proc-start-wmiservice-child
+    annotation: "{\"mitre_attack\": [\"T1047\"], \"author\": \"Citrix\"}"
+    query: Parent.Name == "wmiprvse.exe" and not Process.Path iregex_envvars r"^(%ProgramFiles%|%ProgramFiles(x86)%)\\Citrix\\HDX\\bin\\CtxSession\.exe$"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 8a16160d-4eac-4ae4-8fe4-7af7320ebf1e
+    rule-name: Detect child processes of Adobe Acrobat Reader
+    tag: proc-start-adobereader-child
+    annotation: "{\"mitre_attack\": [\"T1204.002\"], \"author\": \"Citrix\"}"
+    query: Parent.Name == "acrord32.exe" and Process.Name not in ["RdrCEF.exe", "acrord32.exe", "AdobeARM.exe"]
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 0e85dc3b-6230-4e8c-b09a-183c23bf31a7
+    rule-name: Detect child processes (LOLBAS)
+    tag: proc-start-lolbas-child
+    annotation: "{\"mitre_attack\": [\"T1218\"], \"author\": \"Citrix\"}"
+    query: Parent.Name in ["bash.exe", "bitsadmin.exe", "diskshadow.exe", "forfiles.exe", "ftp.exe", "hh.exe", "ieexec.exe", "Microsoft.Workflow.Compiler.exe", "msconfig.exe", "pcalua.exe", "pcwrun.exe", "rundll32.exe", "scriptrunner.exe", "wmic.exe", "Appvlp.exe", "cdb.exe", "devtoolslauncher.exe", "dnx.exe", "dxcap.exe", "mftrace.exe", "msdeploy.exe", "Sqlps.exe", "SQLToolsPS.exe", "te.exe", "update.exe", "vsjitdebugger.exe", "wsl.exe", "squirrel.exe"]
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 3b95cda6-6057-42cc-bf6b-9b49d0848ca4
+    rule-name: Detect starts from non-default locations (LOLBAS)
+    tag: proc-start-lolbas-other-location
+    annotation: "{\"mitre_attack\": [\"T1218\"], \"author\": \"Citrix\"}"
+    query: not ProcessPathIsSystemDirectory and Process.Name in ["ie4uinit.exe", "cscript.exe", "wsscript.exe", "cmd.exe"]
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 25b35200-5154-4154-a2dd-0e4c932b8366
+    rule-name: Detect compile and execute (LOLBAS)
+    tag: proc-start-lolbas-compile-and-exec
+    annotation: "{\"mitre_attack\": [\"T1127.001\"], \"author\": \"Citrix\"}"
+    query: lower(Process.Name) == "msbuild.exe" and (icontains(Process.CommandLine, ".csproj") or icontains(Process.CommandLine, ".xml"))
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 9220e5d6-5c97-44ac-9dca-2063300d62d1
+    rule-name: Detect proxy execution (LOLBAS)
+    tag: proc-start-lolbas-proxy-exec
+    annotation: "{\"mitre_attack\": [\"T1218\"], \"author\": \"Citrix\"}"
+    query: "Process.Name == \"reg.exe\" and Process.CommandLine iregex r\"import.*\\.reg.*&.*winrm.*quickconfig\""
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 6b0add9d-8df0-4df3-899c-d36e020329fb
+    rule-name: Detect jsc compile (LOLBAS)
+    tag: proc-start-lolbas-compile
+    annotation: "{\"mitre_attack\": [\"T1127\"], \"author\": \"Citrix\"}"
+    query: Process.Name == "jsc.exe" and Process.CommandLine like "%.js"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: c9e5bbda-d545-45f9-b0cd-505d25899c1e
+    rule-name: Detect csc compile (LOLBAS)
+    tag: proc-start-lolbas-compile
+    annotation: "{\"mitre_attack\": [\"T1127\"], \"author\": \"Citrix\"}"
+    query: Process.Name == "csc.exe" and (Process.CommandLine iregex r"[\/|-]out:.*.exe.*.cs" or Process.CommandLine iregex r"[\/|-]target:library.*.cs")
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 5417022a-b435-49e5-8b4a-14c57f25af94
+    rule-name: Detect execution from alternate data streams (LOLBAS)
+    tag: proc-start-lolbas-alternate-data-streams
+    annotation: "{\"mitre_attack\": [\"T1564.004\"], \"author\": \"Citrix\"}"
+    query: Process.Name in ["Certutil.exe", "Cmd.exe", "Control.exe", "Cscript.exe", "Esentutl.exe", "Expand.exe", "Extract32.exe", "Findstr.exe", "Makecab.exe", "Mavinject.exe", "Mshta.exe", "Print.exe", "Reg.exe", "Regedit.exe", "Sc.exe", "Wmic.exe", "Wscript.exe"] and Process.CommandLine iregex r"\w:\w"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: b95c2154-3299-4653-9b6e-d421a158e6ba
+    rule-name: Detect encode and decode operations (LOLBAS)
+    tag: proc-start-lolbas-encode-decode
+    annotation: "{\"mitre_attack\": [\"T1027\"], \"author\": \"Citrix\"}"
+    query: Process.Name == "certutil.exe" and (Process.CommandLine iregex r"[\/|-]encode" or Process.CommandLine iregex r"[\/|-]decode")
+    event-type: Process.Start
+  - platform: windows
+    rule-id: dee9e5ed-7d35-4658-a474-26c6ab4b40de
+    rule-name: Detect findstr.exe download operations (LOLBAS)
+    tag: proc-start-lolbas-download
+    annotation: "{\"mitre_attack\": [\"T1185\"], \"author\": \"Citrix\"}"
+    query: Process.Name == "findstr.exe" and Process.CommandLine iregex r"(?=.*[\/|-]v)(?=.*[\/|-]l)(?=.*>)"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 5563d38c-c379-4e84-bfe0-51f136a84fdb
+    rule-name: Detect makecab.exe download operations (LOLBAS)
+    tag: proc-start-lolbas-download
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Citrix\"}"
+    query: Process.Name == "makecab.exe" and Process.CommandLine iregex r"\S+\s+\S+"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: ac0afdf9-9e9e-4439-ba01-841acbacf8ab
+    rule-name: Detect squirrel.exe download operations (LOLBAS)
+    tag: proc-start-lolbas-download
+    annotation: "{\"mitre_attack\": [\"T1218\"], \"author\": \"Citrix\"}"
+    query: Process.Name == "squirrel.exe" and Process.CommandLine iregex r"--download"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: bc4001fa-a83d-4192-9225-89bb54d6a4b1
+    rule-name: Detect update.exe download operations (LOLBAS)
+    tag: proc-start-lolbas-download
+    annotation: "{\"mitre_attack\": [\"T1218\"], \"author\": \"Citrix\"}"
+    query: Process.Name == "update.exe" and Process.CommandLine iregex r"--download"
+    event-type: Process.Start
+  - rule-id: bc4001fa-a83d-4192-9225-89bb54d6a4c5
+    rule-name: Detect DNS exfiltration through nslookup
+    tag: proc-start-dns-exfiltration-nslookup
+    annotation: "{\"mitre_attack\": [\"T1048\"], \"author\": \"Citrix\"}"
+    query: Process.Name in ["nslookup.exe","nslookup"] and Parent.Name not in ["uberAgent.exe","uberAgent"]
+    event-type: Process.Start
+  - platform: windows
+    rule-id: ad0f46d0-9a7a-4233-a93b-e3bbb5ee7dbd
+    rule-name: PowerShell outbound network connections
+    tag: net-connect-outbound-powershell-network
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Citrix\"}"
+    query: ProcessIsPowerShell and not TargetIsPrivateNetworkIP and not NetworkTargetIsKnown and Process.User iregex r"^NT AUTHORITY\\SYSTEM$"
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - platform: windows
+    rule-id: 4940f757-3470-42a7-a709-8724b759696a
+    rule-name: PowerShell remoting
+    tag: net-connect-powershell-remoting
+    annotation: "{\"mitre_attack\": [\"T1059.001\"], \"author\": \"Citrix\"}"
+    query: ProcessIsPowerShell and Net.Target.Port in [5985, 5986] and not Process.User iregex r"^NT AUTHORITY\\NETWORK SERVICE$"
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - platform: windows
+    rule-id: 5f5774b2-36f4-4990-be0b-ea5c6717e403
+    rule-name: Suspicious target names
+    tag: net-connect-suspicious-target-names
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Citrix\"}"
+    query: Process.Path iregex_envvars r"^%SystemRoot%" and (Net.Target.Name iregex r"dl\.dropboxusercontent\.com" or Net.Target.Name iregex r"\.pastebin\.com" or Net.Target.Name iregex r"\.githubusercontent\.com" or Net.Target.Name iregex r"\.github\.com")
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - platform: windows
+    rule-id: c9de8260-a99b-401e-b28b-b4530df68ebc
+    rule-name: Suspicious outbound Kerberos connections
+    tag: net-connect-outbound-kerberos
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1558.003\"], \"author\": \"Citrix\"}"
+    query: not ProcessIsBrowser and not TargetIsPrivateNetworkIP and not NetworkTargetIsKnown and Net.Target.Port == 88
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - platform: windows
+    rule-id: 0c204f73-ce45-4708-934a-9d07fd2d7303
+    rule-name: Detect network connects from suspicious sources
+    tag: net-connect-suspicious-sources
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Citrix\"}"
+    query: (Process.Path iregex r"^C:\\Users" or Process.Path iregex_envvars r"^%ALLUSERSPROFILE%" or Process.Path iregex_envvars r"^%ProgramData%" or Process.Path iregex_envvars r"^%SystemRoot%\\Temp" or Process.Path iregex r"$Recycle.bin$" or Process.Path iregex_envvars r"^%Systemdrive%:\\Perflogs" or Process.Path iregex r"config\\systemprofile" or Process.Path iregex_envvars r"^%SystemRoot%\\Fonts" or Process.Path iregex_envvars r"^%SystemRoot%\\IME" or Process.Path iregex_envvars r"^%SystemRoot%\\addins") and not ProcessPathIsWindowsDefender and not NetworkTargetIsKnown
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - platform: windows
+    rule-id: e1c5e054-fe7b-4cee-9ea0-24b8185130ce
+    rule-name: Detect network connects from Windows processes
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Citrix\"}"
+    query: (ProcessIsPowerShell or Process.Name in ["at.exe", "certutil.exe", "cmd.exe", "cmstp.exe", "cscript.exe", "driverquery.exe", "dsquery.exe", "hh.exe", "infDefaultInstall.exe", "mmc.exe", "msbuild.exe", "mshta.exe", "msiexec.exe", "nbtstat.exe", "net.exe", "net1.exe", "notepad.exe", "nslookup.exe", "qprocess.exe", "qwinsta.exe", "qwinsta.exe", "reg.exe", "regsvcs.exe", "regsvr32.exe", "rundll32.exe", "rwinsta.exe", "sc.exe", "schtasks.exe", "taskkill.exe", "tasklist.exe", "wmic.exe", "wscript.exe"]) and not NetworkTargetIsKnown
+    tag: net-connect-Windows-processes
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - platform: windows
+    rule-id: 29094c60-6459-47aa-8620-581a25cad376
+    rule-name: Detect network connects from third-party tools
+    tag: net-connect-third-party-processes
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Citrix\"}"
+    query: (Process.Name in ["java.exe", "javaw.exe", "javaws.exe", "nc.exe", "ncat.exe", "psexec.exe", "psexesvc.exe", "tor.exe", "vnc.exe", "vncservice.exe", "vncviewer.exe", "winexesvc.exe", "nmap.exe", "psinfo.exe"]) and not NetworkTargetIsKnown
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - platform: windows
+    rule-id: 35103d32-ff9a-4a50-b20c-396f185e8a93
+    rule-name: RDP connects from non-RDP software indicating lateral movement
+    tag: net-connect-suspicious-RDP-connects
+    annotation: "{\"mitre_attack\": [\"T1021.001\"], \"author\": \"Citrix\"}"
+    query: not ProcessIsKnownRDPSoftware and Net.Target.Port == 3389
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - rule-id: 91ded0fc-2869-45a8-a06d-04f0b3f21532
+    rule-name: Detect network connects to suspicious ports
+    tag: net-connect-suspicious-ports
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Citrix\"}"
+    query: Net.Target.Port in [ /* SSH */ 22, /* Telnet */ 23, /* SMTP */ 25, /* IMAP */ 142, /* VNC */ 5800, 5900, /* Socks proxy */ 1080, 3128, 8080, /* Tor */ 1723, 4500, 9001, 9030]
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - rule-id: f8257d1f-a86f-44d8-b583-2b8d9cbe867e
+    rule-name: Detect network connects to 80 and 443 from non-browser applications
+    tag: net-connect-80-443-non-browser
+    risk-score: 25
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Citrix\"}"
+    query: Net.Target.Port in [80, 443] and not ProcessIsBrowser and not TargetIsPrivateNetworkIP and not NetworkTargetIsKnown and not ProcessPathIsKnownWindows and not ProcessPathIsKnownMacOS
+    event-type: Net.Connect
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Target.Name
+      - Net.Target.Port
+      - Net.Target.Protocol
+  - platform: windows
+    rule-id: 1414388f-fc7b-4916-ad7f-1399ffcff026
+    rule-name: Detect AuthRoot, CA and Root certificate changes
+    hive:
+      - HKLM
+      - HKU
+    annotation: "{\"mitre_attack\": [\"T1588.003\"], \"author\": \"Citrix\"}"
+    query: Process.Name != "uberAgent.exe" and Reg.Key.Path iregex_envvars r"Software(\\Policies)*\\Microsoft\\(EnterpriseCertificates|SystemCertificates)\\(AuthRoot|CA|Root)\\Certificates\\.+" and Reg.Value.Name == "Blob"
+    tag: reg-value-write-cert-change
+    risk-score: 100
+    event-type: Reg.Value.Write
+    generic-properties:
+      - Reg.Key.Path
+      - Reg.Key.Name
+      - Reg.Parent.Key.Path
+      - Reg.Value.Name
+      - Reg.File.Name
+      - Reg.Key.Sddl
+      - Reg.Key.Hive
+      - Reg.Key.Target
+  - platform: windows
+    rule-id: a20c2e1f-2984-4622-bd47-bf925c1aaa07
+    rule-name: Detect service creation via registry
+    hive: HKLM
+    annotation: "{\"mitre_attack\": [\"T1543.003\"], \"author\": \"Citrix\"}"
+    query: Reg.Parent.Key.Path iregex r"^SYSTEM\\\w*ControlSet\d*\\Services$" and not Process.Path iregex_envvars r"^%SystemRoot%\\(System32|SysWOW64)\\(services\.exe|svchost\.exe)$"
+    tag: reg-key-create-service
+    event-type: Reg.Key.Create
+    generic-properties:
+      - Reg.Key.Path
+      - Reg.Key.Name
+      - Reg.Parent.Key.Path
+      - Reg.Value.Name
+      - Reg.File.Name
+      - Reg.Key.Sddl
+      - Reg.Key.Hive
+      - Reg.Key.Target
+  - platform: windows
+    rule-id: d5b4d0b7-1bfe-4a6b-9664-7b321bfa4094
+    rule-name: Detect disabling security eventlog on create
+    hive: HKLM
+    annotation: "{\"mitre_attack\": [\"T1562.002\"], \"author\": \"Citrix\"}"
+    query: Reg.Key.Path iregex r"^SYSTEM\\\w*ControlSet\d*\\Control\\MiniNt$"
+    tag: reg-key-create-disable-security-eventlog
+    risk-score: 100
+    event-type: Reg.Key.Create
+    generic-properties:
+      - Reg.Key.Path
+      - Reg.Key.Name
+      - Reg.Parent.Key.Path
+      - Reg.Value.Name
+      - Reg.File.Name
+      - Reg.Key.Sddl
+      - Reg.Key.Hive
+      - Reg.Key.Target
+  - platform: windows
+    rule-id: 21791409-7892-4122-9441-066955ee01b5
+    rule-name: Detect disabling security eventlog on rename
+    hive: HKLM
+    annotation: "{\"mitre_attack\": [\"T1562.002\"], \"author\": \"Citrix\"}"
+    query: Reg.Key.Path.New iregex r"^SYSTEM\\\w*ControlSet\d*\\Control\\MiniNt$"
+    tag: reg-key-rename-disable-security-eventlog
+    risk-score: 100
+    event-type: Reg.Key.Rename
+    generic-properties:
+      - Reg.Key.Path
+      - Reg.Key.Name
+      - Reg.Parent.Key.Path
+      - Reg.Value.Name
+      - Reg.File.Name
+      - Reg.Key.Sddl
+      - Reg.Key.Hive
+      - Reg.Key.Target

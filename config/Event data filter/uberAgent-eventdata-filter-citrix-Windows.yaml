@@ -1,0 +1,28 @@
+config-version: 9.0
+event-data-filters:
+  - action: deny
+    query: ProcName in ["chrome.exe", "iexplore.exe", "firefox.exe", "msedge.exe", "opera.exe"]
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: ProcName == "uberagent.exe"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: ProcName == "svchost.exe" AND DnsRiskEmptyResponse==true
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: ProcPath iregex_envvars r"^(\\\?\?\\)?%SystemRoot%\\System32\\conhost\.exe$"
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["cmd.exe", "conhost.exe", "csrss.exe", "lsm.exe", "smss.exe", "wininit.exe", "winlogon.exe", "System Idle Process"]
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName == "uberAgent.exe" OR ProcParentName == "uberAgent.exe"
+    sourcetypes:
+      - ActivityMonitoring:ProcessTagging

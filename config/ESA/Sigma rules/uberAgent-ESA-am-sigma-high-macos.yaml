@@ -1,0 +1,112 @@
+config-version: 9.0
+threat-detection-rules:
+  - platform: macos
+    rule-id: 95361ce5-c891-4b0a-87ca-e24607884a96
+    rule-name: Binary Padding - MacOS
+    tag: proc-start-binary-padding-macos
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1027.001\"], \"author\": \"Igor Fits, Mikhail Larin, oscd.community\"}"
+    query: iendswith(Process.Path, "/truncate") and icontains(Process.CommandLine, "-s +") or iendswith(Process.Path, "/dd") and (icontains(Process.CommandLine, "if=/dev/zero") or icontains(Process.CommandLine, "if=/dev/random") or icontains(Process.CommandLine, "if=/dev/urandom"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 69483748-1525-4a6c-95ca-90dc8d431b68
+    rule-name: Suspicious Microsoft Office Child Process - MacOS
+    tag: proc-start-suspicious-microsoft-office-child-process-macos
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1059.002\", \"T1137.002\", \"T1204.002\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: (icontains(Parent.Path, "Microsoft Word") or icontains(Parent.Path, "Microsoft Excel") or icontains(Parent.Path, "Microsoft PowerPoint") or icontains(Parent.Path, "Microsoft OneNote")) and (iendswith(Process.Path, "/bash") or iendswith(Process.Path, "/curl") or iendswith(Process.Path, "/dash") or iendswith(Process.Path, "/fish") or iendswith(Process.Path, "/osacompile") or iendswith(Process.Path, "/osascript") or iendswith(Process.Path, "/sh") or iendswith(Process.Path, "/zsh") or iendswith(Process.Path, "/python") or iendswith(Process.Path, "/python3") or iendswith(Process.Path, "/wget"))
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: f1408a58-0e94-4165-b80a-da9f96cf6fc3
+    rule-name: JXA In-memory Execution Via OSAScript
+    tag: proc-start-jxa-in-memory-execution-via-osascript
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1059.002\", \"T1059.007\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: icontains(Process.CommandLine, "osascript") and icontains(Process.CommandLine, " -e ") and icontains(Process.CommandLine, "eval") and icontains(Process.CommandLine, "NSData.dataWithContentsOfURL") and (icontains(Process.CommandLine, " -l ") and icontains(Process.CommandLine, "JavaScript") or icontains(Process.CommandLine, ".js"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 65d506d3-fcfe-4071-b4b2-bcefe721bbbb
+    rule-name: Potential Persistence Via PlistBuddy
+    tag: proc-start-potential-persistence-via-plistbuddy
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1543.001\", \"T1543.004\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: iendswith(Process.Path, "/PlistBuddy") and icontains(Process.CommandLine, "RunAtLoad") and icontains(Process.CommandLine, "true") and (icontains(Process.CommandLine, "LaunchAgents") or icontains(Process.CommandLine, "LaunchDaemons"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: e710a880-1f18-4417-b6a0-b5afdf7e3023
+    rule-name: Atomic MacOS Stealer - Persistence Indicators
+    tag: atomic-macos-stealer-persistence-indicators
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1564.001\", \"T1543.004\"], \"author\": \"Jason Phang Vern - Onn, Robbin Ooi Zhen Heng (Gen Digital)\"}"
+    query: iendswith(Process.Path, "/curl") and istartswith(File.Path, "/Users/") and iendswith(File.Path, ".helper") or File.Path == "/Library/LaunchDaemons/com.finder.helper.plist"
+    event-type: File.Create
+    generic-properties:
+      - File.Path
+  - platform: macos
+    rule-id: e710a880-1f18-4417-b6a0-b5afdf7e33da
+    rule-name: Atomic MacOS Stealer - FileGrabber Activity
+    tag: proc-start-atomic-macos-stealer-filegrabber-activity
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1059.002\"], \"author\": \"Jason Phang Vern - Onn, Robbin Ooi Zhen Heng (Gen Digital)\"}"
+    query: "icontains(Process.CommandLine, \"curl\") and icontains(Process.CommandLine, \"POST\") and icontains(Process.CommandLine, \"user:\") and icontains(Process.CommandLine, \"-H \") and icontains(Process.CommandLine, \"BuildID\") and icontains(Process.CommandLine, \"file=@/tmp/out.zip\") and icontains(Process.CommandLine, \"cl: 0\") or icontains(Process.CommandLine, \"FileGrabber\") and icontains(Process.CommandLine, \"/tmp\")"
+    event-type: Process.Start
+  - platform: macos
+    rule-id: b9d9b652-d8ed-4697-89a2-a1186ee680ac
+    rule-name: OSACompile Run-Only Execution
+    tag: proc-start-osacompile-run-only-execution
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1059.002\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: icontains(Process.CommandLine, "osacompile") and icontains(Process.CommandLine, " -x ") and icontains(Process.CommandLine, " -e ")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: f68c4a4f-19ef-4817-952c-50dce331f4b0
+    rule-name: Potential WizardUpdate Malware Infection
+    tag: proc-start-potential-wizardupdate-malware-infection
+    risk-score: 75
+    annotation: "{\"author\": \"Tim Rauch (rule), Elastic (idea)\"}"
+    query: iendswith(Process.Path, "/sh") and icontains(Process.CommandLine, "=$(curl ") and icontains(Process.CommandLine, "eval") or iendswith(Process.Path, "/curl") and icontains(Process.CommandLine, "\_intermediate\_agent\_")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 09a910bf-f71f-4737-9c40-88880ba5913d
+    rule-name: Potential Base64 Decoded From Images
+    tag: proc-start-potential-base64-decoded-from-images
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1140\"], \"author\": \"Joseliyo Sanchez, @Joseliyo_Jstnk\"}"
+    query: iendswith(Process.Path, "/bash") and icontains(Process.CommandLine, "tail") and icontains(Process.CommandLine, "-c") and icontains(Process.CommandLine, "base64") and icontains(Process.CommandLine, "-d") and icontains(Process.CommandLine, ">") and (icontains(Process.CommandLine, ".avif") or icontains(Process.CommandLine, ".gif") or icontains(Process.CommandLine, ".jfif") or icontains(Process.CommandLine, ".jpeg") or icontains(Process.CommandLine, ".jpg") or icontains(Process.CommandLine, ".pjp") or icontains(Process.CommandLine, ".pjpeg") or icontains(Process.CommandLine, ".png") or icontains(Process.CommandLine, ".svg") or icontains(Process.CommandLine, ".webp"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 53b1b378-9b06-4992-b972-dde6e423d2b4
+    rule-name: Credentials In Files
+    tag: proc-start-credentials-in-files
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1552.001\"], \"author\": \"Igor Fits, Mikhail Larin, oscd.community\"}"
+    query: iendswith(Process.Path, "/grep") and icontains(Process.CommandLine, "password") or icontains(Process.CommandLine, "laZagne")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 2db0458c-05c9-4069-a26f-77becd9c8c13
+    rule-name: Axios NPM Compromise File Creation Indicators - MacOS
+    tag: axios-npm-compromise-file-creation-indicators-macos
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1195.002\", \"T1105\"], \"author\": \"Swachchhanda Shrawan Poudel (Nextron Systems)\"}"
+    query: iendswith(Process.Path, "/curl") and File.Path == "/Library/Caches/com.apple.act.mond" or iendswith(Process.Path, "/node") and File.Path == "/tmp/6202033"
+    event-type: File.Create
+    generic-properties:
+      - File.Path
+  - platform: macos
+    rule-id: a09ee860-31b3-4586-8a68-0ebd74ce0e5f
+    rule-name: Axios NPM Compromise Indicators - macOS
+    tag: proc-start-axios-npm-compromise-indicators-macos
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1195.002\", \"T1059.002\", \"T1059.004\", \"T1105\"], \"author\": \"Swachchhanda Shrawan Poudel (Nextron Systems)\"}"
+    query: icontains(Process.CommandLine, "nohup ") and icontains(Process.CommandLine, "osascript ") and icontains(Process.CommandLine, "/tmp/6202033") or icontains(Process.CommandLine, "curl ") and icontains(Process.CommandLine, "packages.npm.org/product") and icontains(Process.CommandLine, "/Library/Caches/com.apple.act.mond") or icontains(Process.CommandLine, "rm ") and icontains(Process.CommandLine, "-rf ") and icontains(Process.CommandLine, "/tmp/6202033")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: bd3b5eaa-439d-4a42-8f35-a49f5c8a2582
+    rule-name: Remote Access Tool - Renamed MeshAgent Execution - MacOS
+    tag: proc-start-remote-access-tool-renamed-meshagent-execution-macos
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1219.002\", \"T1036.003\"], \"author\": \"Norbert Ja\\u015bniewicz (AlphaSOC)\"}"
+    query: (icontains(Process.CommandLine, "--meshServiceName") or icontains(Process.Name, "meshagent")) and not (iendswith(Process.Path, "/meshagent") or iendswith(Process.Path, "/meshagent\_osx64"))
+    event-type: Process.Start

@@ -1,0 +1,92 @@
+config-version: 9.0
+timers:
+  - name: "Security & Compliance Inventory timer"
+    interval: 24h
+    start-delay: 10m
+    persist-interval: true
+    ua-metrics:
+      - SecurityInventory.Firewall
+      - SecurityInventory.RemoteLogin
+      - SecurityInventory.Updates
+      - SecurityInventory.OsConfiguration
+      - SecurityInventory.NetworkConfiguration
+      - SecurityInventory.Antivirus
+      - SecurityInventory.LocalUsersAndGroups
+      - SecurityInventory.Certificate
+script-interpreters:
+  - name: zsh
+    executable: /bin/zsh
+    args-template: "###UA_SCRIPT###"
+security-inventory-tests:
+  - platform: macos
+    name: Firewall
+    category: Firewall
+    script-id: c668ecf5-756c-4586-ac1d-0b2cb7753201
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###/Firewall/Firewall.zsh\""
+    interpreter: zsh
+    script-context: root
+  - platform: macos
+    name: RemoteLogin
+    category: RemoteLogin
+    script-id: 5710f1d1-4f21-4ad8-822d-1b0a6bf42b78
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###/RemoteLogin/RemoteLogin.zsh\""
+    interpreter: zsh
+    script-context: root
+  - platform: macos
+    name: Updates
+    category: Updates
+    script-id: f7160a1e-ff7d-4f50-9e81-a4874e4dcd27
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###/Updates/Updates.zsh\""
+    interpreter: zsh
+    script-context: root
+  - platform: macos
+    name: OsConfiguration
+    category: OsConfiguration
+    script-id: 11d9441b-a2fd-40ee-9912-e5057fd50f8e
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###/OsConfiguration/OsConfiguration.zsh\""
+    interpreter: zsh
+    script-context: root
+  - platform: macos
+    name: NetworkConfiguration
+    category: NetworkConfiguration
+    script-id: 31cbcd42-8430-4832-bc0f-6667d8870440
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###/NetworkConfiguration/NetworkConfiguration.zsh\""
+    interpreter: zsh
+    script-context: root
+  - platform: macos
+    name: Antivirus
+    category: Antivirus
+    script-id: dcd13614-68fc-4398-a5f7-d5532883ea2b
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###/Antivirus/Antivirus.zsh\""
+    interpreter: zsh
+    script-context: root
+  - platform: macos
+    name: LocalUsersAndGroups
+    category: LocalUsersAndGroups
+    script-id: b8925414-8812-4cbe-9be9-0f266c79f44e
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###/LocalUsersAndGroups/LocalUsersAndGroups-User.zsh\""
+    interpreter: zsh
+    script-context: root
+  - platform: macos
+    name: LocalUsersAndGroups
+    category: LocalUsersAndGroups
+    script-id: 83c8470f-a9c9-4a70-b26a-0ab654da395d
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###/LocalUsersAndGroups/LocalUsersAndGroups-Machine.zsh\""
+    interpreter: zsh
+    script-context: root
+  - platform: macos
+    name: Certificate
+    category: Certificate
+    script-id: 20293f3e-a0d3-4e57-97de-837ece490375
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###/Certificate/Certificate.zsh\""
+    interpreter: zsh
+    script-context: root

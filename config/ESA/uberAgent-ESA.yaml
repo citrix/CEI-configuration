@@ -1,0 +1,18 @@
+config-version: 9.0
+includes:
+  - path: uberAgent-ESA-am-citrix.yaml
+  - path: Sigma rules/uberAgent-ESA-am-sigma-critical-common.yaml
+  - path: Sigma rules/uberAgent-ESA-am-sigma-critical-macos.yaml
+    platform: macos
+  - path: Sigma rules/uberAgent-ESA-am-sigma-critical-windows.yaml
+    platform: windows
+  - path: Sigma rules/uberAgent-ESA-am-sigma-high-common.yaml
+  - path: Sigma rules/uberAgent-ESA-am-sigma-high-macos.yaml
+    platform: macos
+  - path: Sigma rules/uberAgent-ESA-am-sigma-high-windows.yaml
+    platform: windows
+  - path: uberAgent-ESA-si-citrix-windows.yaml
+    platform: windows
+  - path: uberAgent-ESA-si-citrix-macos.yaml
+    platform: macos
+  - path: uberAgent-ESA-eventlog.yaml

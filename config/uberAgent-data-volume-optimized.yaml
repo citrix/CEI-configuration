@@ -1,0 +1,162 @@
+config-version: 9.0
+includes:
+  - path: ESA/uberAgent-ESA.yaml
+  - path: Event data filter/uberAgent-eventdata-filter.yaml
+product-components:
+  enable-esa: false
+miscellaneous:
+  debug-mode: true
+configuration-settings:
+  {}
+receivers:
+  - type: splunk-tcp
+on-demand:
+  ua-metrics:
+    - LogonDetail
+    - LogonProcesses
+    - BootDetail
+    - ShutdownDetail
+    - StandbyDetail
+    - OutlookPerformanceEvents
+    - ApplicationErrors
+    - ApplicationUIDelay
+    - SessionProfile
+    - ScheduledTaskMonitoring
+timers:
+  - name: Default
+    comment: Metrics are placed here unless there is a reason to have them run at different frequencies or to isolate them
+    interval: 2m
+    ua-metrics:
+      - ProcessDetailTop5
+      - SessionDetail
+      - CitrixSessionVirtualChannelDetail
+      - SystemPerformanceSummary
+      - SMBClientSharePerformance
+      - NetworkTargetPerformanceProcess
+      - ProcessStartup
+      - ProcessStop
+      - ActivityMonitoring
+      - DnsMonitoring
+  - name: "Network config & AppNameIdMapping"
+    comment: Collects network configuration information and lists mappings between app IDs and app names for use in lookups in the backend
+    interval: 5m
+    ua-metrics:
+      - NetworkConfigInformation
+      - AppNameIdMapping
+  - name: GPU usage
+    comment: Isolate GPU metrics from the other metrics
+    interval: 2m
+    ua-metrics:
+      - GpuUsage
+  - name: Browser performance
+    comment: Isolate browser metrics from the other metrics
+    interval: 2m
+    ua-metrics:
+      - BrowserPerformanceChrome
+      - BrowserPerformanceEdge
+      - BrowserPerformanceFirefox
+      - BrowserPerformanceIE
+  - name: Inventory
+    comment: Perform an inventory at a very low frequency
+    interval: 24h
+    start-delay: 10m
+    persist-interval: true
+    ua-metrics:
+      - ApplicationInventory
+      - SoftwareUpdateInventory
+      - MachineInventory
+      - CitrixADCInventory
+  - name: Citrix site - default
+    comment: Collect Citrix Virtual Apps and Desktops site information
+    interval: 5m
+    start-delay: 4m
+    ua-metrics:
+      - CitrixDCDesktopGroup
+      - CitrixDCCatalog
+      - CitrixDCHypervisor
+      - CitrixDCGeneralInformation
+      - CitrixDCApplication
+      - CitrixDCPublishedDesktops
+  - name: Citrix site - machines
+    comment: Collect Citrix Virtual Apps and Desktops site information
+    interval: 5m
+    start-delay: 260s
+    ua-metrics:
+      - CitrixDCMachine
+  - name: Citrix site - licenses
+    comment: Collect Citrix Virtual Apps and Desktops site information
+    interval: 5m
+    start-delay: 3m
+    ua-metrics:
+      - CitrixDCLicenseInformation
+  - name: Citrix Netscaler - performance
+    comment: Collect Citrix Netscaler performance information for virtual servers, gateways and the appliance itself. Primary Citrix Netscaler only.
+    interval: 5m
+    start-delay: 5m
+    ua-metrics:
+      - CitrixADCPerformance
+      - CitrixADCvServer
+      - CitrixADCGateways
+  - platform: windows
+    name: Citrix session configuration details
+    comment: Collect Citrix HDX metrics
+    interval: 15m
+    event-trigger: TriggerCitrixSessionConfig
+    ua-metrics:
+      - CitrixSessionConfig
+  - name: Process statistics
+    comment: Collect process statistics metrics at a longer interval than ProcessDetail to keep the data volume low.
+    interval: 10m
+    ua-metrics:
+      - ProcessStatistics
+event-triggers:
+  - platform: windows
+    name: TriggerCitrixSessionConfig
+    query: BrokerType == "Citrix"
+    types:
+      - user-logon
+      - session-connection-state-change
+      - session-roaming
+process-to-application-mapping:
+  - regex: ^%ProgramData%\\Microsoft\\Windows Defender\\Platform\\.+\\.+\.exe$
+    name: Windows Defender
+  - regex: ^%ProgramFiles%\\Windows Defender\\.+\.exe$
+    name: Windows Defender
+  - regex: ^\/usr/sbin/uberAgent$
+    name: Citrix Experience Insights
+  - regex: ^\/usr/libexec/uberAgent/uAInSessionHelper$
+    name: Citrix Experience Insights
+application-mapping-ignored-processes:
+  []
+process-startup-duration-wait-interval-override:
+  per-process:
+    - executable: AcroRd32.exe
+      dll-load-wait-duration: 15s
+process-startup-settings:
+  {}
+browser-web-app-url-filter:
+  []
+browser-web-app-url-component-detail:
+  []
+process-detail-send-commandline:
+  []
+network-target-performance-process-config:
+  {}
+citrix-adc-configs:
+  []
+citrix-cloud-configs:
+  []
+session-detail-config:
+  {}
+user-host-tags:
+  []
+threat-detection-rule-filter:
+  []
+filesystem-monitoring:
+  {}
+security-inventory-tests:
+  []
+ignore-logon-monitoring-processes:
+  - NiAgnt32.exe
+  - LoginPI.Logon.exe
+  - LoginPI.Engine.exe

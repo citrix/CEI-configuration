@@ -1,11 +1,15 @@
 {
-  "contractVersion": 2,
+  "configVersion": {
+    "current": "9.0",
+    "oldest": "9.0"
+  },
+  "contractVersion": 3,
   "stanzas": [
     {
       "diagnosticCodePrefix": "UA-YAML-CONFIG-VERSION",
       "fields": [],
       "key": "config-version",
-      "kind": "unsigned-integer",
+      "kind": "string",
       "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp"
     },
     {
@@ -16,6 +20,18 @@
           "diagnosticCode": "UA-YAML-RECEIVER-NAME",
           "key": "name",
           "kind": "string",
+          "required": false
+        },
+        {
+          "confKey": "ReceiverPlatform",
+          "diagnosticCode": "UA-YAML-RECEIVER-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
           "required": false
         },
         {
@@ -42,60 +58,82 @@
           "required": false
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "ReceiverRESTToken",
+          "credentialStoreReference": true,
           "diagnosticCode": "UA-YAML-RECEIVER-REST-TOKEN",
           "key": "rest-token",
           "kind": "string",
-          "required": false
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'rest-token' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "ReceiverTLSClientCertificate",
+          "credentialStoreReference": true,
           "diagnosticCode": "UA-YAML-RECEIVER-TLS-CLIENT-CERTIFICATE",
           "key": "tls-client-certificate",
           "kind": "string",
-          "required": false
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'tls-client-certificate' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "ReceiverElasticIngestPipeline",
           "diagnosticCode": "UA-YAML-RECEIVER-ELASTIC-INGEST-PIPELINE",
           "key": "elastic-ingest-pipeline",
           "kind": "string",
-          "required": false
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'elastic-ingest-pipeline' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         },
         {
+          "acceptsRuntimeQuery": true,
           "confKey": "ReceiverIndex",
           "diagnosticCode": "UA-YAML-RECEIVER-INDEX",
           "key": "index",
           "kind": "string",
-          "required": false
+          "required": false,
+          "runtimeQueryResolved": true
         },
         {
+          "acceptsRuntimeQuery": true,
           "confKey": "ReceiverHost",
           "diagnosticCode": "UA-YAML-RECEIVER-HOST",
           "key": "host",
           "kind": "string",
-          "required": false
+          "required": false,
+          "runtimeQueryResolved": true
         },
         {
+          "acceptsRuntimeQuery": true,
           "confKey": "ReceiverSource",
           "diagnosticCode": "UA-YAML-RECEIVER-SOURCE",
           "key": "source",
           "kind": "string",
-          "required": false
+          "required": false,
+          "runtimeQueryResolved": true
         },
         {
+          "acceptsRuntimeQuery": true,
           "confKey": "ReceiverKafkaTopicName",
           "diagnosticCode": "UA-YAML-RECEIVER-KAFKA-TOPIC-NAME",
           "key": "kafka-topic-name",
           "kind": "string",
+          "queryOnly": true,
           "required": false
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "ReceiverAzureEventHubsConfigurationID",
           "diagnosticCode": "UA-YAML-RECEIVER-AZURE-EVENT-HUBS-CONFIGURATION-ID",
           "key": "azure-event-hubs-configuration-id",
           "kind": "guid",
-          "required": false
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'azure-event-hubs-configuration-id' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         },
         {
           "confKey": "ReceiverETWProviderGuid",
@@ -107,6 +145,10 @@
         {
           "confKey": "ReceiverMaxQueueSizeRAMMB",
           "diagnosticCode": "UA-YAML-RECEIVER-MAX-QUEUE-SIZE-RAM-MB",
+          "integerRange": {
+            "maximum": 17592186044415,
+            "minimum": 0
+          },
           "key": "max-queue-size-ram-mb",
           "kind": "unsigned-integer",
           "required": false
@@ -114,7 +156,23 @@
         {
           "confKey": "ReceiverMaxEventsPerSendOperation",
           "diagnosticCode": "UA-YAML-RECEIVER-MAX-EVENTS-PER-SEND-OPERATION",
+          "integerRange": {
+            "maximum": 4294967295,
+            "minimum": 0
+          },
           "key": "max-events-per-send-operation",
+          "kind": "unsigned-integer",
+          "required": false
+        },
+        {
+          "confKey": "ReceiverMaxEventLengthBytes",
+          "description": "Optional event-length override in bytes. Splunk's effective default is 10000 bytes when unset; 0 disables the limit. Valid range: 0..4294967295 bytes. Other receiver types accept but ignore the option. Configuration-only; this setting is not enforced at runtime.",
+          "diagnosticCode": "UA-YAML-RECEIVER-MAX-EVENT-LENGTH-BYTES",
+          "integerRange": {
+            "maximum": 4294967295,
+            "minimum": 0
+          },
+          "key": "max-event-length-bytes",
           "kind": "unsigned-integer",
           "required": false
         },
@@ -132,41 +190,66 @@
             {
               "confKey": "PersistentOutputQueueBackend",
               "diagnosticCode": "UA-YAML-RECEIVER-POQ-BACKEND",
+              "enumValues": [
+                "SQLite",
+                "Off"
+              ],
               "key": "backend",
-              "kind": "string",
+              "kind": "enum-string",
               "required": false
             },
             {
               "confKey": "PersistentOutputQueueErrorHandling",
               "diagnosticCode": "UA-YAML-RECEIVER-POQ-ERROR-HANDLING",
+              "enumValues": [
+                "None",
+                "IgnoreFile",
+                "StopReceiver",
+                "Shutdown"
+              ],
               "key": "error-handling",
-              "kind": "string",
+              "kind": "enum-string",
               "required": false
             },
             {
+              "acceptsRuntimeQuery": false,
               "confKey": "PersistentOutputQueuePathWindows",
               "diagnosticCode": "UA-YAML-RECEIVER-POQ-PATH-WINDOWS",
               "key": "path-windows",
               "kind": "string",
-              "required": false
+              "required": false,
+              "runtimeQueryResolved": true,
+              "runtimeQueryUnsupportedReason": "The YAML key 'path-windows' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
             },
             {
+              "acceptsRuntimeQuery": false,
               "confKey": "PersistentOutputQueuePathMacOS",
               "diagnosticCode": "UA-YAML-RECEIVER-POQ-PATH-MACOS",
               "key": "path-macos",
               "kind": "string",
-              "required": false
+              "required": false,
+              "runtimeQueryResolved": true,
+              "runtimeQueryUnsupportedReason": "The YAML key 'path-macos' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
             },
             {
+              "acceptsRuntimeQuery": false,
               "confKey": "PersistentOutputQueuePathLinux",
               "diagnosticCode": "UA-YAML-RECEIVER-POQ-PATH-LINUX",
               "key": "path-linux",
               "kind": "string",
-              "required": false
+              "required": false,
+              "runtimeQueryResolved": true,
+              "runtimeQueryUnsupportedReason": "The YAML key 'path-linux' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
             },
             {
               "confKey": "PersistentOutputQueueMaxAge",
               "diagnosticCode": "UA-YAML-RECEIVER-POQ-MAX-AGE",
+              "durationRange": {
+                "maxMs": null,
+                "minMs": 3600000,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": true
+              },
               "key": "max-age",
               "kind": "duration",
               "required": false
@@ -174,6 +257,12 @@
             {
               "confKey": "PersistentOutputQueueNextSendAttempt",
               "diagnosticCode": "UA-YAML-RECEIVER-POQ-NEXT-SEND-ATTEMPT",
+              "durationRange": {
+                "maxMs": null,
+                "minMs": 1000,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": true
+              },
               "key": "next-send-attempt",
               "kind": "duration",
               "required": false
@@ -181,6 +270,10 @@
             {
               "confKey": "PersistentOutputQueueMaxSizeMB",
               "diagnosticCode": "UA-YAML-RECEIVER-POQ-MAX-SIZE-MB",
+              "integerRange": {
+                "maximum": 4294967295,
+                "minimum": 0
+              },
               "key": "max-size-mb",
               "kind": "unsigned-integer",
               "required": false
@@ -188,6 +281,10 @@
             {
               "confKey": "PersistentOutputQueueMaxInMemoryBulkOperations",
               "diagnosticCode": "UA-YAML-RECEIVER-POQ-MAX-IN-MEMORY-BULK-OPERATIONS",
+              "integerRange": {
+                "maximum": 4294967295,
+                "minimum": 0
+              },
               "key": "max-in-memory-bulk-operations",
               "kind": "unsigned-integer",
               "required": false
@@ -200,6 +297,19 @@
       ],
       "key": "receivers",
       "kind": "object-array",
+      "requireIf": [
+        {
+          "diagnosticCode": "UA-YAML-RECEIVER-AZURE-EVENT-HUBS-CONFIGURATION-ID-REQUIRED",
+          "if": {
+            "equals": "azure-event-hubs",
+            "key": "type"
+          },
+          "message": "An azure-event-hubs receiver needs azure-event-hubs-configuration-id, the id of an entry in azure-event-hubs-configurations; without it the agent discards the receiver and sends it no data.",
+          "require": [
+            "azure-event-hubs-configuration-id"
+          ]
+        }
+      ],
       "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp"
     },
     {
@@ -232,6 +342,7 @@
           "diagnosticCode": "UA-YAML-TIMER-NAME",
           "key": "name",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -245,12 +356,19 @@
           "confKey": "TimerEventTrigger",
           "diagnosticCode": "UA-YAML-TIMER-EVENT-TRIGGER",
           "key": "event-trigger",
-          "kind": "string",
+          "kind": "string-or-string-array",
+          "rejectsEmptyList": true,
           "required": false
         },
         {
           "confKey": "TimerInterval",
           "diagnosticCode": "UA-YAML-TIMER-INTERVAL",
+          "durationRange": {
+            "maxMs": null,
+            "minMs": 0,
+            "warnOnSubsecondRemainder": false,
+            "zeroAllowed": true
+          },
           "key": "interval",
           "kind": "duration",
           "required": false
@@ -258,6 +376,12 @@
         {
           "confKey": "TimerStartDelay",
           "diagnosticCode": "UA-YAML-TIMER-START-DELAY",
+          "durationRange": {
+            "maxMs": null,
+            "minMs": 0,
+            "warnOnSubsecondRemainder": false,
+            "zeroAllowed": true
+          },
           "key": "start-delay",
           "kind": "duration",
           "required": false
@@ -302,6 +426,25 @@
         {
           "confKey": "TimerScriptContext",
           "diagnosticCode": "UA-YAML-TIMER-SCRIPT-CONTEXT",
+          "enumPlatforms": {
+            "root": [
+              "macos",
+              "linux"
+            ],
+            "session-0-as-system": [
+              "windows"
+            ],
+            "user": [
+              "macos",
+              "linux"
+            ],
+            "user-session-as-system": [
+              "windows"
+            ],
+            "user-session-as-user": [
+              "windows"
+            ]
+          },
           "enumValues": [
             "session-0-as-system",
             "user-session-as-system",
@@ -316,6 +459,12 @@
         {
           "confKey": "TimerScriptTimeout",
           "diagnosticCode": "UA-YAML-TIMER-SCRIPT-TIMEOUT",
+          "durationRange": {
+            "maxMs": null,
+            "minMs": 0,
+            "warnOnSubsecondRemainder": false,
+            "zeroAllowed": true
+          },
           "key": "script-timeout",
           "kind": "duration",
           "required": false
@@ -362,6 +511,7 @@
       "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp"
     },
     {
+      "description": "Event triggers that can additionally trigger timers on specific events (Windows only).",
       "diagnosticCodePrefix": "UA-YAML-EVENT-TRIGGERS",
       "fields": [
         {
@@ -369,6 +519,7 @@
           "diagnosticCode": "UA-YAML-EVENT-TRIGGER-NAME",
           "key": "name",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -381,13 +532,14 @@
           ],
           "key": "types",
           "kind": "enum-string-or-array",
+          "rejectsEmptyList": true,
           "required": true
         },
         {
           "confKey": "EventTriggerQuery",
           "diagnosticCode": "UA-YAML-EVENT-TRIGGER-QUERY",
           "key": "query",
-          "kind": "string",
+          "kind": "string-or-boolean",
           "required": false
         },
         {
@@ -405,6 +557,9 @@
       ],
       "key": "event-triggers",
       "kind": "object-array",
+      "platforms": [
+        "windows"
+      ],
       "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp"
     },
     {
@@ -420,6 +575,7 @@
         {
           "confKey": "NoTelemetry",
           "diagnosticCode": "UA-YAML-MISCELLANEOUS-NO-TELEMETRY",
+          "hidden": true,
           "key": "no-telemetry",
           "kind": "boolean",
           "required": false
@@ -427,6 +583,7 @@
         {
           "confKey": "TelemetryStaging",
           "diagnosticCode": "UA-YAML-MISCELLANEOUS-TELEMETRY-STAGING",
+          "hidden": true,
           "key": "telemetry-staging",
           "kind": "boolean",
           "required": false
@@ -434,6 +591,10 @@
         {
           "confKey": "LogFileCount",
           "diagnosticCode": "UA-YAML-MISCELLANEOUS-LOG-FILE-COUNT",
+          "integerRange": {
+            "maximum": 4294967295,
+            "minimum": 1
+          },
           "key": "log-file-count",
           "kind": "unsigned-integer",
           "required": false
@@ -455,6 +616,9 @@
           ],
           "key": "register-ie-addon",
           "kind": "enum-string",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -481,6 +645,9 @@
           "diagnosticCode": "UA-YAML-MISCELLANEOUS-REGISTRY-MONITORING",
           "key": "registry-monitoring",
           "kind": "boolean",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -488,18 +655,23 @@
           "diagnosticCode": "UA-YAML-MISCELLANEOUS-REMOTE-THREAD-MONITORING",
           "key": "remote-thread-monitoring",
           "kind": "boolean",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
           "confKey": "WmiProvider",
           "diagnosticCode": "UA-YAML-MISCELLANEOUS-WMI-PROVIDER",
           "enumValues": [
-            "wmic",
             "powershell",
             "uberAgent"
           ],
           "key": "wmi-provider",
           "kind": "enum-string",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -525,6 +697,9 @@
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-IE-IGNORE-FRAMES",
               "key": "ie-ignore-frames",
               "kind": "boolean",
+              "platforms": [
+                "windows"
+              ],
               "required": false
             },
             {
@@ -614,6 +789,12 @@
             {
               "confKey": "ConfigFlags.SessionHelperQueryDelayMs",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-SESSION-HELPER-QUERY-DELAY",
+              "durationRange": {
+                "maxMs": null,
+                "minMs": 0,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": false
+              },
               "key": "session-helper-query-delay",
               "kind": "duration",
               "required": false
@@ -621,6 +802,12 @@
             {
               "confKey": "ConfigFlags.POQSendWaitDelayMs",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-POQ-SEND-WAIT-DELAY",
+              "durationRange": {
+                "maxMs": 10000,
+                "minMs": 100,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": false
+              },
               "key": "poq-send-wait-delay",
               "kind": "duration",
               "required": false
@@ -628,6 +815,12 @@
             {
               "confKey": "ConfigFlags.POQTimeoutMs",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-POQ-TIMEOUT",
+              "durationRange": {
+                "maxMs": 100000,
+                "minMs": 100,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": false
+              },
               "key": "poq-timeout",
               "kind": "duration",
               "required": false
@@ -635,6 +828,12 @@
             {
               "confKey": "ConfigFlags.NetworkCommunicationTimeoutMs",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-NETWORK-COMMUNICATION-TIMEOUT",
+              "durationRange": {
+                "maxMs": 1000000,
+                "minMs": 100,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": false
+              },
               "key": "network-communication-timeout",
               "kind": "duration",
               "required": false
@@ -642,6 +841,12 @@
             {
               "confKey": "ConfigFlags.LockEnterMaxWaitMs",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-LOCK-ENTER-MAX-WAIT",
+              "durationRange": {
+                "maxMs": null,
+                "minMs": 100,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": false
+              },
               "key": "lock-enter-max-wait",
               "kind": "duration",
               "required": false
@@ -649,6 +854,12 @@
             {
               "confKey": "ConfigFlags.LockHeldMaxWaitMs",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-LOCK-HELD-MAX-WAIT",
+              "durationRange": {
+                "maxMs": null,
+                "minMs": 100,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": false
+              },
               "key": "lock-held-max-wait",
               "kind": "duration",
               "required": false
@@ -656,6 +867,12 @@
             {
               "confKey": "ConfigFlags.InternalScriptTimeoutMs",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-INTERNAL-SCRIPT-TIMEOUT",
+              "durationRange": {
+                "maxMs": null,
+                "minMs": 100,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": true
+              },
               "key": "internal-script-timeout",
               "kind": "duration",
               "required": false
@@ -663,20 +880,39 @@
             {
               "confKey": "ConfigFlags.BootDetailTimeoutMs",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-BOOT-DETAIL-TIMEOUT",
+              "durationRange": {
+                "maxMs": null,
+                "minMs": 60000,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": false
+              },
               "key": "boot-detail-timeout",
               "kind": "duration",
               "required": false
             },
             {
-              "confKey": "ConfigFlags.RegistryEventsCacheTTL",
+              "confKey": "ConfigFlags.RegistryEventsCacheTtlSec",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-REGISTRY-EVENTS-CACHE-TTL",
+              "durationRange": {
+                "maxMs": null,
+                "minMs": 1000,
+                "warnOnSubsecondRemainder": false,
+                "zeroAllowed": false
+              },
               "key": "registry-events-cache-ttl",
               "kind": "duration",
+              "platforms": [
+                "windows"
+              ],
               "required": false
             },
             {
               "confKey": "ConfigFlags.CitrixODataAPIMaximumAttempts",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-CITRIX-ODATA-API-MAXIMUM-ATTEMPTS",
+              "integerRange": {
+                "maximum": 9223372036854775807,
+                "minimum": 1
+              },
               "key": "citrix-odata-api-maximum-attempts",
               "kind": "unsigned-integer",
               "required": false
@@ -684,6 +920,10 @@
             {
               "confKey": "ConfigFlags.CitrixSDKMaxRecordCount",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-CITRIX-SDK-MAX-RECORD-COUNT",
+              "integerRange": {
+                "maximum": 9223372036854775807,
+                "minimum": 0
+              },
               "key": "citrix-sdk-max-record-count",
               "kind": "unsigned-integer",
               "required": false
@@ -691,20 +931,37 @@
             {
               "confKey": "ConfigFlags.NetworkDriverMaximumConnectionLimit",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-NETWORK-DRIVER-MAXIMUM-CONNECTION-LIMIT",
+              "integerRange": {
+                "maximum": 65535,
+                "minimum": 1
+              },
               "key": "network-driver-maximum-connection-limit",
               "kind": "unsigned-integer",
+              "platforms": [
+                "windows"
+              ],
               "required": false
             },
             {
               "confKey": "ConfigFlags.RegDataMaxLength",
+              "description": "Maximum registry value data length in bytes. The agent rounds an odd value down to the next even number.",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-REG-DATA-MAX-LENGTH",
+              "integerRange": {
+                "maximum": 18446744073709551615,
+                "minimum": 0
+              },
               "key": "reg-data-max-length",
               "kind": "unsigned-integer",
-              "required": false
+              "required": false,
+              "roundsDownToEven": true
             },
             {
               "confKey": "ConfigFlags.MaxProcessEventQueueSize",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-MAX-PROCESS-EVENT-QUEUE-SIZE",
+              "integerRange": {
+                "maximum": 9223372036854775807,
+                "minimum": 100
+              },
               "key": "max-process-event-queue-size",
               "kind": "unsigned-integer",
               "required": false
@@ -712,6 +969,10 @@
             {
               "confKey": "ConfigFlags.MaxLibraryEventQueueSize",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-MAX-LIBRARY-EVENT-QUEUE-SIZE",
+              "integerRange": {
+                "maximum": 9223372036854775807,
+                "minimum": 100
+              },
               "key": "max-library-event-queue-size",
               "kind": "unsigned-integer",
               "required": false
@@ -719,6 +980,10 @@
             {
               "confKey": "ConfigFlags.MaxThreadEventQueueSize",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-MAX-THREAD-EVENT-QUEUE-SIZE",
+              "integerRange": {
+                "maximum": 9223372036854775807,
+                "minimum": 100
+              },
               "key": "max-thread-event-queue-size",
               "kind": "unsigned-integer",
               "required": false
@@ -726,6 +991,10 @@
             {
               "confKey": "ConfigFlags.MaxRegistryEventQueueSize",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-MAX-REGISTRY-EVENT-QUEUE-SIZE",
+              "integerRange": {
+                "maximum": 9223372036854775807,
+                "minimum": 100
+              },
               "key": "max-registry-event-queue-size",
               "kind": "unsigned-integer",
               "required": false
@@ -733,6 +1002,10 @@
             {
               "confKey": "ConfigFlags.MaxProcessBatchSize",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-MAX-PROCESS-BATCH-SIZE",
+              "integerRange": {
+                "maximum": 4294967295,
+                "minimum": 100
+              },
               "key": "max-process-batch-size",
               "kind": "unsigned-integer",
               "required": false
@@ -740,6 +1013,10 @@
             {
               "confKey": "ConfigFlags.MaxLibrariesBatchSize",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-MAX-LIBRARIES-BATCH-SIZE",
+              "integerRange": {
+                "maximum": 4294967295,
+                "minimum": 100
+              },
               "key": "max-libraries-batch-size",
               "kind": "unsigned-integer",
               "required": false
@@ -747,6 +1024,10 @@
             {
               "confKey": "ConfigFlags.AzureEventHubsMaxEventSizeKB",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-AZURE-EVENT-HUBS-MAX-EVENT-SIZE-KB",
+              "integerRange": {
+                "maximum": 9223372036854775807,
+                "minimum": 10
+              },
               "key": "azure-event-hubs-max-event-size-kb",
               "kind": "unsigned-integer",
               "required": false
@@ -754,8 +1035,15 @@
             {
               "confKey": "ConfigFlags.RegistryEventsCacheSize",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-REGISTRY-EVENTS-CACHE-SIZE",
+              "integerRange": {
+                "maximum": 18446744073709551615,
+                "minimum": 1
+              },
               "key": "registry-events-cache-size",
               "kind": "unsigned-integer",
+              "platforms": [
+                "windows"
+              ],
               "required": false
             },
             {
@@ -770,6 +1058,11 @@
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-TRACE-LOG-FILTER-EXPRESSION",
               "key": "trace-log-filter-expression",
               "kind": "string",
+              "regex": {
+                "engine": "boost-regex",
+                "ignoreCase": true,
+                "syntax": "perl"
+              },
               "required": false
             }
           ],
@@ -786,11 +1079,14 @@
       "diagnosticCodePrefix": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATIONS",
       "fields": [
         {
+          "acceptsRuntimeQuery": true,
           "confKey": "AzureEventHubsConfiguration.ID",
           "diagnosticCode": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATION-ID",
           "key": "id",
           "kind": "guid",
-          "required": false
+          "required": false,
+          "runtimeQueryResolved": true,
+          "uniqueAcrossEntries": true
         },
         {
           "confKey": "AzureEventHubsConfiguration.Platform",
@@ -805,58 +1101,95 @@
           "required": false
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "AzureEventHubsConfiguration.AuthenticationURL",
           "diagnosticCode": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATION-AUTHENTICATION-URL",
           "key": "authentication-url",
           "kind": "uri",
-          "required": false
+          "nonEmpty": true,
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'authentication-url' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "AzureEventHubsConfiguration.SendDataURL",
           "diagnosticCode": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATION-SEND-DATA-URL",
           "key": "send-data-url",
           "kind": "uri",
-          "required": false
+          "nonEmpty": true,
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'send-data-url' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         },
         {
+          "acceptsRuntimeQuery": true,
           "confKey": "AzureEventHubsConfiguration.Namespace",
           "diagnosticCode": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATION-NAMESPACE",
           "key": "namespace",
           "kind": "string",
-          "required": false
+          "nonEmpty": true,
+          "required": false,
+          "runtimeQueryResolved": true
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "AzureEventHubsConfiguration.HubName",
           "diagnosticCode": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATION-HUB-NAME",
           "key": "hub-name",
           "kind": "string",
-          "required": false
+          "nonEmpty": true,
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'hub-name' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "AzureEventHubsConfiguration.TenantID",
           "diagnosticCode": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATION-TENANT-ID",
           "key": "tenant-id",
-          "kind": "string",
-          "required": false
+          "kind": "guid",
+          "nonEmpty": true,
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'tenant-id' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "AzureEventHubsConfiguration.ClientID",
           "diagnosticCode": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATION-CLIENT-ID",
           "key": "client-id",
-          "kind": "string",
-          "required": false
+          "kind": "guid",
+          "nonEmpty": true,
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'client-id' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         },
         {
+          "acceptsRuntimeQuery": false,
           "confKey": "AzureEventHubsConfiguration.ClientSecret",
+          "credentialStoreReference": true,
           "diagnosticCode": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATION-CLIENT-SECRET",
           "key": "client-secret",
           "kind": "string",
-          "required": false
+          "nonEmpty": true,
+          "required": false,
+          "runtimeQueryResolved": true,
+          "runtimeQueryUnsupportedReason": "The YAML key 'client-secret' cannot be set by a uAQL query because uAQL variable names cannot contain '-'; use a literal value."
         }
       ],
+      "inertPlaceholderEntries": true,
       "key": "azure-event-hubs-configurations",
       "kind": "object-array",
-      "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp"
+      "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp",
+      "uniqueAcrossEntries": [
+        {
+          "caseInsensitive": true,
+          "diagnosticCode": "UA-YAML-AZURE-EVENT-HUBS-CONFIGURATION-DUPLICATE-ID",
+          "field": "id",
+          "message": "Duplicate Azure Event Hubs configuration id"
+        }
+      ]
     },
     {
       "diagnosticCodePrefix": "UA-YAML-EVENT-LOGS",
@@ -867,6 +1200,7 @@
           "diagnosticCode": "UA-YAML-EVENT-LOG-NAME",
           "key": "name",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -883,6 +1217,10 @@
       ],
       "key": "event-logs",
       "kind": "object-array",
+      "platforms": [
+        "windows",
+        "macos"
+      ],
       "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp",
       "variants": [
         {
@@ -892,6 +1230,7 @@
               "diagnosticCode": "UA-YAML-EVENT-LOG-CHANNEL",
               "key": "channel",
               "kind": "string",
+              "nonEmpty": true,
               "required": true
             },
             {
@@ -939,11 +1278,16 @@
               "diagnosticCode": "UA-YAML-EVENT-LOG-PREDICATE",
               "key": "predicate",
               "kind": "string",
+              "nonEmpty": true,
               "required": true
             },
             {
               "confKey": "EventLog.MaxMessageLengthBytes",
               "diagnosticCode": "UA-YAML-EVENT-LOG-MAX-MESSAGE-LENGTH-BYTES",
+              "integerRange": {
+                "maximum": 9223372036854775807,
+                "minimum": 1
+              },
               "key": "max-message-length-bytes",
               "kind": "unsigned-integer",
               "required": false
@@ -951,6 +1295,10 @@
             {
               "confKey": "EventLog.RateLimit",
               "diagnosticCode": "UA-YAML-EVENT-LOG-RATE-LIMIT",
+              "integerRange": {
+                "maximum": 9223372036854775807,
+                "minimum": 1
+              },
               "key": "rate-limit",
               "kind": "unsigned-integer",
               "required": false
@@ -968,7 +1316,9 @@
           "diagnosticCode": "UA-YAML-SCRIPT-INTERPRETER-NAME",
           "key": "name",
           "kind": "string",
-          "required": true
+          "nonEmpty": true,
+          "required": true,
+          "uniqueAcrossEntries": true
         },
         {
           "confKey": "ScriptInterpreter.Platform",
@@ -987,10 +1337,12 @@
           "diagnosticCode": "UA-YAML-SCRIPT-INTERPRETER-EXECUTABLE",
           "key": "executable",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         },
         {
           "confKey": "ScriptInterpreter.ArgsTemplate",
+          "description": "Argument template for the interpreter's command line. Use ###UA_SCRIPT### as the placeholder for the script path.",
           "diagnosticCode": "UA-YAML-SCRIPT-INTERPRETER-ARGS-TEMPLATE",
           "key": "args-template",
           "kind": "string",
@@ -999,13 +1351,22 @@
       ],
       "key": "script-interpreters",
       "kind": "object-array",
-      "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp"
+      "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp",
+      "uniqueAcrossEntries": [
+        {
+          "caseInsensitive": true,
+          "diagnosticCode": "UA-YAML-SCRIPT-INTERPRETER-DUPLICATE-NAME",
+          "field": "name",
+          "message": "Duplicate script-interpreter name"
+        }
+      ]
     },
     {
       "diagnosticCodePrefix": "UA-YAML-PROXY",
       "fields": [
         {
           "confKey": "Proxy.HonorEnvironmentProxy",
+          "description": "Honor proxy settings from environment variables when no configured proxy route matches (all platforms).",
           "diagnosticCode": "UA-YAML-PROXY-HONOR-ENVIRONMENT-PROXY",
           "key": "honor-environment-proxy",
           "kind": "boolean",
@@ -1024,6 +1385,13 @@
           "diagnosticCode": "UA-YAML-PROXY-ROUTE-HOST-PATTERN",
           "key": "host-pattern",
           "kind": "string",
+          "nonEmpty": true,
+          "nonEmptyTrimmed": true,
+          "regex": {
+            "engine": "boost-regex",
+            "ignoreCase": true,
+            "syntax": "perl"
+          },
           "required": true
         },
         {
@@ -1031,6 +1399,8 @@
           "diagnosticCode": "UA-YAML-PROXY-ROUTE-PROXY",
           "key": "proxy",
           "kind": "string",
+          "nonEmpty": true,
+          "nonEmptyTrimmed": true,
           "required": true
         },
         {
@@ -1058,13 +1428,18 @@
           "diagnosticCode": "UA-YAML-PROXY-CREDENTIAL-PROXY",
           "key": "proxy",
           "kind": "string",
+          "nonEmpty": true,
+          "nonEmptyTrimmed": true,
+          "proxyHostRequired": true,
           "required": true
         },
         {
           "confKey": "ProxyAuth.ProxyAuth",
+          "credentialStoreReference": true,
           "diagnosticCode": "UA-YAML-PROXY-CREDENTIAL-CREDENTIAL",
           "key": "credential",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -1096,6 +1471,7 @@
         },
         {
           "confKey": "NutanixFrame.AgentDetectionPath",
+          "description": "Registry key below HKLM whose presence tells the agent that the Frame agent is installed (default SOFTWARE\\Nutanix\\Frame\\FGA).",
           "diagnosticCode": "UA-YAML-NUTANIX-FRAME-AGENT-DETECTION-PATH",
           "key": "frame-agent-detection-path",
           "kind": "string",
@@ -1104,9 +1480,13 @@
       ],
       "key": "nutanix-frame",
       "kind": "object",
+      "platforms": [
+        "windows"
+      ],
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
+      "description": "macOS/Linux remote-configuration descriptor only (uberAgent-remote-config-macOS.yaml or uberAgent-remote-config-linux.yaml); a main configuration ignores it. Windows uses the registry-based central configuration instead.",
       "diagnosticCodePrefix": "UA-YAML-REMOTE-CONFIGURATION",
       "fields": [
         {
@@ -1119,6 +1499,10 @@
       ],
       "key": "remote-configuration",
       "kind": "object",
+      "platforms": [
+        "macos",
+        "linux"
+      ],
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1129,6 +1513,7 @@
           "diagnosticCode": "UA-YAML-INCLUDE-PATH",
           "key": "path",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -1169,6 +1554,12 @@
         {
           "confKey": "ConfigCachePollInterval",
           "diagnosticCode": "UA-YAML-CONFIGURATION-SETTINGS-CONFIG-CACHE-POLL-INTERVAL",
+          "durationRange": {
+            "maxMs": null,
+            "minMs": 60000,
+            "warnOnSubsecondRemainder": false,
+            "zeroAllowed": true
+          },
           "key": "config-cache-poll-interval",
           "kind": "duration",
           "required": false
@@ -1176,6 +1567,12 @@
         {
           "confKey": "LicenseCachePollInterval",
           "diagnosticCode": "UA-YAML-CONFIGURATION-SETTINGS-LICENSE-CACHE-POLL-INTERVAL",
+          "durationRange": {
+            "maxMs": null,
+            "minMs": 60000,
+            "warnOnSubsecondRemainder": false,
+            "zeroAllowed": false
+          },
           "key": "license-cache-poll-interval",
           "kind": "duration",
           "required": false
@@ -1183,6 +1580,12 @@
         {
           "confKey": "ConfigChangeRestartTimeout",
           "diagnosticCode": "UA-YAML-CONFIGURATION-SETTINGS-CONFIG-CHANGE-RESTART-TIMEOUT",
+          "durationRange": {
+            "maxMs": null,
+            "minMs": 1000,
+            "warnOnSubsecondRemainder": true,
+            "zeroAllowed": true
+          },
           "key": "config-change-restart-timeout",
           "kind": "duration",
           "required": false
@@ -1204,7 +1607,12 @@
       "fields": [
         {
           "confKey": "SessionFgWindowTitleMaxLength",
+          "description": "Maximum number of characters of the foreground window title to include in SessionDetail; 0 sends no window title.",
           "diagnosticCode": "UA-YAML-SESSION-DETAIL-CONFIG-SESSION-FG-WINDOW-TITLE-MAX-LENGTH",
+          "integerRange": {
+            "maximum": 2147483647,
+            "minimum": 0
+          },
           "key": "session-fg-window-title-max-length",
           "kind": "unsigned-integer",
           "required": false
@@ -1236,11 +1644,22 @@
           "diagnosticCode": "UA-YAML-FILESYSTEM-MONITORING-ENABLE-BYPASS-IO",
           "key": "enable-bypass-io",
           "kind": "boolean",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
           "confKey": "FilesystemMonitoring.Monitor",
           "diagnosticCode": "UA-YAML-FILESYSTEM-MONITORING-MONITOR",
+          "enumPlatforms": {
+            "mailslots": [
+              "windows"
+            ],
+            "named-pipes": [
+              "windows"
+            ]
+          },
           "enumValues": [
             "disks",
             "network-shares",
@@ -1271,6 +1690,9 @@
           "diagnosticCode": "UA-YAML-PROCESS-STARTUP-SETTINGS-ENABLE-CALCULATE-HASH",
           "key": "enable-calculate-hash",
           "kind": "boolean",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -1278,6 +1700,9 @@
           "diagnosticCode": "UA-YAML-PROCESS-STARTUP-SETTINGS-ENABLE-CD-HASH",
           "key": "enable-cd-hash",
           "kind": "boolean",
+          "platforms": [
+            "macos"
+          ],
           "required": false
         },
         {
@@ -1285,6 +1710,9 @@
           "diagnosticCode": "UA-YAML-PROCESS-STARTUP-SETTINGS-ENABLE-BLOCKED-EXECS",
           "key": "enable-blocked-execs",
           "kind": "boolean",
+          "platforms": [
+            "macos"
+          ],
           "required": false
         },
         {
@@ -1297,6 +1725,9 @@
           ],
           "key": "hash-image-types",
           "kind": "enum-string",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -1309,14 +1740,25 @@
             "imphash"
           ],
           "key": "hash-algorithm",
-          "kind": "enum-string",
+          "kind": "enum-string-or-array",
+          "platforms": [
+            "windows"
+          ],
+          "rejectsEmptyList": true,
           "required": false
         },
         {
           "confKey": "ProcessStartup.HashesCacheMaxSize",
           "diagnosticCode": "UA-YAML-PROCESS-STARTUP-SETTINGS-HASHES-CACHE-MAX-SIZE",
+          "integerRange": {
+            "maximum": 2000000,
+            "minimum": 0
+          },
           "key": "hashes-cache-max-size",
           "kind": "unsigned-integer",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -1324,6 +1766,9 @@
           "diagnosticCode": "UA-YAML-PROCESS-STARTUP-SETTINGS-ENABLE-AUTHENTICODE",
           "key": "enable-authenticode",
           "kind": "boolean",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -1336,13 +1781,23 @@
           ],
           "key": "authenticode-image-types",
           "kind": "enum-string",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
           "confKey": "ProcessStartup.AuthenticodeCacheMaxSize",
           "diagnosticCode": "UA-YAML-PROCESS-STARTUP-SETTINGS-AUTHENTICODE-CACHE-MAX-SIZE",
+          "integerRange": {
+            "maximum": 2000000,
+            "minimum": 0
+          },
           "key": "authenticode-cache-max-size",
           "kind": "unsigned-integer",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -1350,6 +1805,9 @@
           "diagnosticCode": "UA-YAML-PROCESS-STARTUP-SETTINGS-ENABLE-PROCESS-TAMPERING",
           "key": "enable-process-tampering",
           "kind": "boolean",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         }
       ],
@@ -1400,6 +1858,9 @@
       ],
       "key": "process-startup-duration-wait-interval-override",
       "kind": "object",
+      "platforms": [
+        "windows"
+      ],
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1407,9 +1868,22 @@
       "fields": [
         {
           "confKey": "NetworkTargetPerformanceProcessConfig.Key",
+          "description": "Grouping key: process-id or process-name (the aliases id and name are accepted, case-insensitive).",
           "diagnosticCode": "UA-YAML-NETWORK-TARGET-PERFORMANCE-PROCESS-CONFIG-KEY",
+          "enumAliases": {
+            "process-id": [
+              "id"
+            ],
+            "process-name": [
+              "name"
+            ]
+          },
+          "enumValues": [
+            "process-id",
+            "process-name"
+          ],
           "key": "key",
-          "kind": "string",
+          "kind": "enum-string",
           "required": false
         },
         {
@@ -1431,6 +1905,9 @@
           "diagnosticCode": "UA-YAML-NETWORK-TARGET-PERFORMANCE-PROCESS-CONFIG-NETWORK-DRIVER-ENABLED",
           "key": "network-driver-enabled",
           "kind": "boolean",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -1438,6 +1915,9 @@
           "diagnosticCode": "UA-YAML-NETWORK-TARGET-PERFORMANCE-PROCESS-CONFIG-NETWORK-DRIVER-LEGACY-API",
           "key": "network-driver-legacy-api",
           "kind": "boolean",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         },
         {
@@ -1445,6 +1925,9 @@
           "diagnosticCode": "UA-YAML-NETWORK-TARGET-PERFORMANCE-PROCESS-CONFIG-TEST-COMPARE-NETWORK-DRIVER-AND-ETW",
           "key": "test-compare-network-driver-and-etw",
           "kind": "boolean",
+          "platforms": [
+            "windows"
+          ],
           "required": false
         }
       ],
@@ -1460,6 +1943,12 @@
           "diagnosticCode": "UA-YAML-PROCESS-TO-APPLICATION-MAPPING-ENTRY-REGEX",
           "key": "regex",
           "kind": "string",
+          "nonEmpty": true,
+          "regex": {
+            "engine": "boost-regex",
+            "ignoreCase": true,
+            "syntax": "perl"
+          },
           "required": true
         },
         {
@@ -1467,6 +1956,7 @@
           "diagnosticCode": "UA-YAML-PROCESS-TO-APPLICATION-MAPPING-ENTRY-NAME",
           "key": "name",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         }
       ],
@@ -1489,6 +1979,12 @@
           "diagnosticCode": "UA-YAML-BROWSER-WEB-APP-URL-FILTER-ENTRY-REGEX",
           "key": "regex",
           "kind": "string",
+          "nonEmpty": true,
+          "regex": {
+            "engine": "boost-regex",
+            "ignoreCase": true,
+            "syntax": "perl"
+          },
           "required": true
         },
         {
@@ -1515,13 +2011,22 @@
           "diagnosticCode": "UA-YAML-BROWSER-WEB-APP-URL-COMPONENT-DETAIL-ENTRY-REGEX",
           "key": "regex",
           "kind": "string",
+          "nonEmpty": true,
+          "regex": {
+            "engine": "boost-regex",
+            "ignoreCase": true,
+            "syntax": "perl"
+          },
           "required": true
         },
         {
           "confKey": "BrowserWebAppUrlComponentDetail.Component",
+          "description": "Component detail spec for URLs that match the entry's regex: host[:path[(depth)]][:query[(parameters)]], case-insensitive. path(2) keeps the first two path segments; query(id,page) keeps only the query parameters whose names match one of these comma-separated regular expressions. Two specs separated by ';' apply to tab URLs and to request URLs respectively.",
           "diagnosticCode": "UA-YAML-BROWSER-WEB-APP-URL-COMPONENT-DETAIL-ENTRY-COMPONENT",
           "key": "component",
           "kind": "string",
+          "nonEmpty": true,
+          "pattern": "^host(?::path(?:\\([0-9]+\\)?)?)?(?::query(?:\\([^)]+\\)?)?)?(?:;host(?::path(?:\\([0-9]+\\)?)?)?(?::query(?:\\([^)]+\\)?)?)?)?$",
           "required": true
         }
       ],
@@ -1537,6 +2042,12 @@
           "diagnosticCode": "UA-YAML-PROCESS-DETAIL-SEND-COMMANDLINE-ENTRY-REGEX",
           "key": "regex",
           "kind": "string",
+          "nonEmpty": true,
+          "regex": {
+            "engine": "boost-regex",
+            "ignoreCase": true,
+            "syntax": "perl"
+          },
           "required": true
         },
         {
@@ -1556,13 +2067,21 @@
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
+      "description": "Filter for threat detection rules. Allow or deny rules by a regular expression matched against the full rule ID.",
       "diagnosticCodePrefix": "UA-YAML-THREAT-DETECTION-RULE-FILTER",
       "fields": [
         {
           "confKey": "ThreatDetectionRuleFilter.Regex",
+          "description": "Regular expression matched against the full rule ID (not the rule name); matching rules are allowed or denied by action.",
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-FILTER-ENTRY-REGEX",
           "key": "regex",
           "kind": "string",
+          "nonEmpty": true,
+          "regex": {
+            "engine": "boost-regex",
+            "ignoreCase": true,
+            "syntax": "perl"
+          },
           "required": true
         },
         {
@@ -1586,6 +2105,9 @@
       "fields": [],
       "key": "ignore-logon-monitoring-processes",
       "kind": "string-array",
+      "platforms": [
+        "windows"
+      ],
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1596,6 +2118,8 @@
           "diagnosticCode": "UA-YAML-CITRIX-ADC-CONFIG-SERVERS",
           "key": "servers",
           "kind": "string-or-string-array",
+          "nonEmpty": true,
+          "rejectsEmptyList": true,
           "required": false
         },
         {
@@ -1607,6 +2131,7 @@
         },
         {
           "confKey": "CitrixADCConfig.Password",
+          "credentialStoreReference": true,
           "diagnosticCode": "UA-YAML-CITRIX-ADC-CONFIG-PASSWORD",
           "key": "password",
           "kind": "string",
@@ -1634,10 +2159,12 @@
           "required": false
         },
         {
+          "commaSeparatedItems": true,
           "confKey": "CitrixADCConfig.CollectADCInformationMachines",
           "diagnosticCode": "UA-YAML-CITRIX-ADC-CONFIG-COLLECT-ADC-INFORMATION-MACHINES",
           "key": "collect-adc-information-machines",
           "kind": "string-or-string-array",
+          "nonEmpty": true,
           "required": false
         },
         {
@@ -1653,8 +2180,25 @@
           "required": false
         }
       ],
+      "inertPlaceholderEntries": true,
       "key": "citrix-adc-configs",
       "kind": "object-array",
+      "platforms": [
+        "windows"
+      ],
+      "requireIf": [
+        {
+          "diagnosticCode": "UA-YAML-CITRIX-ADC-CONFIG-MACHINELIST-MACHINES",
+          "if": {
+            "equals": "machinelist",
+            "key": "collect-adc-information"
+          },
+          "message": "collect-adc-information: MachineList needs at least one machine name in collect-adc-information-machines; without one the agent discards this ADC configuration. Add the machine names, or choose another collect-adc-information value.",
+          "require": [
+            "collect-adc-information-machines"
+          ]
+        }
+      ],
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1672,6 +2216,7 @@
           "diagnosticCode": "UA-YAML-CITRIX-CLOUD-CONFIG-CUSTOMER-ID",
           "key": "customer-id",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
@@ -1679,13 +2224,16 @@
           "diagnosticCode": "UA-YAML-CITRIX-CLOUD-CONFIG-CLIENT-ID",
           "key": "client-id",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
           "confKey": "CitrixCloudConfig.ClientSecret",
+          "credentialStoreReference": true,
           "diagnosticCode": "UA-YAML-CITRIX-CLOUD-CONFIG-CLIENT-SECRET",
           "key": "client-secret",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
@@ -1694,7 +2242,6 @@
           "enumValues": [
             "true",
             "false",
-            "none",
             "DDCOnly",
             "MachineList"
           ],
@@ -1703,10 +2250,12 @@
           "required": false
         },
         {
+          "commaSeparatedItems": true,
           "confKey": "CitrixCloudConfig.CollectCitrixCloudInformationMachines",
           "diagnosticCode": "UA-YAML-CITRIX-CLOUD-CONFIG-COLLECT-CITRIX-CLOUD-INFORMATION-MACHINES",
           "key": "collect-citrix-cloud-information-machines",
           "kind": "string-or-string-array",
+          "nonEmpty": true,
           "required": false
         },
         {
@@ -1722,8 +2271,25 @@
           "required": false
         }
       ],
+      "inertPlaceholderEntries": true,
       "key": "citrix-cloud-configs",
       "kind": "object-array",
+      "platforms": [
+        "windows"
+      ],
+      "requireIf": [
+        {
+          "diagnosticCode": "UA-YAML-CITRIX-CLOUD-CONFIG-MACHINELIST-MACHINES",
+          "if": {
+            "equals": "machinelist",
+            "key": "collect-citrix-cloud-information"
+          },
+          "message": "collect-citrix-cloud-information: MachineList needs at least one machine name in collect-citrix-cloud-information-machines; without one the agent discards this Citrix Cloud configuration. Add the machine names, or choose another collect-citrix-cloud-information value.",
+          "require": [
+            "collect-citrix-cloud-information-machines"
+          ]
+        }
+      ],
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1734,20 +2300,30 @@
           "diagnosticCode": "UA-YAML-USER-HOST-TAG-NAME",
           "key": "name",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
           "confKey": "UserHostTag.Type",
           "diagnosticCode": "UA-YAML-USER-HOST-TAG-TYPE",
+          "enumValues": [
+            "host",
+            "user"
+          ],
           "key": "type",
-          "kind": "string",
+          "kind": "enum-string",
           "required": false
         },
         {
           "confKey": "UserHostTag.Source",
           "diagnosticCode": "UA-YAML-USER-HOST-TAG-SOURCE",
+          "enumValues": [
+            "registry",
+            "environment",
+            "ad"
+          ],
           "key": "source",
-          "kind": "string",
+          "kind": "enum-string",
           "required": false
         },
         {
@@ -1755,6 +2331,7 @@
           "diagnosticCode": "UA-YAML-USER-HOST-TAG-VALUE",
           "key": "value",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
@@ -1770,8 +2347,12 @@
           "required": false
         }
       ],
+      "inertPlaceholderEntries": true,
       "key": "user-host-tags",
       "kind": "object-array",
+      "platforms": [
+        "windows"
+      ],
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1788,8 +2369,9 @@
           "confKey": "SecurityInventoryTest.ScriptId",
           "diagnosticCode": "UA-YAML-SECURITY-INVENTORY-TEST-SCRIPT-ID",
           "key": "script-id",
-          "kind": "string",
-          "required": false
+          "kind": "guid",
+          "required": false,
+          "uniqueAcrossEntries": true
         },
         {
           "confKey": "SecurityInventoryTest.Category",
@@ -1803,6 +2385,7 @@
           "diagnosticCode": "UA-YAML-SECURITY-INVENTORY-TEST-SCRIPT-COMMANDLINE",
           "key": "script-commandline",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
@@ -1815,13 +2398,36 @@
         {
           "confKey": "SecurityInventoryTest.OutputFormat",
           "diagnosticCode": "UA-YAML-SECURITY-INVENTORY-TEST-OUTPUT-FORMAT",
+          "enumValues": [
+            "json",
+            "kv"
+          ],
           "key": "output-format",
-          "kind": "string",
+          "kind": "enum-string",
           "required": false
         },
         {
           "confKey": "SecurityInventoryTest.ScriptContext",
           "diagnosticCode": "UA-YAML-SECURITY-INVENTORY-TEST-SCRIPT-CONTEXT",
+          "enumPlatforms": {
+            "root": [
+              "macos",
+              "linux"
+            ],
+            "session-0-as-system": [
+              "windows"
+            ],
+            "user": [
+              "macos",
+              "linux"
+            ],
+            "user-session-as-system": [
+              "windows"
+            ],
+            "user-session-as-user": [
+              "windows"
+            ]
+          },
           "enumValues": [
             "session-0-as-system",
             "user-session-as-system",
@@ -1838,6 +2444,7 @@
           "diagnosticCode": "UA-YAML-SECURITY-INVENTORY-TEST-INTEGRITY-LEVEL",
           "key": "integrity-level",
           "kind": "string",
+          "pattern": "^(Low|Medium|High)(?:\\s*[+-]\\s*[A-Za-z]+(?:=[0-9]+)?)*$",
           "required": false
         },
         {
@@ -1860,9 +2467,18 @@
           "required": false
         }
       ],
+      "inertPlaceholderEntries": true,
       "key": "security-inventory-tests",
       "kind": "object-array",
-      "source": "Agent/Shared/Configuration/Yaml/"
+      "source": "Agent/Shared/Configuration/Yaml/",
+      "uniqueAcrossEntries": [
+        {
+          "caseInsensitive": true,
+          "diagnosticCode": "UA-YAML-SECURITY-INVENTORY-TEST-DUPLICATE-SCRIPT-ID",
+          "field": "script-id",
+          "message": "Duplicate security inventory script-id"
+        }
+      ]
     },
     {
       "diagnosticCodePrefix": "UA-YAML-THREAT-DETECTION-EXPRESSIONS",
@@ -1872,13 +2488,16 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-EXPRESSION-NAME",
           "key": "name",
           "kind": "string",
-          "required": true
+          "nonEmpty": true,
+          "required": true,
+          "uniqueAcrossEntries": true
         },
         {
           "confKey": "ThreatDetectionExpression.Query",
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-EXPRESSION-QUERY",
           "key": "query",
-          "kind": "string",
+          "kind": "string-or-boolean",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -1896,7 +2515,15 @@
       ],
       "key": "threat-detection-expressions",
       "kind": "object-array",
-      "source": "Agent/Shared/Configuration/Yaml/"
+      "source": "Agent/Shared/Configuration/Yaml/",
+      "uniqueAcrossEntries": [
+        {
+          "caseInsensitive": true,
+          "diagnosticCode": "UA-YAML-THREAT-DETECTION-EXPRESSION-DUPLICATE-NAME",
+          "field": "name",
+          "message": "Duplicate threat-detection expression name"
+        }
+      ]
     },
     {
       "diagnosticCodePrefix": "UA-YAML-THREAT-DETECTION-RULES",
@@ -1906,6 +2533,7 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-RULE-ID",
           "key": "rule-id",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -1913,6 +2541,7 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-RULE-NAME",
           "key": "rule-name",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -1951,6 +2580,20 @@
             "Reg.Key.Save",
             "Reg.Key.Replace",
             "Reg.Any",
+            "Reg_Key_Create",
+            "Reg_Value_Write",
+            "Reg_Delete",
+            "Reg_Key_Delete",
+            "Reg_Value_Delete",
+            "Reg_Key_SecurityChange",
+            "Reg_Key_Rename",
+            "Reg_Key_SetInformation",
+            "Reg_Key_Load",
+            "Reg_Key_Unload",
+            "Reg_Key_Restore",
+            "Reg_Key_Save",
+            "Reg_Key_Replace",
+            "Reg_Any",
             "Dns.Query",
             "DnsQuery",
             "Process.CreateRemoteThread",
@@ -1976,34 +2619,100 @@
         {
           "confKey": "ThreatDetectionRule.EventTypes",
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-EVENT-TYPES",
+          "enumValues": [
+            "Process.Start",
+            "ProcessStart",
+            "Process.Stop",
+            "ProcessStop",
+            "Image.Load",
+            "ImageLoad",
+            "Net.Connect",
+            "NetConnect",
+            "Net.Receive",
+            "NetReceive",
+            "Net.Reconnect",
+            "NetReconnect",
+            "Net.Retransmit",
+            "NetRetransmit",
+            "Net.Send",
+            "NetSend",
+            "Net.Any",
+            "NetAny",
+            "Reg.Key.Create",
+            "Reg_Key_Create",
+            "Reg.Value.Write",
+            "Reg_Value_Write",
+            "Reg.Delete",
+            "Reg_Delete",
+            "Reg.Key.Delete",
+            "Reg_Key_Delete",
+            "Reg.Value.Delete",
+            "Reg_Value_Delete",
+            "Reg.Key.SecurityChange",
+            "Reg_Key_SecurityChange",
+            "Reg.Key.Rename",
+            "Reg_Key_Rename",
+            "Reg.Key.SetInformation",
+            "Reg_Key_SetInformation",
+            "Reg.Key.Load",
+            "Reg_Key_Load",
+            "Reg.Key.Unload",
+            "Reg_Key_Unload",
+            "Reg.Key.Restore",
+            "Reg_Key_Restore",
+            "Reg.Key.Save",
+            "Reg_Key_Save",
+            "Reg.Key.Replace",
+            "Reg_Key_Replace",
+            "Reg.Any",
+            "Reg_Any",
+            "Dns.Query",
+            "DnsQuery",
+            "Process.CreateRemoteThread",
+            "Process.TamperingEvent",
+            "File.ChangeCreationTime",
+            "File.RawAccessRead",
+            "File.Create",
+            "File.CreateStream",
+            "File.PipeCreate",
+            "File.PipeConnected",
+            "File.Delete",
+            "File.Rename",
+            "File.Write",
+            "File.Read",
+            "File.SecurityChange",
+            "Driver.Load",
+            "DriverLoad"
+          ],
           "key": "event-types",
-          "kind": "string-or-string-array",
+          "kind": "enum-string-or-array",
+          "nonEmpty": true,
+          "rejectsEmptyList": true,
           "required": false
         },
         {
           "confKey": "ThreatDetectionRule.Hive",
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-HIVE",
-          "enumValues": [
-            "HKLM",
-            "HKCU",
-            "HKU",
-            "HKCR",
-            "HKCC"
-          ],
           "key": "hive",
-          "kind": "enum-string-or-array",
+          "kind": "string-or-string-array",
+          "pattern": "^[A-Za-z]+(,[A-Za-z]+)*,?$|^\\*$",
+          "rejectsEmptyList": true,
           "required": false
         },
         {
           "confKey": "ThreatDetectionRule.Annotation",
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-ANNOTATION",
           "key": "annotation",
-          "kind": "string",
+          "kind": "json-value",
           "required": false
         },
         {
           "confKey": "ThreatDetectionRule.RiskScore",
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-RISK-SCORE",
+          "integerRange": {
+            "maximum": 100,
+            "minimum": 0
+          },
           "key": "risk-score",
           "kind": "unsigned-integer",
           "required": false
@@ -2013,13 +2722,15 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-TAG",
           "key": "tag",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
           "confKey": "ThreatDetectionRule.Query",
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-QUERY",
           "key": "query",
-          "kind": "string",
+          "kind": "string-or-boolean",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -2027,6 +2738,7 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-GENERIC-PROPERTIES",
           "key": "generic-properties",
           "kind": "string-array-or-index-map",
+          "rejectsEmptyList": true,
           "required": false
         },
         {
@@ -2061,6 +2773,7 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-EXTENSION-NAME",
           "key": "name",
           "kind": "string",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -2068,6 +2781,7 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-EXTENSION-RULE-ID",
           "key": "rule-id",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
@@ -2075,6 +2789,7 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-EXTENSION-EVENT-TYPE",
           "key": "event-type",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
@@ -2082,6 +2797,9 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-EXTENSION-EVENT-TYPES",
           "key": "event-types",
           "kind": "string-or-string-array",
+          "maxItems": 1,
+          "nonEmpty": true,
+          "rejectsEmptyList": true,
           "required": false
         },
         {
@@ -2089,20 +2807,24 @@
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-EXTENSION-TAG",
           "key": "tag",
           "kind": "string",
+          "nonEmpty": true,
           "required": false
         },
         {
           "confKey": "ThreatDetectionRuleExtension.Altitude",
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-EXTENSION-ALTITUDE",
           "key": "altitude",
-          "kind": "unsigned-integer",
+          "kind": "number",
+          "maximum": 100.0,
+          "minimum": 0.0,
           "required": false
         },
         {
           "confKey": "ThreatDetectionRuleExtension.Query",
           "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-EXTENSION-QUERY",
           "key": "query",
-          "kind": "string",
+          "kind": "string-or-boolean",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -2120,6 +2842,26 @@
       ],
       "key": "threat-detection-rule-extensions",
       "kind": "object-array",
+      "mutuallyExclusive": [
+        {
+          "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-EXTENSION-SELECTOR",
+          "groups": [
+            [
+              "rule-id"
+            ],
+            [
+              "event-type"
+            ],
+            [
+              "event-types"
+            ],
+            [
+              "tag"
+            ]
+          ],
+          "message": "Use exactly one selector: rule-id, event-type, one event-types entry, or tag. The agent drops an extension that combines selector kinds, and of several event types it uses only the first."
+        }
+      ],
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -2137,6 +2879,8 @@
           "diagnosticCode": "UA-YAML-EVENT-DATA-FILTER-SOURCETYPES",
           "key": "sourcetypes",
           "kind": "string-or-string-array",
+          "nonEmpty": true,
+          "rejectsEmptyList": true,
           "required": true
         },
         {
@@ -2156,14 +2900,18 @@
           "confKey": "EventDataFilter.Field",
           "diagnosticCode": "UA-YAML-EVENT-DATA-FILTER-FIELD",
           "key": "field",
-          "kind": "string",
+          "kind": "string-or-string-array",
+          "nonEmpty": true,
+          "rejectsEmptyList": true,
           "required": false
         },
         {
           "confKey": "EventDataFilter.Query",
+          "description": "uAQL query (required) that selects the events the action applies to; use true to match every event of the listed sourcetypes.",
           "diagnosticCode": "UA-YAML-EVENT-DATA-FILTER-QUERY",
           "key": "query",
-          "kind": "string",
+          "kind": "string-or-boolean",
+          "nonEmpty": true,
           "required": true
         },
         {
@@ -2179,8 +2927,56 @@
           "required": false
         }
       ],
+      "forbidIf": [
+        {
+          "diagnosticCode": "UA-YAML-EVENT-DATA-FILTER-NONCLEAR-FIELD",
+          "forbid": [
+            "field"
+          ],
+          "if": {
+            "equals": "allow",
+            "key": "action"
+          },
+          "message": "event-data-filters field is only valid with action 'clear'"
+        },
+        {
+          "diagnosticCode": "UA-YAML-EVENT-DATA-FILTER-NONCLEAR-FIELD",
+          "forbid": [
+            "field"
+          ],
+          "if": {
+            "equals": "deny",
+            "key": "action"
+          },
+          "message": "event-data-filters field is only valid with action 'clear'"
+        },
+        {
+          "diagnosticCode": "UA-YAML-EVENT-DATA-FILTER-NONCLEAR-FIELD",
+          "forbid": [
+            "field"
+          ],
+          "if": {
+            "equals": "defer",
+            "key": "action"
+          },
+          "message": "event-data-filters field is only valid with action 'clear'"
+        }
+      ],
       "key": "event-data-filters",
       "kind": "object-array",
+      "requireIf": [
+        {
+          "diagnosticCode": "UA-YAML-EVENT-DATA-FILTER-CLEAR-FIELD",
+          "if": {
+            "equals": "clear",
+            "key": "action"
+          },
+          "message": "event-data-filters action 'clear' requires field",
+          "require": [
+            "field"
+          ]
+        }
+      ],
       "source": "Agent/Shared/Configuration/Yaml/"
     }
   ],

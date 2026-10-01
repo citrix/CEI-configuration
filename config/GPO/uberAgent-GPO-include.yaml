@@ -1,0 +1,5 @@
+config-version: 9.0
+includes:
+  - path: ../ESA/uberAgent-ESA.yaml
+    platform: windows
+  - path: ../Event data filter/uberAgent-eventdata-filter.yaml

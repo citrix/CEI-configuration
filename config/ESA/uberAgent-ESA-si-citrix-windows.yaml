@@ -1,0 +1,142 @@
+config-version: 9.0
+timers:
+  - name: "Security & Compliance Inventory timer"
+    interval: 24h
+    start-delay: 10m
+    persist-interval: true
+    ua-metrics:
+      - SecurityInventory.Antivirus
+      - SecurityInventory.Firewall
+      - SecurityInventory.LocalUsersAndGroups
+      - SecurityInventory.Network
+      - SecurityInventory.PowerShell
+      - SecurityInventory.Service
+      - SecurityInventory.WindowsConfiguration
+  - name: "Security & Compliance Inventory timer for Certificate"
+    interval: 24h
+    start-delay: 10m
+    persist-interval: true
+    ua-metrics:
+      - SecurityInventory.Certificate
+script-interpreters:
+  - name: PowerShell
+    executable: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+    args-template: "-ExecutionPolicy Bypass -file ###UA_SCRIPT###"
+security-inventory-tests:
+  - platform: windows
+    name: Antivirus
+    script-id: 01270F6B-7160-4629-90C4-F36E621D43E1
+    category: Antivirus
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\Antivirus\\Antivirus.ps1\""
+    interpreter: PowerShell
+    script-context: session-0-as-system
+    integrity-level: Medium + AllowChildProcesses=2
+  - platform: windows
+    name: Certificate-Machine
+    script-id: 02270F6B-7160-4629-90C4-F36E621D43E2
+    category: Certificate
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\Certificate\\Certificate-Machine.ps1\""
+    interpreter: PowerShell
+    script-context: session-0-as-system
+    integrity-level: High
+  - platform: windows
+    name: Certificate-User
+    script-id: 03270F6B-7160-4629-90C4-F36E621D43C2
+    category: Certificate
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\Certificate\\Certificate-User.ps1\""
+    interpreter: PowerShell
+    script-context: user-session-as-user
+    integrity-level: Medium + AllowChildProcesses=3
+  - platform: windows
+    name: Firewall
+    script-id: 04270F6B-7160-4629-90C4-F36E621D43E3
+    category: Firewall
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\Firewall\\Firewall.ps1\""
+    interpreter: PowerShell
+    script-context: session-0-as-system
+    integrity-level: Medium + AllowChildProcesses=2
+  - platform: windows
+    name: LocalUsersAndGroups-Machine
+    script-id: 05270F6B-7160-4629-90C4-F36E621D43E4
+    category: LocalUsersAndGroups
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\LocalUserAndGroups\\LocalUsersAndGroups-Machine.ps1\""
+    interpreter: PowerShell
+    script-context: session-0-as-system
+    integrity-level: Medium + AllowChildProcesses=2
+  - platform: windows
+    name: LocalUsersAndGroups-User
+    script-id: 06270F6B-7160-4629-90C4-F36E621D43E5
+    category: LocalUsersAndGroups
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\LocalUserAndGroups\\LocalUsersAndGroups-User.ps1\""
+    interpreter: PowerShell
+    script-context: user-session-as-user
+    integrity-level: Medium + AllowChildProcesses=2
+  - platform: windows
+    name: Network-Machine
+    script-id: 07270F6B-7160-4629-90C4-F36E621D43E6
+    category: Network
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\Network\\NetworkConfiguration-Machine.ps1\""
+    interpreter: PowerShell
+    script-context: session-0-as-system
+    integrity-level: Medium + AllowChildProcesses=2
+  - platform: windows
+    name: Network-User
+    script-id: 08270F6B-7160-4629-90C4-F36E621D43F1
+    category: Network
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\Network\\NetworkConfiguration-User.ps1\""
+    interpreter: PowerShell
+    script-context: user-session-as-user
+    integrity-level: Medium + AllowChildProcesses=2
+  - platform: windows
+    name: PowerShell-Machine
+    script-id: 09270F6B-7160-4629-90C4-F36E621D43E7
+    category: PowerShell
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\PowerShell\\PowerShell-Machine.ps1\""
+    interpreter: PowerShell
+    script-context: session-0-as-system
+    integrity-level: Medium + AllowChildProcesses=2
+  - platform: windows
+    name: PowerShell-User
+    script-id: 10270F6B-7160-4629-90C4-F36E621D41A7
+    category: PowerShell
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\PowerShell\\PowerShell-User.ps1\""
+    interpreter: PowerShell
+    script-context: user-session-as-user
+    integrity-level: Medium + AllowChildProcesses=2
+  - platform: windows
+    name: Service
+    script-id: 11270F6B-7160-4629-90C4-F36E621D43E8
+    category: Service
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\Service\\WindowsServices.ps1\""
+    interpreter: PowerShell
+    script-context: session-0-as-system
+    integrity-level: Medium + AllowChildProcesses=3
+  - platform: windows
+    name: WindowsConfiguration-Machine
+    script-id: 12270F6B-7160-4629-90C4-F36E621D43E9
+    category: WindowsConfiguration
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\WindowsConfiguration\\WindowsConfiguration-Machine.ps1\""
+    interpreter: PowerShell
+    script-context: session-0-as-system
+    integrity-level: High
+  - platform: windows
+    name: WindowsConfiguration-User
+    script-id: 13270F6B-7160-4629-90C4-F36E621D43F9
+    category: WindowsConfiguration
+    script-timeout: 10m
+    script-commandline: "\"###UA_SI_LOCALPATH###\\WindowsConfiguration\\WindowsConfiguration-User.ps1\" uberAgent-SCI WCHta WCCURecallStatus"
+    interpreter: PowerShell
+    script-context: user-session-as-user
+    integrity-level: Medium + AllowChildProcesses=3

@@ -1,0 +1,89 @@
+config-version: 9.0
+event-data-filters:
+  - action: deny
+    query: ProcName in ["Google Chrome", "Google Chrome Helper", "Microsoft Edge", "Microsoft Edge Helper", "Safari", "com.apple.Safari.SafeBrowsing.Service", "com.apple.WebKit.Networking", "com.apple.Safari.SearchHelper", "firefox"]
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: ProcName == "uberAgent"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: ProcName in ["awk", "basename", "bc", "bzip2", "cat", "chmod", "cmp", "cp", "cut", "date", "df", "dirname", "du", "echo", "egrep", "env", "expr", "file", "find", "grep", "groups", "head", "hostname", "id", "jq-universal", "killall", "ln", "locale", "ls", "lsof", "mkdir", "mktemp", "mv", "od", "printenv", "ps", "pwd", "readlink", "rm", "sed", "seq", "sleep", "sort", "stat", "stty", "sw_vers", "tail", "test", "touch", "tput", "tr", "uname", "vm_stat", "wc", "which", "who", "whoami", "xargs", "xmllint", "xxd"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["aslmanager", "dirhelper", "logd_helper", "logd_reporter", "path_helper"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["bash", "sh", "zsh"] AND ProcParentName in ["bash", "cmake", "jamf", "JamfDaemon", "launchd", "make", "networksetup", "ninja", "perl", "periodic-wrapper", "Python", "sh", "splunk", "splunkd", "uberAgent", "uberAgentScriptHelper", "zsh"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["xpcproxy", "AppleQEMUGuestAgent", "mdworker_shared"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName regex r"^com\.apple\."
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName regex r"^XProtectRemediator"
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName regex r"(Subscriber|Service|Helper|Extension|Worker)$" AND ProcParentName == "launchd"
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName == "oahd"
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["accessoryupdaterd", "applessdstatistics", "automount", "contactsd", "corecaptured", "gssd", "helpd", "logkextloadsd", "mc_notifier", "NANDTaskScheduler", "newsyslog", "parsec-fbf", "signpost_reporter", "trustevaluationagent"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["defaults", "diskutil", "dscl", "dsconfigad", "fdesetup", "launchctl", "MCXCompositor", "mcxalr", "networksetup", "pkgutil", "profiles", "pwpolicy", "spctl", "system_profiler", "xprotect"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["csrutil", "ifconfig", "kinit", "mount", "networkQuality", "route", "scutil", "sysctl"]
+    sourcetypes:
+      - Process:ProcessStartup
+      - Process:ProcessStop
+  - action: deny
+    query: ProcName in ["awk", "basename", "bc", "bzip2", "cat", "chmod", "cmp", "cp", "cut", "date", "df", "dirname", "du", "echo", "egrep", "env", "expr", "file", "find", "grep", "groups", "head", "hostname", "id", "jq-universal", "killall", "ln", "locale", "ls", "lsof", "mkdir", "mktemp", "mv", "od", "printenv", "ps", "pwd", "readlink", "rm", "sed", "seq", "sleep", "sort", "stat", "stty", "sw_vers", "tail", "test", "touch", "tput", "tr", "uname", "vm_stat", "wc", "which", "who", "whoami", "xargs", "xmllint", "xxd"]
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName in ["bash", "sh", "zsh"]
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName in ["aslmanager", "dirhelper", "logd_helper", "logd_reporter", "path_helper"]
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName in ["defaults", "diskutil", "dscl", "dsconfigad", "fdesetup", "networksetup", "profiles", "spctl", "system_profiler"]
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStatistics
+  - action: deny
+    query: ProcName == "uberAgent" OR ProcParentName == "uberAgent"
+    sourcetypes:
+      - ActivityMonitoring:ProcessTagging

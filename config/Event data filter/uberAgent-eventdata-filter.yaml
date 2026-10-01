@@ -1,0 +1,30 @@
+config-version: 9.0
+includes:
+  - path: uberAgent-eventdata-filter-citrix-Windows.yaml
+    platform: windows
+  - path: uberAgent-eventdata-filter-citrix-macOS.yaml
+    platform: macos
+  - path: uberAgent-eventdata-filter-citrix-Linux.yaml
+    platform: linux
+  - path: uberAgent-eventdata-filter-citrix-DNS.yaml
+    platform: windows
+  - path: uberAgent-eventdata-filter-citrix-DNS.yaml
+    platform: macos
+event-data-filters:
+  - action: clear
+    field:
+      - ProcID
+      - ProcGUID
+      - ProcParentID
+      - SessionID
+      - SessionGUID
+      - ProcParentName
+      - ProcPath
+      - ProcCmdline
+    query: Receiver.EnableExtendedInfo == false
+    sourcetypes:
+      - Process:ProcessDetail
+      - Process:ProcessStartup
+      - Application:Errors
+      - Process:DnsQuery
+      - Process:ProcessStatistics

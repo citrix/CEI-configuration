@@ -1,0 +1,60 @@
+config-version: 9.0
+threat-detection-rules:
+  - platform: macos
+    rule-id: 10227522-8429-47e6-a301-f2b2d014e7ad
+    rule-name: Macos Remote System Discovery
+    tag: proc-start-macos-remote-system-discovery
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1018\"], \"author\": \"Alejandro Ortuno, oscd.community\"}"
+    query: iendswith(Process.Path, "/arp") and icontains(Process.CommandLine, "-a") or iendswith(Process.Path, "/ping") and (icontains(Process.CommandLine, " 10.") or icontains(Process.CommandLine, " 192.168.") or icontains(Process.CommandLine, " 172.16.") or icontains(Process.CommandLine, " 172.17.") or icontains(Process.CommandLine, " 172.18.") or icontains(Process.CommandLine, " 172.19.") or icontains(Process.CommandLine, " 172.20.") or icontains(Process.CommandLine, " 172.21.") or icontains(Process.CommandLine, " 172.22.") or icontains(Process.CommandLine, " 172.23.") or icontains(Process.CommandLine, " 172.24.") or icontains(Process.CommandLine, " 172.25.") or icontains(Process.CommandLine, " 172.26.") or icontains(Process.CommandLine, " 172.27.") or icontains(Process.CommandLine, " 172.28.") or icontains(Process.CommandLine, " 172.29.") or icontains(Process.CommandLine, " 172.30.") or icontains(Process.CommandLine, " 172.31.") or icontains(Process.CommandLine, " 127.") or icontains(Process.CommandLine, " 169.254."))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 40b1fbe2-18ea-4ee7-be47-0294285811de
+    rule-name: System Shutdown/Reboot - MacOs
+    tag: proc-start-system-shutdown/reboot-macos
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1529\"], \"author\": \"Igor Fits, Mikhail Larin, oscd.community\"}"
+    query: iendswith(Process.Path, "/shutdown") or iendswith(Process.Path, "/reboot") or iendswith(Process.Path, "/halt")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: adc9bcc4-c39c-4f6b-a711-1884017bf043
+    rule-name: Network Sniffing - MacOs
+    tag: proc-start-network-sniffing-macos
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1040\"], \"author\": \"Alejandro Ortuno, oscd.community\"}"
+    query: iendswith(Process.Path, "/tcpdump") or iendswith(Process.Path, "/tshark")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 89bb1f97-c7b9-40e8-b52b-7d6afbd67276
+    rule-name: Local Groups Discovery - MacOs
+    tag: proc-start-local-groups-discovery-macos
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1069.001\"], \"author\": \"\\u00d6mer G\\u00fcnal, Alejandro Ortuno, oscd.community\"}"
+    query: iendswith(Process.Path, "/dscacheutil") and icontains(Process.CommandLine, "-q") and icontains(Process.CommandLine, "group") or iendswith(Process.Path, "/cat") and icontains(Process.CommandLine, "/etc/group") or iendswith(Process.Path, "/dscl") and icontains(Process.CommandLine, "-list") and icontains(Process.CommandLine, "/groups")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 089dbdf6-b960-4bcc-90e3-ffc3480c20f6
+    rule-name: File and Directory Discovery - MacOS
+    tag: proc-start-file-and-directory-discovery-macos
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1083\"], \"author\": \"Daniil Yugoslavskiy, oscd.community\"}"
+    query: Process.Path == "/usr/bin/file" and Process.CommandLine regex "(.){200,}" or Process.Path == "/bin/ls" and icontains(Process.CommandLine, "-R") or Process.Path == "/usr/bin/find" or Process.Path == "/usr/bin/mdfind" or Process.Path == "/tree"
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 9a7a0393-2144-4626-9bf1-7c2f5a7321db
+    rule-name: System Network Connections Discovery - MacOs
+    tag: proc-start-system-network-connections-discovery-macos
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1049\"], \"author\": \"Daniil Yugoslavskiy, oscd.community\"}"
+    query: iendswith(Process.Path, "/who") or iendswith(Process.Path, "/w") or iendswith(Process.Path, "/last") or iendswith(Process.Path, "/lsof") or iendswith(Process.Path, "/netstat")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 58800443-f9fc-4d55-ae0c-98a3966dfb97
+    rule-name: System Network Discovery - macOS
+    tag: proc-start-system-network-discovery-macos
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1016\"], \"author\": \"remotephone, oscd.community\"}"
+    query: (iendswith(Process.Path, "/arp") or iendswith(Process.Path, "/ifconfig") or iendswith(Process.Path, "/netstat") or iendswith(Process.Path, "/networksetup") or iendswith(Process.Path, "/socketfilterfw") or Process.Path == "/usr/bin/defaults" and icontains(Process.CommandLine, "/Library/Preferences/com.apple.alf") and icontains(Process.CommandLine, "read")) and not iendswith(Parent.Path, "/wifivelocityd")
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path

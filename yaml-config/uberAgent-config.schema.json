@@ -2,33 +2,94 @@
   "$defs": {
     "azure-event-hubs-configuration": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "not": {
+              "propertyNames": {
+                "const": "platform"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "id",
+              "namespace",
+              "hub-name",
+              "tenant-id",
+              "client-id",
+              "client-secret"
+            ]
+          }
+        }
+      ],
       "description": "Azure Event Hubs credential and endpoint blocks. Referenced from receivers via azure-event-hubs-configuration-id.",
       "properties": {
         "authentication-url": {
           "description": "Azure AD token endpoint URL.",
           "format": "uri",
+          "minLength": 1,
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
           "type": "string"
         },
         "client-id": {
           "description": "Azure AD application (client) ID.",
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
           "type": "string"
         },
         "client-secret": {
           "description": "Azure AD client secret.",
+          "minLength": 1,
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
+          "pattern": "^(?![\\s\\S]*###UA_CREDENTIAL_)|^###UA_CREDENTIAL_(?:#{0,2}[^#])+###(?![\\s\\S])",
           "type": "string"
         },
         "hub-name": {
           "description": "Event Hub name.",
+          "minLength": 1,
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
           "type": "string"
         },
         "id": {
-          "description": "Unique identifier (GUID) for this configuration block.",
-          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-          "type": "string"
+          "anyOf": [
+            {
+              "description": "Unique identifier (GUID) for this configuration block.",
+              "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+              "type": "string"
+            },
+            {
+              "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+              "type": "string"
+            }
+          ],
+          "description": "Unique identifier (GUID) for this configuration block."
         },
         "namespace": {
-          "description": "Event Hubs namespace.",
-          "type": "string"
+          "anyOf": [
+            {
+              "description": "Event Hubs namespace.",
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+              "type": "string"
+            }
+          ],
+          "description": "Event Hubs namespace."
         },
         "platform": {
           "$ref": "#/$defs/platform",
@@ -37,10 +98,20 @@
         "send-data-url": {
           "description": "Event Hubs data plane endpoint URL.",
           "format": "uri",
+          "minLength": 1,
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
           "type": "string"
         },
         "tenant-id": {
           "description": "Azure AD tenant ID.",
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
           "type": "string"
         }
       },
@@ -51,11 +122,15 @@
       "description": "Browser web app URL component detail configuration.",
       "properties": {
         "component": {
-          "description": "URL component name.",
-          "type": "string"
+          "description": "Component detail spec for URLs that match the entry's regex: host[:path[(depth)]][:query[(parameters)]], case-insensitive. path(2) keeps the first two path segments; query(id,page) keeps only the query parameters whose names match one of these comma-separated regular expressions. Two specs separated by ';' apply to tab URLs and to request URLs respectively.",
+          "minLength": 1,
+          "pattern": "^[hH][oO][sS][tT](?::[pP][aA][tT][hH](?:\\([0-9]+\\)?)?)?(?::[qQ][uU][eE][rR][yY](?:\\([^)]+\\)?)?)?(?:;[hH][oO][sS][tT](?::[pP][aA][tT][hH](?:\\([0-9]+\\)?)?)?(?::[qQ][uU][eE][rR][yY](?:\\([^)]+\\)?)?)?)?$",
+          "type": "string",
+          "x-uberagent-pattern-ignore-case": true
         },
         "regex": {
           "description": "URL regex pattern.",
+          "minLength": 1,
           "type": "string"
         }
       },
@@ -71,14 +146,26 @@
       "properties": {
         "action": {
           "description": "Filter action.",
-          "enum": [
-            "allow",
-            "deny"
-          ],
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "allow",
+                "deny"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:allow|deny)$"
+              },
+              "pattern": "^(?:[aA][lL][lL][oO][wW]|[dD][eE][nN][yY])$",
+              "type": "string"
+            }
+          ]
         },
         "regex": {
           "description": "URL regex pattern.",
+          "minLength": 1,
           "type": "string"
         }
       },
@@ -90,32 +177,99 @@
     },
     "citrix-adc-config": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "collect-adc-information": {
+                "pattern": "^[mM][aA][cC][hH][iI][nN][eE][lL][iI][sS][tT]$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "collect-adc-information"
+            ]
+          },
+          "then": {
+            "properties": {
+              "collect-adc-information-machines": {
+                "anyOf": [
+                  {
+                    "pattern": "[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]",
+                    "type": "string"
+                  },
+                  {
+                    "contains": {
+                      "pattern": "[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "collect-adc-information-machines"
+            ]
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "propertyNames": {
+                "const": "platform"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "servers"
+            ]
+          }
+        }
+      ],
       "description": "Citrix NetScaler / ADC configuration (Windows-only). One entry per ADC pair.",
       "properties": {
         "collect-adc-information": {
           "description": "ADC information collection scope.",
-          "enum": [
-            "true",
-            "false",
-            "none",
-            "DDCOnly",
-            "MachineList",
-            true,
-            false
-          ],
-          "type": [
-            "string",
-            "boolean"
+          "oneOf": [
+            {
+              "enum": [
+                "true",
+                "false",
+                "none",
+                "DDCOnly",
+                "MachineList"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:true|false|none|DDCOnly|MachineList)$"
+              },
+              "pattern": "^(?:[tT][rR][uU][eE]|[fF][aA][lL][sS][eE]|[nN][oO][nN][eE]|[dD][dD][cC][oO][nN][lL][yY]|[mM][aA][cC][hH][iI][nN][eE][lL][iI][sS][tT])$",
+              "type": "string"
+            },
+            {
+              "const": true,
+              "type": "boolean"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
           ]
         },
         "collect-adc-information-machines": {
           "description": "Machine list for ADC information collection (when scope is MachineList).",
           "oneOf": [
             {
+              "minLength": 1,
               "type": "string"
             },
             {
               "items": {
+                "minLength": 1,
                 "type": "string"
               },
               "type": "array"
@@ -128,6 +282,7 @@
         },
         "password": {
           "description": "NetScaler password.",
+          "pattern": "^(?![\\s\\S]*###UA_CREDENTIAL_)|^###UA_CREDENTIAL_(?:#{0,2}[^#])+###(?![\\s\\S])",
           "type": "string"
         },
         "platform": {
@@ -138,12 +293,15 @@
           "description": "NetScaler server endpoints.",
           "oneOf": [
             {
+              "minLength": 1,
               "type": "string"
             },
             {
               "items": {
+                "minLength": 1,
                 "type": "string"
               },
+              "minItems": 1,
               "type": "array"
             }
           ]
@@ -157,6 +315,59 @@
     },
     "citrix-cloud-config": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "collect-citrix-cloud-information": {
+                "pattern": "^[mM][aA][cC][hH][iI][nN][eE][lL][iI][sS][tT]$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "collect-citrix-cloud-information"
+            ]
+          },
+          "then": {
+            "properties": {
+              "collect-citrix-cloud-information-machines": {
+                "anyOf": [
+                  {
+                    "pattern": "[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]",
+                    "type": "string"
+                  },
+                  {
+                    "contains": {
+                      "pattern": "[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "collect-citrix-cloud-information-machines"
+            ]
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "propertyNames": {
+                "const": "platform"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "customer-id",
+              "client-id",
+              "client-secret"
+            ]
+          }
+        }
+      ],
       "description": "Citrix Cloud configuration (Windows-only).",
       "properties": {
         "api-endpoint": {
@@ -165,36 +376,54 @@
         },
         "client-id": {
           "description": "Citrix Cloud API client ID.",
+          "minLength": 1,
           "type": "string"
         },
         "client-secret": {
           "description": "Citrix Cloud API client secret.",
+          "minLength": 1,
+          "pattern": "^(?![\\s\\S]*###UA_CREDENTIAL_)|^###UA_CREDENTIAL_(?:#{0,2}[^#])+###(?![\\s\\S])",
           "type": "string"
         },
         "collect-citrix-cloud-information": {
           "description": "Citrix Cloud information collection scope.",
-          "enum": [
-            "true",
-            "false",
-            "none",
-            "DDCOnly",
-            "MachineList",
-            true,
-            false
-          ],
-          "type": [
-            "string",
-            "boolean"
+          "oneOf": [
+            {
+              "enum": [
+                "true",
+                "false",
+                "DDCOnly",
+                "MachineList"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:true|false|DDCOnly|MachineList)$"
+              },
+              "pattern": "^(?:[tT][rR][uU][eE]|[fF][aA][lL][sS][eE]|[dD][dD][cC][oO][nN][lL][yY]|[mM][aA][cC][hH][iI][nN][eE][lL][iI][sS][tT])$",
+              "type": "string"
+            },
+            {
+              "const": true,
+              "type": "boolean"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
           ]
         },
         "collect-citrix-cloud-information-machines": {
           "description": "Machine list for Citrix Cloud information collection.",
           "oneOf": [
             {
+              "minLength": 1,
               "type": "string"
             },
             {
               "items": {
+                "minLength": 1,
                 "type": "string"
               },
               "type": "array"
@@ -203,6 +432,7 @@
         },
         "customer-id": {
           "description": "Citrix Cloud customer ID.",
+          "minLength": 1,
           "type": "string"
         },
         "platform": {
@@ -255,7 +485,112 @@
           "if": {
             "properties": {
               "action": {
-                "const": "clear"
+                "pattern": "^[cC][lL][eE][aA][rR]$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          "then": {
+            "required": [
+              "field"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "pattern": "^[aA][lL][lL][oO][wW]$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "field"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "pattern": "^[dD][eE][nN][yY]$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "field"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "pattern": "^[dD][eE][fF][eE][rR]$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "action"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "field"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "clear"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "not": {
+                      "pattern": "^(?:clear)$"
+                    },
+                    "pattern": "^(?:[cC][lL][eE][aA][rR])$",
+                    "type": "string"
+                  }
+                ],
+                "pattern": "^(?:[cC][lL][eE][aA][rR])$"
               }
             },
             "required": [
@@ -274,7 +609,22 @@
               {
                 "properties": {
                   "action": {
-                    "const": "allow"
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "allow"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "not": {
+                          "pattern": "^(?:allow)$"
+                        },
+                        "pattern": "^(?:[aA][lL][lL][oO][wW])$",
+                        "type": "string"
+                      }
+                    ],
+                    "pattern": "^(?:[aA][lL][lL][oO][wW])$"
                   }
                 },
                 "required": [
@@ -284,7 +634,22 @@
               {
                 "properties": {
                   "action": {
-                    "const": "deny"
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "deny"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "not": {
+                          "pattern": "^(?:deny)$"
+                        },
+                        "pattern": "^(?:[dD][eE][nN][yY])$",
+                        "type": "string"
+                      }
+                    ],
+                    "pattern": "^(?:[dD][eE][nN][yY])$"
                   }
                 },
                 "required": [
@@ -294,7 +659,22 @@
               {
                 "properties": {
                   "action": {
-                    "const": "defer"
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "defer"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "not": {
+                          "pattern": "^(?:defer)$"
+                        },
+                        "pattern": "^(?:[dD][eE][fF][eE][rR])$",
+                        "type": "string"
+                      }
+                    ],
+                    "pattern": "^(?:[dD][eE][fF][eE][rR])$"
                   }
                 },
                 "required": [
@@ -316,40 +696,71 @@
       "properties": {
         "action": {
           "description": "Filter action: allow, deny, clear, or defer.",
-          "enum": [
-            "allow",
-            "deny",
-            "clear",
-            "defer"
-          ],
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "allow",
+                "deny",
+                "clear",
+                "defer"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:allow|deny|clear|defer)$"
+              },
+              "pattern": "^(?:[aA][lL][lL][oO][wW]|[dD][eE][nN][yY]|[cC][lL][eE][aA][rR]|[dD][eE][fF][eE][rR])$",
+              "type": "string"
+            }
+          ]
         },
         "comment": {
           "description": "Optional human-readable comment.",
           "type": "string"
         },
         "field": {
-          "description": "Field name to clear. Required when action is 'clear'.",
-          "type": "string"
+          "description": "Field name to clear, or a list of field names. Required when action is 'clear'.",
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          ]
         },
         "platform": {
           "$ref": "#/$defs/platform",
           "description": "Restrict this filter to specific platforms."
         },
         "query": {
-          "description": "Optional uAQL query. When set, the action applies only to matching events.",
-          "type": "string"
+          "description": "uAQL query (required) that selects the events the action applies to; use true to match every event of the listed sourcetypes.",
+          "minLength": 1,
+          "type": [
+            "string",
+            "boolean"
+          ]
         },
         "sourcetypes": {
           "description": "One or more sourcetypes this filter applies to.",
           "oneOf": [
             {
+              "minLength": 1,
               "type": "string"
             },
             {
               "items": {
+                "minLength": 1,
                 "type": "string"
               },
+              "minItems": 1,
               "type": "array"
             }
           ]
@@ -370,6 +781,7 @@
           "properties": {
             "channel": {
               "description": "Windows Event Log channel to subscribe to, e.g. Security or Application.",
+              "minLength": 1,
               "type": "string"
             },
             "event-filter-xpaths": {
@@ -410,25 +822,47 @@
               "description": "Restrict collection to events of these severity levels.",
               "oneOf": [
                 {
-                  "enum": [
-                    "critical",
-                    "error",
-                    "warning",
-                    "information",
-                    "verbose"
-                  ],
-                  "type": "string"
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "critical",
+                        "error",
+                        "warning",
+                        "information",
+                        "verbose"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "not": {
+                        "pattern": "^(?:critical|error|warning|information|verbose)$"
+                      },
+                      "pattern": "^(?:[cC][rR][iI][tT][iI][cC][aA][lL]|[eE][rR][rR][oO][rR]|[wW][aA][rR][nN][iI][nN][gG]|[iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[vV][eE][rR][bB][oO][sS][eE])$",
+                      "type": "string"
+                    }
+                  ]
                 },
                 {
                   "items": {
-                    "enum": [
-                      "critical",
-                      "error",
-                      "warning",
-                      "information",
-                      "verbose"
-                    ],
-                    "type": "string"
+                    "oneOf": [
+                      {
+                        "enum": [
+                          "critical",
+                          "error",
+                          "warning",
+                          "information",
+                          "verbose"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "not": {
+                          "pattern": "^(?:critical|error|warning|information|verbose)$"
+                        },
+                        "pattern": "^(?:[cC][rR][iI][tT][iI][cC][aA][lL]|[eE][rR][rR][oO][rR]|[wW][aA][rR][nN][iI][nN][gG]|[iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[vV][eE][rR][bB][oO][sS][eE])$",
+                        "type": "string"
+                      }
+                    ]
                   },
                   "type": "array"
                 }
@@ -436,14 +870,26 @@
             },
             "name": {
               "description": "Event log name. Referenced from a timer's event-logs field.",
+              "minLength": 1,
               "type": "string"
             },
             "platform": {
-              "description": "Platform this entry applies to. Selects the entry's key set: windows collects from the Windows Event Log, macos from the macOS Unified Log.",
-              "enum": [
-                "windows"
+              "oneOf": [
+                {
+                  "enum": [
+                    "windows"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "not": {
+                    "pattern": "^(?:windows)$"
+                  },
+                  "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS])$",
+                  "type": "string"
+                }
               ],
-              "type": "string"
+              "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS])$"
             },
             "providers": {
               "description": "Restrict collection to events from these Windows event providers.",
@@ -472,27 +918,42 @@
           "properties": {
             "max-message-length-bytes": {
               "description": "Truncate collected log messages to this many bytes.",
-              "minimum": 0,
+              "maximum": 9223372036854775807,
+              "minimum": 1,
               "type": "integer"
             },
             "name": {
               "description": "Event log name. Referenced from a timer's event-logs field.",
+              "minLength": 1,
               "type": "string"
             },
             "platform": {
-              "description": "Platform this entry applies to. Selects the entry's key set: windows collects from the Windows Event Log, macos from the macOS Unified Log.",
-              "enum": [
-                "macos"
+              "oneOf": [
+                {
+                  "enum": [
+                    "macos"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "not": {
+                    "pattern": "^(?:macos)$"
+                  },
+                  "pattern": "^(?:[mM][aA][cC][oO][sS])$",
+                  "type": "string"
+                }
               ],
-              "type": "string"
+              "pattern": "^(?:[mM][aA][cC][oO][sS])$"
             },
             "predicate": {
               "description": "macOS Unified Log predicate string.",
+              "minLength": 1,
               "type": "string"
             },
             "rate-limit": {
               "description": "Maximum number of messages collected per interval.",
-              "minimum": 0,
+              "maximum": 9223372036854775807,
+              "minimum": 1,
               "type": "integer"
             }
           },
@@ -508,10 +969,11 @@
     },
     "event-trigger": {
       "additionalProperties": false,
-      "description": "Event triggers that can additionally trigger timers on specific events.",
+      "description": "Event triggers that can additionally trigger timers on specific events (Windows only).",
       "properties": {
         "name": {
           "description": "Event trigger name. Referenced by timers via the event-trigger field.",
+          "minLength": 1,
           "type": "string"
         },
         "platform": {
@@ -520,28 +982,54 @@
         },
         "query": {
           "description": "Optional uAQL filter query. The trigger fires only when the query matches.",
-          "type": "string"
+          "type": [
+            "string",
+            "boolean"
+          ]
         },
         "types": {
           "description": "Event types that fire this trigger.",
           "oneOf": [
             {
-              "enum": [
-                "user-logon",
-                "session-connection-state-change",
-                "session-roaming"
-              ],
-              "type": "string"
+              "oneOf": [
+                {
+                  "enum": [
+                    "user-logon",
+                    "session-connection-state-change",
+                    "session-roaming"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "not": {
+                    "pattern": "^(?:user\\-logon|session\\-connection\\-state\\-change|session\\-roaming)$"
+                  },
+                  "pattern": "^(?:[uU][sS][eE][rR]\\-[lL][oO][gG][oO][nN]|[sS][eE][sS][sS][iI][oO][nN]\\-[cC][oO][nN][nN][eE][cC][tT][iI][oO][nN]\\-[sS][tT][aA][tT][eE]\\-[cC][hH][aA][nN][gG][eE]|[sS][eE][sS][sS][iI][oO][nN]\\-[rR][oO][aA][mM][iI][nN][gG])$",
+                  "type": "string"
+                }
+              ]
             },
             {
               "items": {
-                "enum": [
-                  "user-logon",
-                  "session-connection-state-change",
-                  "session-roaming"
-                ],
-                "type": "string"
+                "oneOf": [
+                  {
+                    "enum": [
+                      "user-logon",
+                      "session-connection-state-change",
+                      "session-roaming"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "not": {
+                      "pattern": "^(?:user\\-logon|session\\-connection\\-state\\-change|session\\-roaming)$"
+                    },
+                    "pattern": "^(?:[uU][sS][eE][rR]\\-[lL][oO][gG][oO][nN]|[sS][eE][sS][sS][iI][oO][nN]\\-[cC][oO][nN][nN][eE][cC][tT][iI][oO][nN]\\-[sS][tT][aA][tT][eE]\\-[cC][hH][aA][nN][gG][eE]|[sS][eE][sS][sS][iI][oO][nN]\\-[rR][oO][aA][mM][iI][nN][gG])$",
+                    "type": "string"
+                  }
+                ]
               },
+              "minItems": 1,
               "type": "array"
             }
           ]
@@ -573,23 +1061,45 @@
           "description": "Filesystem object types to monitor.",
           "oneOf": [
             {
-              "enum": [
-                "disks",
-                "network-shares",
-                "named-pipes",
-                "mailslots"
-              ],
-              "type": "string"
+              "oneOf": [
+                {
+                  "enum": [
+                    "disks",
+                    "network-shares",
+                    "named-pipes",
+                    "mailslots"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "not": {
+                    "pattern": "^(?:disks|network\\-shares|named\\-pipes|mailslots)$"
+                  },
+                  "pattern": "^(?:[dD][iI][sS][kK][sS]|[nN][eE][tT][wW][oO][rR][kK]\\-[sS][hH][aA][rR][eE][sS]|[nN][aA][mM][eE][dD]\\-[pP][iI][pP][eE][sS]|[mM][aA][iI][lL][sS][lL][oO][tT][sS])$",
+                  "type": "string"
+                }
+              ]
             },
             {
               "items": {
-                "enum": [
-                  "disks",
-                  "network-shares",
-                  "named-pipes",
-                  "mailslots"
-                ],
-                "type": "string"
+                "oneOf": [
+                  {
+                    "enum": [
+                      "disks",
+                      "network-shares",
+                      "named-pipes",
+                      "mailslots"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "not": {
+                      "pattern": "^(?:disks|network\\-shares|named\\-pipes|mailslots)$"
+                    },
+                    "pattern": "^(?:[dD][iI][sS][kK][sS]|[nN][eE][tT][wW][oO][rR][kK]\\-[sS][hH][aA][rR][eE][sS]|[nN][aA][mM][eE][dD]\\-[pP][iI][pP][eE][sS]|[mM][aA][iI][lL][sS][lL][oO][tT][sS])$",
+                    "type": "string"
+                  }
+                ]
               },
               "type": "array"
             }
@@ -604,6 +1114,7 @@
       "properties": {
         "path": {
           "description": "Path to the configuration file to include.",
+          "minLength": 1,
           "type": "string"
         },
         "platform": {
@@ -619,15 +1130,34 @@
     "miscellaneous": {
       "additionalProperties": false,
       "description": "General agent settings and implementation-defined flags.",
+      "patternProperties": {
+        "^no-telemetry$(?![\\s\\S])": {
+          "type": "boolean"
+        },
+        "^telemetry-staging$(?![\\s\\S])": {
+          "type": "boolean"
+        }
+      },
       "properties": {
         "browser-data-collection": {
           "description": "Enable or disable data collection of uberAgent's browser extensions.",
-          "enum": [
-            "do-nothing",
-            "enable",
-            "disable"
-          ],
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "do-nothing",
+                "enable",
+                "disable"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:do\\-nothing|enable|disable)$"
+              },
+              "pattern": "^(?:[dD][oO]\\-[nN][oO][tT][hH][iI][nN][gG]|[eE][nN][aA][bB][lL][eE]|[dD][iI][sS][aA][bB][lL][eE])$",
+              "type": "string"
+            }
+          ]
         },
         "config-flags": {
           "additionalProperties": false,
@@ -637,17 +1167,20 @@
               "type": "boolean"
             },
             "azure-event-hubs-max-event-size-kb": {
-              "minimum": 0,
+              "maximum": 9223372036854775807,
+              "minimum": 10,
               "type": "integer"
             },
             "boot-detail-timeout": {
               "$ref": "#/$defs/duration"
             },
             "citrix-odata-api-maximum-attempts": {
-              "minimum": 0,
+              "maximum": 9223372036854775807,
+              "minimum": 1,
               "type": "integer"
             },
             "citrix-sdk-max-record-count": {
+              "maximum": 9223372036854775807,
               "minimum": 0,
               "type": "integer"
             },
@@ -670,6 +1203,7 @@
               "type": "boolean"
             },
             "ie-ignore-frames": {
+              "description": "Applies to Windows only.",
               "type": "boolean"
             },
             "internal-script-timeout": {
@@ -682,34 +1216,42 @@
               "$ref": "#/$defs/duration"
             },
             "max-libraries-batch-size": {
-              "minimum": 0,
+              "maximum": 4294967295,
+              "minimum": 100,
               "type": "integer"
             },
             "max-library-event-queue-size": {
-              "minimum": 0,
+              "maximum": 9223372036854775807,
+              "minimum": 100,
               "type": "integer"
             },
             "max-process-batch-size": {
-              "minimum": 0,
+              "maximum": 4294967295,
+              "minimum": 100,
               "type": "integer"
             },
             "max-process-event-queue-size": {
-              "minimum": 0,
+              "maximum": 9223372036854775807,
+              "minimum": 100,
               "type": "integer"
             },
             "max-registry-event-queue-size": {
-              "minimum": 0,
+              "maximum": 9223372036854775807,
+              "minimum": 100,
               "type": "integer"
             },
             "max-thread-event-queue-size": {
-              "minimum": 0,
+              "maximum": 9223372036854775807,
+              "minimum": 100,
               "type": "integer"
             },
             "network-communication-timeout": {
               "$ref": "#/$defs/duration"
             },
             "network-driver-maximum-connection-limit": {
-              "minimum": 0,
+              "description": "Applies to Windows only.",
+              "maximum": 65535,
+              "minimum": 1,
               "type": "integer"
             },
             "no-gateway-check": {
@@ -725,6 +1267,8 @@
               "$ref": "#/$defs/duration"
             },
             "reg-data-max-length": {
+              "description": "Maximum registry value data length in bytes. The agent rounds an odd value down to the next even number.",
+              "maximum": 18446744073709551615,
               "minimum": 0,
               "type": "integer"
             },
@@ -733,7 +1277,8 @@
             },
             "registry-events-cache-size": {
               "description": "Applies to Windows only.",
-              "minimum": 0,
+              "maximum": 18446744073709551615,
+              "minimum": 1,
               "type": "integer"
             },
             "registry-events-cache-ttl": {
@@ -780,42 +1325,56 @@
         },
         "log-file-count": {
           "description": "Number of log files to keep (current + historical). When exceeded, the oldest log file is deleted.",
-          "minimum": 0,
+          "maximum": 4294967295,
+          "minimum": 1,
           "type": "integer"
         },
-        "no-telemetry": {
-          "description": "Disables uberAgent self-telemetry.",
-          "type": "boolean"
-        },
         "register-ie-addon": {
-          "description": "Register or deregister uberAgent's Internet Explorer add-on through the service.",
-          "enum": [
-            "do-nothing",
-            "register",
-            "deregister"
-          ],
-          "type": "string"
+          "description": "Register or deregister uberAgent's Internet Explorer add-on through the service. Applies to Windows only.",
+          "oneOf": [
+            {
+              "enum": [
+                "do-nothing",
+                "register",
+                "deregister"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:do\\-nothing|register|deregister)$"
+              },
+              "pattern": "^(?:[dD][oO]\\-[nN][oO][tT][hH][iI][nN][gG]|[rR][eE][gG][iI][sS][tT][eE][rR]|[dD][eE][rR][eE][gG][iI][sS][tT][eE][rR])$",
+              "type": "string"
+            }
+          ]
         },
         "registry-monitoring": {
-          "description": "Enable registry monitoring. Requires ESA and Threat Detection Engine.",
+          "description": "Enable registry monitoring. Requires ESA and Threat Detection Engine. Applies to Windows only.",
           "type": "boolean"
         },
         "remote-thread-monitoring": {
-          "description": "Enable remote thread monitoring. Requires ESA and Threat Detection Engine.",
-          "type": "boolean"
-        },
-        "telemetry-staging": {
-          "description": "Sends self-telemetry to the staging endpoint instead of production.",
+          "description": "Enable remote thread monitoring. Requires ESA and Threat Detection Engine. Applies to Windows only.",
           "type": "boolean"
         },
         "wmi-provider": {
-          "description": "Specifies the WMI query provider.",
-          "enum": [
-            "wmic",
-            "powershell",
-            "uberAgent"
-          ],
-          "type": "string"
+          "description": "Specifies the WMI query provider. Applies to Windows only.",
+          "oneOf": [
+            {
+              "enum": [
+                "powershell",
+                "uberAgent"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:powershell|uberAgent)$"
+              },
+              "pattern": "^(?:[pP][oO][wW][eE][rR][sS][hH][eE][lL][lL]|[uU][bB][eE][rR][aA][gG][eE][nN][tT])$",
+              "type": "string"
+            }
+          ]
         }
       },
       "type": "object"
@@ -833,19 +1392,34 @@
           "type": "boolean"
         },
         "key": {
-          "description": "Process name or regex key for targeting.",
-          "type": "string"
+          "description": "Grouping key: process-id or process-name (the aliases id and name are accepted, case-insensitive).",
+          "oneOf": [
+            {
+              "enum": [
+                "process-id",
+                "process-name"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:process\\-id|process\\-name)$"
+              },
+              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\-[iI][dD]|[pP][rR][oO][cC][eE][sS][sS]\\-[nN][aA][mM][eE]|[iI][dD]|[nN][aA][mM][eE])$",
+              "type": "string"
+            }
+          ]
         },
         "network-driver-enabled": {
-          "description": "Enable network driver for this process.",
+          "description": "Enable network driver for this process. Applies to Windows only.",
           "type": "boolean"
         },
         "network-driver-legacy-api": {
-          "description": "Use legacy network driver API.",
+          "description": "Use legacy network driver API. Applies to Windows only.",
           "type": "boolean"
         },
         "test-compare-network-driver-and-etw": {
-          "description": "Compare network driver and ETW data (diagnostic).",
+          "description": "Compare network driver and ETW data (diagnostic). Applies to Windows only.",
           "type": "boolean"
         }
       },
@@ -860,7 +1434,7 @@
           "type": "boolean"
         },
         "frame-agent-detection-path": {
-          "description": "Path to the Frame agent detection file.",
+          "description": "Registry key below HKLM whose presence tells the agent that the Frame agent is installed (default SOFTWARE\\Nutanix\\Frame\\FGA).",
           "type": "string"
         }
       },
@@ -888,11 +1462,11 @@
           "description": "Metrics to collect on demand.",
           "oneOf": [
             {
-              "$ref": "#/$defs/ua-metric-name"
+              "$ref": "#/$defs/on-demand-ua-metric-name"
             },
             {
               "items": {
-                "$ref": "#/$defs/ua-metric-name"
+                "$ref": "#/$defs/on-demand-ua-metric-name"
               },
               "type": "array"
             }
@@ -901,25 +1475,95 @@
       },
       "type": "object"
     },
+    "on-demand-ua-metric-name": {
+      "description": "A valid uberAgent on-demand metric name.",
+      "oneOf": [
+        {
+          "const": "ApplicationErrors",
+          "description": "Detects application crashes, hangs, and error events"
+        },
+        {
+          "const": "ApplicationUIDelay",
+          "description": "Detects application UI unresponsiveness and input delays"
+        },
+        {
+          "const": "BootDetail",
+          "description": "Computer startup duration and phase timing breakdown"
+        },
+        {
+          "const": "LogonDetail",
+          "description": "User logon timing, group policies, and process performance data"
+        },
+        {
+          "const": "LogonProcesses",
+          "description": "Process performance and I/O during user logon"
+        },
+        {
+          "const": "OutlookPerformanceEvents",
+          "description": "Outlook plugin load duration and performance metrics"
+        },
+        {
+          "const": "ScheduledTaskMonitoring",
+          "description": "Scheduled task configuration, triggers, and actions (ESA)"
+        },
+        {
+          "const": "SessionProfile",
+          "description": "User session profile information and attributes"
+        },
+        {
+          "const": "ShutdownDetail",
+          "description": "Computer shutdown duration and phase timing breakdown"
+        },
+        {
+          "const": "StandbyDetail",
+          "description": "Standby/resume timing, wake sources, and duration metrics"
+        }
+      ],
+      "type": "string"
+    },
     "platform": {
       "description": "Platform restriction. A single platform string or a list of platforms. Omit for all platforms.",
       "oneOf": [
         {
-          "enum": [
-            "windows",
-            "macos",
-            "linux"
+          "oneOf": [
+            {
+              "enum": [
+                "windows",
+                "macos",
+                "linux"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:windows|macos|linux)$"
+              },
+              "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS]|[mM][aA][cC][oO][sS]|[lL][iI][nN][uU][xX])$",
+              "type": "string"
+            }
           ],
-          "type": "string"
+          "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS]|[mM][aA][cC][oO][sS]|[lL][iI][nN][uU][xX])$"
         },
         {
           "items": {
-            "enum": [
-              "windows",
-              "macos",
-              "linux"
+            "oneOf": [
+              {
+                "enum": [
+                  "windows",
+                  "macos",
+                  "linux"
+                ],
+                "type": "string"
+              },
+              {
+                "not": {
+                  "pattern": "^(?:windows|macos|linux)$"
+                },
+                "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS]|[mM][aA][cC][oO][sS]|[lL][iI][nN][uU][xX])$",
+                "type": "string"
+              }
             ],
-            "type": "string"
+            "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS]|[mM][aA][cC][oO][sS]|[lL][iI][nN][uU][xX])$"
           },
           "minItems": 1,
           "type": "array",
@@ -933,14 +1577,26 @@
       "properties": {
         "action": {
           "description": "Filter action.",
-          "enum": [
-            "allow",
-            "deny"
-          ],
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "allow",
+                "deny"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:allow|deny)$"
+              },
+              "pattern": "^(?:[aA][lL][lL][oO][wW]|[dD][eE][nN][yY])$",
+              "type": "string"
+            }
+          ]
         },
         "regex": {
           "description": "Process name regex pattern.",
+          "minLength": 1,
           "type": "string"
         }
       },
@@ -992,21 +1648,33 @@
       "description": "Process startup monitoring and hashing settings (ESA).",
       "properties": {
         "authenticode-cache-max-size": {
-          "description": "Maximum entries in the Authenticode cache.",
+          "description": "Maximum entries in the Authenticode cache. Applies to Windows only.",
+          "maximum": 2000000,
           "minimum": 0,
           "type": "integer"
         },
         "authenticode-image-types": {
-          "description": "Image types for Authenticode validation.",
-          "enum": [
-            "processes",
-            "libraries",
-            "processes-and-libraries"
-          ],
-          "type": "string"
+          "description": "Image types for Authenticode validation. Applies to Windows only.",
+          "oneOf": [
+            {
+              "enum": [
+                "processes",
+                "libraries",
+                "processes-and-libraries"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:processes|libraries|processes\\-and\\-libraries)$"
+              },
+              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS][eE][sS]|[lL][iI][bB][rR][aA][rR][iI][eE][sS]|[pP][rR][oO][cC][eE][sS][sS][eE][sS]\\-[aA][nN][dD]\\-[lL][iI][bB][rR][aA][rR][iI][eE][sS])$",
+              "type": "string"
+            }
+          ]
         },
         "enable-authenticode": {
-          "description": "Validate Authenticode signatures (Windows only).",
+          "description": "Validate Authenticode signatures (Windows only). Applies to Windows only.",
           "type": "boolean"
         },
         "enable-blocked-execs": {
@@ -1014,7 +1682,7 @@
           "type": "boolean"
         },
         "enable-calculate-hash": {
-          "description": "Calculate file hashes for process images.",
+          "description": "Calculate file hashes for process images. Applies to Windows only.",
           "type": "boolean"
         },
         "enable-cd-hash": {
@@ -1026,30 +1694,81 @@
           "type": "boolean"
         },
         "enable-process-tampering": {
-          "description": "Detect process tampering (Windows only).",
+          "description": "Detect process tampering (Windows only). Applies to Windows only.",
           "type": "boolean"
         },
         "hash-algorithm": {
-          "description": "Hash algorithm for process image hashing.",
-          "enum": [
-            "sha-1",
-            "sha-256",
-            "md5",
-            "imphash"
-          ],
-          "type": "string"
+          "description": "Hash algorithm for process image hashing, or a list of algorithms to compute together. Applies to Windows only.",
+          "oneOf": [
+            {
+              "oneOf": [
+                {
+                  "enum": [
+                    "sha-1",
+                    "sha-256",
+                    "md5",
+                    "imphash"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "not": {
+                    "pattern": "^(?:sha\\-1|sha\\-256|md5|imphash)$"
+                  },
+                  "pattern": "^(?:[sS][hH][aA]\\-1|[sS][hH][aA]\\-256|[mM][dD]5|[iI][mM][pP][hH][aA][sS][hH])$",
+                  "type": "string"
+                }
+              ]
+            },
+            {
+              "items": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "sha-1",
+                      "sha-256",
+                      "md5",
+                      "imphash"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "not": {
+                      "pattern": "^(?:sha\\-1|sha\\-256|md5|imphash)$"
+                    },
+                    "pattern": "^(?:[sS][hH][aA]\\-1|[sS][hH][aA]\\-256|[mM][dD]5|[iI][mM][pP][hH][aA][sS][hH])$",
+                    "type": "string"
+                  }
+                ]
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          ]
         },
         "hash-image-types": {
-          "description": "Image types to hash.",
-          "enum": [
-            "processes",
-            "libraries",
-            "processes-and-libraries"
-          ],
-          "type": "string"
+          "description": "Image types to hash. Applies to Windows only.",
+          "oneOf": [
+            {
+              "enum": [
+                "processes",
+                "libraries",
+                "processes-and-libraries"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:processes|libraries|processes\\-and\\-libraries)$"
+              },
+              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS][eE][sS]|[lL][iI][bB][rR][aA][rR][iI][eE][sS]|[pP][rR][oO][cC][eE][sS][sS][eE][sS]\\-[aA][nN][dD]\\-[lL][iI][bB][rR][aA][rR][iI][eE][sS])$",
+              "type": "string"
+            }
+          ]
         },
         "hashes-cache-max-size": {
-          "description": "Maximum number of entries in the hash cache.",
+          "description": "Maximum number of entries in the hash cache. Applies to Windows only.",
+          "maximum": 2000000,
           "minimum": 0,
           "type": "integer"
         }
@@ -1062,10 +1781,12 @@
       "properties": {
         "name": {
           "description": "Application name to assign to matching processes.",
+          "minLength": 1,
           "type": "string"
         },
         "regex": {
           "description": "Regex pattern matched against the full executable path.",
+          "minLength": 1,
           "type": "string"
         }
       },
@@ -1091,7 +1812,7 @@
       "description": "Proxy settings for receiver communication.",
       "properties": {
         "honor-environment-proxy": {
-          "description": "Honor proxy settings from environment variables (macOS/Linux).",
+          "description": "Honor proxy settings from environment variables when no configured proxy route matches (all platforms).",
           "type": "boolean"
         }
       },
@@ -1103,6 +1824,8 @@
       "properties": {
         "credential": {
           "description": "Proxy credential (plaintext, XOR/Base64, or credential store reference).",
+          "minLength": 1,
+          "pattern": "^(?![\\s\\S]*###UA_CREDENTIAL_)|^###UA_CREDENTIAL_(?:#{0,2}[^#])+###(?![\\s\\S])",
           "type": "string"
         },
         "platform": {
@@ -1111,6 +1834,8 @@
         },
         "proxy": {
           "description": "Proxy endpoint this credential applies to.",
+          "minLength": 1,
+          "pattern": "^(?![\\s\\S]*://)[^:]*[^:\\t\\n\\v\\f\\r ]|^(?:(?!://)[\\s\\S])*://[^:]*[^:\\t\\n\\v\\f\\r ]",
           "type": "string"
         }
       },
@@ -1126,6 +1851,8 @@
       "properties": {
         "host-pattern": {
           "description": "Hostname regex pattern to match.",
+          "minLength": 1,
+          "pattern": "\\S",
           "type": "string"
         },
         "platform": {
@@ -1134,6 +1861,8 @@
         },
         "proxy": {
           "description": "Proxy endpoint in host:port format.",
+          "minLength": 1,
+          "pattern": "\\S",
           "type": "string"
         }
       },
@@ -1145,15 +1874,43 @@
     },
     "receiver": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "pattern": "^[aA][zZ][uU][rR][eE]\\-[eE][vV][eE][nN][tT]\\-[hH][uU][bB][sS]$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "azure-event-hubs-configuration-id"
+            ]
+          }
+        }
+      ],
       "description": "Data receivers. uberAgent sends data to each configured receiver. Override per timer with the timer-level 'receivers' field.",
       "properties": {
         "azure-event-hubs-configuration-id": {
           "description": "Reference to an azure-event-hubs-configurations entry by its id GUID.",
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
           "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
           "type": "string"
         },
         "elastic-ingest-pipeline": {
           "description": "Elasticsearch ingest pipeline name.",
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
           "type": "string"
         },
         "enable-extended-info": {
@@ -1166,24 +1923,51 @@
           "type": "string"
         },
         "host": {
-          "description": "Override the host field value sent to the receiver.",
-          "type": "string"
+          "anyOf": [
+            {
+              "description": "Override the host field value sent to the receiver.",
+              "type": "string"
+            },
+            {
+              "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+              "type": "string"
+            }
+          ],
+          "description": "Override the host field value sent to the receiver."
         },
         "index": {
-          "description": "Destination index name (Splunk or Elasticsearch).",
-          "type": "string"
+          "anyOf": [
+            {
+              "description": "Destination index name (Splunk or Elasticsearch).",
+              "type": "string"
+            },
+            {
+              "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+              "type": "string"
+            }
+          ],
+          "description": "Destination index name (Splunk or Elasticsearch)."
         },
         "kafka-topic-name": {
           "description": "Kafka topic name for the receiver.",
+          "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
           "type": "string"
+        },
+        "max-event-length-bytes": {
+          "description": "Optional event-length override in bytes. Splunk's effective default is 10000 bytes when unset; 0 disables the limit. Valid range: 0..4294967295 bytes. Other receiver types accept but ignore the option. Configuration-only; this setting is not enforced at runtime.",
+          "maximum": 4294967295,
+          "minimum": 0,
+          "type": "integer"
         },
         "max-events-per-send-operation": {
           "description": "Maximum events per send operation.",
+          "maximum": 4294967295,
           "minimum": 0,
           "type": "integer"
         },
         "max-queue-size-ram-mb": {
           "description": "Maximum RAM queue size in megabytes.",
+          "maximum": 17592186044415,
           "minimum": 0,
           "type": "integer"
         },
@@ -1197,11 +1981,43 @@
           "properties": {
             "backend": {
               "description": "POQ backend implementation.",
-              "type": "string"
+              "oneOf": [
+                {
+                  "enum": [
+                    "SQLite",
+                    "Off"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "not": {
+                    "pattern": "^(?:SQLite|Off)$"
+                  },
+                  "pattern": "^(?:[sS][qQ][lL][iI][tT][eE]|[oO][fF][fF])$",
+                  "type": "string"
+                }
+              ]
             },
             "error-handling": {
               "description": "Error handling strategy for the POQ.",
-              "type": "string"
+              "oneOf": [
+                {
+                  "enum": [
+                    "None",
+                    "IgnoreFile",
+                    "StopReceiver",
+                    "Shutdown"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "not": {
+                    "pattern": "^(?:None|IgnoreFile|StopReceiver|Shutdown)$"
+                  },
+                  "pattern": "^(?:[nN][oO][nN][eE]|[iI][gG][nN][oO][rR][eE][fF][iI][lL][eE]|[sS][tT][oO][pP][rR][eE][cC][eE][iI][vV][eE][rR]|[sS][hH][uU][tT][dD][oO][wW][nN])$",
+                  "type": "string"
+                }
+              ]
             },
             "max-age": {
               "$ref": "#/$defs/duration",
@@ -1209,11 +2025,13 @@
             },
             "max-in-memory-bulk-operations": {
               "description": "Maximum number of in-memory bulk operations for the POQ.",
+              "maximum": 4294967295,
               "minimum": 0,
               "type": "integer"
             },
             "max-size-mb": {
               "description": "Maximum size of the POQ in megabytes.",
+              "maximum": 4294967295,
               "minimum": 0,
               "type": "integer"
             },
@@ -1223,21 +2041,41 @@
             },
             "path-linux": {
               "description": "POQ storage path on Linux.",
+              "not": {
+                "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+                "type": "string"
+              },
               "type": "string"
             },
             "path-macos": {
               "description": "POQ storage path on macOS.",
+              "not": {
+                "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+                "type": "string"
+              },
               "type": "string"
             },
             "path-windows": {
               "description": "POQ storage path on Windows.",
+              "not": {
+                "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+                "type": "string"
+              },
               "type": "string"
             }
           },
           "type": "object"
         },
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
         "rest-token": {
           "description": "Splunk HEC authentication token (splunk-http only).",
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
+          "pattern": "^(?![\\s\\S]*###UA_CREDENTIAL_)|^###UA_CREDENTIAL_(?:#{0,2}[^#])+###(?![\\s\\S])",
           "type": "string"
         },
         "servers": {
@@ -1255,25 +2093,50 @@
           ]
         },
         "source": {
-          "description": "Override the source field value sent to the receiver.",
-          "type": "string"
+          "anyOf": [
+            {
+              "description": "Override the source field value sent to the receiver.",
+              "type": "string"
+            },
+            {
+              "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+              "type": "string"
+            }
+          ],
+          "description": "Override the source field value sent to the receiver."
         },
         "tls-client-certificate": {
           "description": "Path to TLS client certificate (PEM on macOS/Linux, thumbprint on Windows).",
+          "not": {
+            "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
+            "type": "string"
+          },
+          "pattern": "^(?![\\s\\S]*###UA_CREDENTIAL_)|^###UA_CREDENTIAL_(?:#{0,2}[^#])+###(?![\\s\\S])",
           "type": "string"
         },
         "type": {
           "description": "The backend this receiver sends to, including its network protocol where there is a choice. Splunk offers both, so pick splunk-tcp or splunk-http; every other backend has exactly one transport.",
-          "enum": [
-            "splunk-tcp",
-            "splunk-http",
-            "elasticsearch",
-            "kafka",
-            "azure-event-hubs",
-            "uaes",
-            "etw"
-          ],
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "splunk-tcp",
+                "splunk-http",
+                "elasticsearch",
+                "kafka",
+                "azure-event-hubs",
+                "uaes",
+                "etw"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:splunk\\-tcp|splunk\\-http|elasticsearch|kafka|azure\\-event\\-hubs|uaes|etw)$"
+              },
+              "pattern": "^(?:[sS][pP][lL][uU][nN][kK]\\-[tT][cC][pP]|[sS][pP][lL][uU][nN][kK]\\-[hH][tT][tT][pP]|[eE][lL][aA][sS][tT][iI][cC][sS][eE][aA][rR][cC][hH]|[kK][aA][fF][kK][aA]|[aA][zZ][uU][rR][eE]\\-[eE][vV][eE][nN][tT]\\-[hH][uU][bB][sS]|[uU][aA][eE][sS]|[eE][tT][wW])$",
+              "type": "string"
+            }
+          ]
         }
       },
       "required": [
@@ -1283,7 +2146,7 @@
     },
     "remote-configuration": {
       "additionalProperties": false,
-      "description": "Remote configuration settings.",
+      "description": "macOS/Linux remote-configuration descriptor only (uberAgent-remote-config-macOS.yaml or uberAgent-remote-config-linux.yaml); a main configuration ignores it. Windows uses the registry-based central configuration instead.",
       "properties": {
         "config-file-path": {
           "description": "Path to the remote configuration file.",
@@ -1297,15 +2160,17 @@
       "description": "Script interpreter definitions for Security & Compliance Inventory test execution. Each entry maps a name to an executable and an argv template.",
       "properties": {
         "args-template": {
-          "description": "Argument template. Use {script} as placeholder for the script path.",
+          "description": "Argument template for the interpreter's command line. Use ###UA_SCRIPT### as the placeholder for the script path.",
           "type": "string"
         },
         "executable": {
           "description": "Path to the interpreter executable.",
+          "minLength": 1,
           "type": "string"
         },
         "name": {
           "description": "Interpreter name. Referenced from security-inventory-test entries.",
+          "minLength": 1,
           "type": "string"
         },
         "platform": {
@@ -1321,6 +2186,146 @@
     },
     "security-inventory-test": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "not": {
+              "propertyNames": {
+                "const": "platform"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "script-id",
+              "script-commandline"
+            ]
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "anyOf": [
+                  {
+                    "not": {
+                      "required": [
+                        "platform"
+                      ]
+                    }
+                  },
+                  {
+                    "properties": {
+                      "platform": {
+                        "anyOf": [
+                          {
+                            "pattern": "^[wW][iI][nN][dD][oO][wW][sS]$",
+                            "type": "string"
+                          },
+                          {
+                            "contains": {
+                              "pattern": "^[wW][iI][nN][dD][oO][wW][sS]$",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            ],
+            "properties": {
+              "integrity-level": {
+                "pattern": "^[\\t\\n\\v\\f\\r ]*[lL][oO][wW][\\t\\n\\v\\f\\r ]*(?:[+-]|$)",
+                "type": "string"
+              },
+              "script-context": {
+                "pattern": "^[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR]$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "script-context",
+              "integrity-level"
+            ]
+          },
+          "then": {
+            "properties": {
+              "integrity-level": false
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "platform": {
+                "anyOf": [
+                  {
+                    "pattern": "^(?:[mM][aA][cC][oO][sS]|[lL][iI][nN][uU][xX])$",
+                    "type": "string"
+                  },
+                  {
+                    "items": {
+                      "pattern": "^(?:[mM][aA][cC][oO][sS]|[lL][iI][nN][uU][xX])$",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                ]
+              },
+              "script-context": {
+                "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]\\-0\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR])$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "script-context",
+              "platform"
+            ]
+          },
+          "then": {
+            "properties": {
+              "script-context": false
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "platform": {
+                "anyOf": [
+                  {
+                    "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS])$",
+                    "type": "string"
+                  },
+                  {
+                    "items": {
+                      "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS])$",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                ]
+              },
+              "script-context": {
+                "pattern": "^(?:[rR][oO][oO][tT]|[uU][sS][eE][rR])$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "script-context",
+              "platform"
+            ]
+          },
+          "then": {
+            "properties": {
+              "script-context": false
+            }
+          }
+        }
+      ],
       "description": "Security & Compliance Inventory test definitions.",
       "properties": {
         "category": {
@@ -1329,7 +2334,9 @@
         },
         "integrity-level": {
           "description": "Required integrity level (Windows only).",
-          "type": "string"
+          "pattern": "^([lL][oO][wW]|[mM][eE][dD][iI][uU][mM]|[hH][iI][gG][hH])(?:\\s*[+-]\\s*[A-Za-z]+(?:=[0-9]+)?)*$",
+          "type": "string",
+          "x-uberagent-pattern-ignore-case": true
         },
         "interpreter": {
           "description": "Script interpreter name.",
@@ -1341,7 +2348,22 @@
         },
         "output-format": {
           "description": "Expected output format.",
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "json",
+                "kv"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:json|kv)$"
+              },
+              "pattern": "^(?:[jJ][sS][oO][nN]|[kK][vV])$",
+              "type": "string"
+            }
+          ]
         },
         "platform": {
           "$ref": "#/$defs/platform",
@@ -1349,21 +2371,34 @@
         },
         "script-commandline": {
           "description": "Script command line.",
+          "minLength": 1,
           "type": "string"
         },
         "script-context": {
           "description": "Execution context. Windows: session-0-as-system, user-session-as-system, user-session-as-user. macOS and Linux: root, user.",
-          "enum": [
-            "session-0-as-system",
-            "user-session-as-system",
-            "user-session-as-user",
-            "root",
-            "user"
-          ],
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "session-0-as-system",
+                "user-session-as-system",
+                "user-session-as-user",
+                "root",
+                "user"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:session\\-0\\-as\\-system|user\\-session\\-as\\-system|user\\-session\\-as\\-user|root|user)$"
+              },
+              "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]\\-0\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR]|[rR][oO][oO][tT]|[uU][sS][eE][rR])$",
+              "type": "string"
+            }
+          ]
         },
         "script-id": {
           "description": "Script identifier.",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
           "type": "string"
         },
         "script-timeout": {
@@ -1378,7 +2413,8 @@
       "description": "Session detail metric configuration.",
       "properties": {
         "session-fg-window-title-max-length": {
-          "description": "Maximum number of characters of the foreground window title to include in SessionDetail.",
+          "description": "Maximum number of characters of the foreground window title to include in SessionDetail; 0 sends no window title.",
+          "maximum": 2147483647,
           "minimum": 0,
           "type": "integer"
         }
@@ -1391,6 +2427,7 @@
       "properties": {
         "name": {
           "description": "Expression name. Referenced from detection rules.",
+          "minLength": 1,
           "type": "string"
         },
         "platform": {
@@ -1399,7 +2436,11 @@
         },
         "query": {
           "description": "uAQL expression body.",
-          "type": "string"
+          "minLength": 1,
+          "type": [
+            "string",
+            "boolean"
+          ]
         }
       },
       "required": [
@@ -1410,77 +2451,324 @@
     },
     "threat-detection-rule": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "anyOf": [
+            {
+              "required": [
+                "event-type"
+              ]
+            },
+            {
+              "required": [
+                "event-types"
+              ]
+            }
+          ]
+        },
+        {
+          "else": {
+            "properties": {
+              "hive": false
+            }
+          },
+          "if": {
+            "anyOf": [
+              {
+                "properties": {
+                  "event-type": {
+                    "pattern": "^[rR][eE][gG]",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "event-type"
+                ]
+              },
+              {
+                "properties": {
+                  "event-types": {
+                    "anyOf": [
+                      {
+                        "pattern": "^[rR][eE][gG]",
+                        "type": "string"
+                      },
+                      {
+                        "contains": {
+                          "pattern": "^[rR][eE][gG]",
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "event-types"
+                ]
+              }
+            ]
+          },
+          "then": {
+            "required": [
+              "hive"
+            ]
+          }
+        }
+      ],
       "description": "Threat detection engine rules. Each entry is a uAQL-based detection over a specific event type (ESA only).",
       "properties": {
         "annotation": {
           "description": "Human-readable annotation for triggered detections.",
-          "type": "string"
+          "type": [
+            "string",
+            "object",
+            "array"
+          ]
         },
         "event-type": {
           "description": "Primary event type this rule detects.",
-          "enum": [
-            "Process.Start",
-            "ProcessStart",
-            "Process.Stop",
-            "ProcessStop",
-            "Image.Load",
-            "ImageLoad",
-            "Net.Connect",
-            "NetConnect",
-            "Net.Receive",
-            "NetReceive",
-            "Net.Reconnect",
-            "NetReconnect",
-            "Net.Retransmit",
-            "NetRetransmit",
-            "Net.Send",
-            "NetSend",
-            "Net.Any",
-            "NetAny",
-            "Reg.Key.Create",
-            "Reg.Value.Write",
-            "Reg.Delete",
-            "Reg.Key.Delete",
-            "Reg.Value.Delete",
-            "Reg.Key.SecurityChange",
-            "Reg.Key.Rename",
-            "Reg.Key.SetInformation",
-            "Reg.Key.Load",
-            "Reg.Key.Unload",
-            "Reg.Key.Restore",
-            "Reg.Key.Save",
-            "Reg.Key.Replace",
-            "Reg.Any",
-            "Dns.Query",
-            "DnsQuery",
-            "Process.CreateRemoteThread",
-            "Process.TamperingEvent",
-            "File.ChangeCreationTime",
-            "File.RawAccessRead",
-            "File.Create",
-            "File.CreateStream",
-            "File.PipeCreate",
-            "File.PipeConnected",
-            "File.Delete",
-            "File.Rename",
-            "File.Write",
-            "File.Read",
-            "File.SecurityChange",
-            "Driver.Load",
-            "DriverLoad"
-          ],
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "Process.Start",
+                "ProcessStart",
+                "Process.Stop",
+                "ProcessStop",
+                "Image.Load",
+                "ImageLoad",
+                "Net.Connect",
+                "NetConnect",
+                "Net.Receive",
+                "NetReceive",
+                "Net.Reconnect",
+                "NetReconnect",
+                "Net.Retransmit",
+                "NetRetransmit",
+                "Net.Send",
+                "NetSend",
+                "Net.Any",
+                "NetAny",
+                "Reg.Key.Create",
+                "Reg.Value.Write",
+                "Reg.Delete",
+                "Reg.Key.Delete",
+                "Reg.Value.Delete",
+                "Reg.Key.SecurityChange",
+                "Reg.Key.Rename",
+                "Reg.Key.SetInformation",
+                "Reg.Key.Load",
+                "Reg.Key.Unload",
+                "Reg.Key.Restore",
+                "Reg.Key.Save",
+                "Reg.Key.Replace",
+                "Reg.Any",
+                "Reg_Key_Create",
+                "Reg_Value_Write",
+                "Reg_Delete",
+                "Reg_Key_Delete",
+                "Reg_Value_Delete",
+                "Reg_Key_SecurityChange",
+                "Reg_Key_Rename",
+                "Reg_Key_SetInformation",
+                "Reg_Key_Load",
+                "Reg_Key_Unload",
+                "Reg_Key_Restore",
+                "Reg_Key_Save",
+                "Reg_Key_Replace",
+                "Reg_Any",
+                "Dns.Query",
+                "DnsQuery",
+                "Process.CreateRemoteThread",
+                "Process.TamperingEvent",
+                "File.ChangeCreationTime",
+                "File.RawAccessRead",
+                "File.Create",
+                "File.CreateStream",
+                "File.PipeCreate",
+                "File.PipeConnected",
+                "File.Delete",
+                "File.Rename",
+                "File.Write",
+                "File.Read",
+                "File.SecurityChange",
+                "Driver.Load",
+                "DriverLoad"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:Process\\.Start|ProcessStart|Process\\.Stop|ProcessStop|Image\\.Load|ImageLoad|Net\\.Connect|NetConnect|Net\\.Receive|NetReceive|Net\\.Reconnect|NetReconnect|Net\\.Retransmit|NetRetransmit|Net\\.Send|NetSend|Net\\.Any|NetAny|Reg\\.Key\\.Create|Reg\\.Value\\.Write|Reg\\.Delete|Reg\\.Key\\.Delete|Reg\\.Value\\.Delete|Reg\\.Key\\.SecurityChange|Reg\\.Key\\.Rename|Reg\\.Key\\.SetInformation|Reg\\.Key\\.Load|Reg\\.Key\\.Unload|Reg\\.Key\\.Restore|Reg\\.Key\\.Save|Reg\\.Key\\.Replace|Reg\\.Any|Reg_Key_Create|Reg_Value_Write|Reg_Delete|Reg_Key_Delete|Reg_Value_Delete|Reg_Key_SecurityChange|Reg_Key_Rename|Reg_Key_SetInformation|Reg_Key_Load|Reg_Key_Unload|Reg_Key_Restore|Reg_Key_Save|Reg_Key_Replace|Reg_Any|Dns\\.Query|DnsQuery|Process\\.CreateRemoteThread|Process\\.TamperingEvent|File\\.ChangeCreationTime|File\\.RawAccessRead|File\\.Create|File\\.CreateStream|File\\.PipeCreate|File\\.PipeConnected|File\\.Delete|File\\.Rename|File\\.Write|File\\.Read|File\\.SecurityChange|Driver\\.Load|DriverLoad)$"
+              },
+              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][oO][pP]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][oO][pP]|[iI][mM][aA][gG][eE]\\.[lL][oO][aA][dD]|[iI][mM][aA][gG][eE][lL][oO][aA][dD]|[nN][eE][tT]\\.[cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT][rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT]\\.[rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT][rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT]\\.[sS][eE][nN][dD]|[nN][eE][tT][sS][eE][nN][dD]|[nN][eE][tT]\\.[aA][nN][yY]|[nN][eE][tT][aA][nN][yY]|[rR][eE][gG]\\.[kK][eE][yY]\\.[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[wW][rR][iI][tT][eE]|[rR][eE][gG]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]\\.[kK][eE][yY]\\.[lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][aA][vV][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]\\.[aA][nN][yY]|[rR][eE][gG]_[kK][eE][yY]_[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[wW][rR][iI][tT][eE]|[rR][eE][gG]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]_[kK][eE][yY]_[lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][aA][vV][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]_[aA][nN][yY]|[dD][nN][sS]\\.[qQ][uU][eE][rR][yY]|[dD][nN][sS][qQ][uU][eE][rR][yY]|[pP][rR][oO][cC][eE][sS][sS]\\.[cC][rR][eE][aA][tT][eE][rR][eE][mM][oO][tT][eE][tT][hH][rR][eE][aA][dD]|[pP][rR][oO][cC][eE][sS][sS]\\.[tT][aA][mM][pP][eE][rR][iI][nN][gG][eE][vV][eE][nN][tT]|[fF][iI][lL][eE]\\.[cC][hH][aA][nN][gG][eE][cC][rR][eE][aA][tT][iI][oO][nN][tT][iI][mM][eE]|[fF][iI][lL][eE]\\.[rR][aA][wW][aA][cC][cC][eE][sS][sS][rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE][sS][tT][rR][eE][aA][mM]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][oO][nN][nN][eE][cC][tT][eE][dD]|[fF][iI][lL][eE]\\.[dD][eE][lL][eE][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][nN][aA][mM][eE]|[fF][iI][lL][eE]\\.[wW][rR][iI][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[dD][rR][iI][vV][eE][rR]\\.[lL][oO][aA][dD]|[dD][rR][iI][vV][eE][rR][lL][oO][aA][dD])$",
+              "type": "string"
+            }
+          ]
         },
         "event-types": {
           "description": "Additional event types (when a rule covers multiple types).",
           "oneOf": [
             {
-              "type": "string"
+              "oneOf": [
+                {
+                  "enum": [
+                    "Process.Start",
+                    "ProcessStart",
+                    "Process.Stop",
+                    "ProcessStop",
+                    "Image.Load",
+                    "ImageLoad",
+                    "Net.Connect",
+                    "NetConnect",
+                    "Net.Receive",
+                    "NetReceive",
+                    "Net.Reconnect",
+                    "NetReconnect",
+                    "Net.Retransmit",
+                    "NetRetransmit",
+                    "Net.Send",
+                    "NetSend",
+                    "Net.Any",
+                    "NetAny",
+                    "Reg.Key.Create",
+                    "Reg_Key_Create",
+                    "Reg.Value.Write",
+                    "Reg_Value_Write",
+                    "Reg.Delete",
+                    "Reg_Delete",
+                    "Reg.Key.Delete",
+                    "Reg_Key_Delete",
+                    "Reg.Value.Delete",
+                    "Reg_Value_Delete",
+                    "Reg.Key.SecurityChange",
+                    "Reg_Key_SecurityChange",
+                    "Reg.Key.Rename",
+                    "Reg_Key_Rename",
+                    "Reg.Key.SetInformation",
+                    "Reg_Key_SetInformation",
+                    "Reg.Key.Load",
+                    "Reg_Key_Load",
+                    "Reg.Key.Unload",
+                    "Reg_Key_Unload",
+                    "Reg.Key.Restore",
+                    "Reg_Key_Restore",
+                    "Reg.Key.Save",
+                    "Reg_Key_Save",
+                    "Reg.Key.Replace",
+                    "Reg_Key_Replace",
+                    "Reg.Any",
+                    "Reg_Any",
+                    "Dns.Query",
+                    "DnsQuery",
+                    "Process.CreateRemoteThread",
+                    "Process.TamperingEvent",
+                    "File.ChangeCreationTime",
+                    "File.RawAccessRead",
+                    "File.Create",
+                    "File.CreateStream",
+                    "File.PipeCreate",
+                    "File.PipeConnected",
+                    "File.Delete",
+                    "File.Rename",
+                    "File.Write",
+                    "File.Read",
+                    "File.SecurityChange",
+                    "Driver.Load",
+                    "DriverLoad"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "not": {
+                    "pattern": "^(?:Process\\.Start|ProcessStart|Process\\.Stop|ProcessStop|Image\\.Load|ImageLoad|Net\\.Connect|NetConnect|Net\\.Receive|NetReceive|Net\\.Reconnect|NetReconnect|Net\\.Retransmit|NetRetransmit|Net\\.Send|NetSend|Net\\.Any|NetAny|Reg\\.Key\\.Create|Reg_Key_Create|Reg\\.Value\\.Write|Reg_Value_Write|Reg\\.Delete|Reg_Delete|Reg\\.Key\\.Delete|Reg_Key_Delete|Reg\\.Value\\.Delete|Reg_Value_Delete|Reg\\.Key\\.SecurityChange|Reg_Key_SecurityChange|Reg\\.Key\\.Rename|Reg_Key_Rename|Reg\\.Key\\.SetInformation|Reg_Key_SetInformation|Reg\\.Key\\.Load|Reg_Key_Load|Reg\\.Key\\.Unload|Reg_Key_Unload|Reg\\.Key\\.Restore|Reg_Key_Restore|Reg\\.Key\\.Save|Reg_Key_Save|Reg\\.Key\\.Replace|Reg_Key_Replace|Reg\\.Any|Reg_Any|Dns\\.Query|DnsQuery|Process\\.CreateRemoteThread|Process\\.TamperingEvent|File\\.ChangeCreationTime|File\\.RawAccessRead|File\\.Create|File\\.CreateStream|File\\.PipeCreate|File\\.PipeConnected|File\\.Delete|File\\.Rename|File\\.Write|File\\.Read|File\\.SecurityChange|Driver\\.Load|DriverLoad)$"
+                  },
+                  "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][oO][pP]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][oO][pP]|[iI][mM][aA][gG][eE]\\.[lL][oO][aA][dD]|[iI][mM][aA][gG][eE][lL][oO][aA][dD]|[nN][eE][tT]\\.[cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT][rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT]\\.[rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT][rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT]\\.[sS][eE][nN][dD]|[nN][eE][tT][sS][eE][nN][dD]|[nN][eE][tT]\\.[aA][nN][yY]|[nN][eE][tT][aA][nN][yY]|[rR][eE][gG]\\.[kK][eE][yY]\\.[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[wW][rR][iI][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[wW][rR][iI][tT][eE]|[rR][eE][gG]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]\\.[kK][eE][yY]\\.[lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][aA][vV][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][aA][vV][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]\\.[aA][nN][yY]|[rR][eE][gG]_[aA][nN][yY]|[dD][nN][sS]\\.[qQ][uU][eE][rR][yY]|[dD][nN][sS][qQ][uU][eE][rR][yY]|[pP][rR][oO][cC][eE][sS][sS]\\.[cC][rR][eE][aA][tT][eE][rR][eE][mM][oO][tT][eE][tT][hH][rR][eE][aA][dD]|[pP][rR][oO][cC][eE][sS][sS]\\.[tT][aA][mM][pP][eE][rR][iI][nN][gG][eE][vV][eE][nN][tT]|[fF][iI][lL][eE]\\.[cC][hH][aA][nN][gG][eE][cC][rR][eE][aA][tT][iI][oO][nN][tT][iI][mM][eE]|[fF][iI][lL][eE]\\.[rR][aA][wW][aA][cC][cC][eE][sS][sS][rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE][sS][tT][rR][eE][aA][mM]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][oO][nN][nN][eE][cC][tT][eE][dD]|[fF][iI][lL][eE]\\.[dD][eE][lL][eE][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][nN][aA][mM][eE]|[fF][iI][lL][eE]\\.[wW][rR][iI][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[dD][rR][iI][vV][eE][rR]\\.[lL][oO][aA][dD]|[dD][rR][iI][vV][eE][rR][lL][oO][aA][dD])$",
+                  "type": "string"
+                }
+              ]
             },
             {
               "items": {
-                "type": "string"
+                "oneOf": [
+                  {
+                    "enum": [
+                      "Process.Start",
+                      "ProcessStart",
+                      "Process.Stop",
+                      "ProcessStop",
+                      "Image.Load",
+                      "ImageLoad",
+                      "Net.Connect",
+                      "NetConnect",
+                      "Net.Receive",
+                      "NetReceive",
+                      "Net.Reconnect",
+                      "NetReconnect",
+                      "Net.Retransmit",
+                      "NetRetransmit",
+                      "Net.Send",
+                      "NetSend",
+                      "Net.Any",
+                      "NetAny",
+                      "Reg.Key.Create",
+                      "Reg_Key_Create",
+                      "Reg.Value.Write",
+                      "Reg_Value_Write",
+                      "Reg.Delete",
+                      "Reg_Delete",
+                      "Reg.Key.Delete",
+                      "Reg_Key_Delete",
+                      "Reg.Value.Delete",
+                      "Reg_Value_Delete",
+                      "Reg.Key.SecurityChange",
+                      "Reg_Key_SecurityChange",
+                      "Reg.Key.Rename",
+                      "Reg_Key_Rename",
+                      "Reg.Key.SetInformation",
+                      "Reg_Key_SetInformation",
+                      "Reg.Key.Load",
+                      "Reg_Key_Load",
+                      "Reg.Key.Unload",
+                      "Reg_Key_Unload",
+                      "Reg.Key.Restore",
+                      "Reg_Key_Restore",
+                      "Reg.Key.Save",
+                      "Reg_Key_Save",
+                      "Reg.Key.Replace",
+                      "Reg_Key_Replace",
+                      "Reg.Any",
+                      "Reg_Any",
+                      "Dns.Query",
+                      "DnsQuery",
+                      "Process.CreateRemoteThread",
+                      "Process.TamperingEvent",
+                      "File.ChangeCreationTime",
+                      "File.RawAccessRead",
+                      "File.Create",
+                      "File.CreateStream",
+                      "File.PipeCreate",
+                      "File.PipeConnected",
+                      "File.Delete",
+                      "File.Rename",
+                      "File.Write",
+                      "File.Read",
+                      "File.SecurityChange",
+                      "Driver.Load",
+                      "DriverLoad"
+                    ],
+                    "type": "string"
+                  },
+                  {
+                    "not": {
+                      "pattern": "^(?:Process\\.Start|ProcessStart|Process\\.Stop|ProcessStop|Image\\.Load|ImageLoad|Net\\.Connect|NetConnect|Net\\.Receive|NetReceive|Net\\.Reconnect|NetReconnect|Net\\.Retransmit|NetRetransmit|Net\\.Send|NetSend|Net\\.Any|NetAny|Reg\\.Key\\.Create|Reg_Key_Create|Reg\\.Value\\.Write|Reg_Value_Write|Reg\\.Delete|Reg_Delete|Reg\\.Key\\.Delete|Reg_Key_Delete|Reg\\.Value\\.Delete|Reg_Value_Delete|Reg\\.Key\\.SecurityChange|Reg_Key_SecurityChange|Reg\\.Key\\.Rename|Reg_Key_Rename|Reg\\.Key\\.SetInformation|Reg_Key_SetInformation|Reg\\.Key\\.Load|Reg_Key_Load|Reg\\.Key\\.Unload|Reg_Key_Unload|Reg\\.Key\\.Restore|Reg_Key_Restore|Reg\\.Key\\.Save|Reg_Key_Save|Reg\\.Key\\.Replace|Reg_Key_Replace|Reg\\.Any|Reg_Any|Dns\\.Query|DnsQuery|Process\\.CreateRemoteThread|Process\\.TamperingEvent|File\\.ChangeCreationTime|File\\.RawAccessRead|File\\.Create|File\\.CreateStream|File\\.PipeCreate|File\\.PipeConnected|File\\.Delete|File\\.Rename|File\\.Write|File\\.Read|File\\.SecurityChange|Driver\\.Load|DriverLoad)$"
+                    },
+                    "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][oO][pP]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][oO][pP]|[iI][mM][aA][gG][eE]\\.[lL][oO][aA][dD]|[iI][mM][aA][gG][eE][lL][oO][aA][dD]|[nN][eE][tT]\\.[cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT][rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT]\\.[rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT][rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT]\\.[sS][eE][nN][dD]|[nN][eE][tT][sS][eE][nN][dD]|[nN][eE][tT]\\.[aA][nN][yY]|[nN][eE][tT][aA][nN][yY]|[rR][eE][gG]\\.[kK][eE][yY]\\.[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[wW][rR][iI][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[wW][rR][iI][tT][eE]|[rR][eE][gG]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]\\.[kK][eE][yY]\\.[lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][aA][vV][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][aA][vV][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]\\.[aA][nN][yY]|[rR][eE][gG]_[aA][nN][yY]|[dD][nN][sS]\\.[qQ][uU][eE][rR][yY]|[dD][nN][sS][qQ][uU][eE][rR][yY]|[pP][rR][oO][cC][eE][sS][sS]\\.[cC][rR][eE][aA][tT][eE][rR][eE][mM][oO][tT][eE][tT][hH][rR][eE][aA][dD]|[pP][rR][oO][cC][eE][sS][sS]\\.[tT][aA][mM][pP][eE][rR][iI][nN][gG][eE][vV][eE][nN][tT]|[fF][iI][lL][eE]\\.[cC][hH][aA][nN][gG][eE][cC][rR][eE][aA][tT][iI][oO][nN][tT][iI][mM][eE]|[fF][iI][lL][eE]\\.[rR][aA][wW][aA][cC][cC][eE][sS][sS][rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE][sS][tT][rR][eE][aA][mM]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][oO][nN][nN][eE][cC][tT][eE][dD]|[fF][iI][lL][eE]\\.[dD][eE][lL][eE][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][nN][aA][mM][eE]|[fF][iI][lL][eE]\\.[wW][rR][iI][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[dD][rR][iI][vV][eE][rR]\\.[lL][oO][aA][dD]|[dD][rR][iI][vV][eE][rR][lL][oO][aA][dD])$",
+                    "type": "string"
+                  }
+                ]
               },
+              "minItems": 1,
               "type": "array"
             }
           ]
@@ -1490,14 +2778,19 @@
           "oneOf": [
             {
               "items": {
+                "minLength": 1,
                 "type": "string"
               },
+              "maxItems": 10,
+              "minItems": 1,
               "type": "array"
             },
             {
               "additionalProperties": {
+                "minLength": 1,
                 "type": "string"
               },
+              "minProperties": 1,
               "propertyNames": {
                 "pattern": "^([1-9]|10)$"
               },
@@ -1509,26 +2802,15 @@
           "description": "Registry hive filter for registry-based detections.",
           "oneOf": [
             {
-              "enum": [
-                "HKLM",
-                "HKCU",
-                "HKU",
-                "HKCR",
-                "HKCC"
-              ],
+              "pattern": "^[A-Za-z]+(,[A-Za-z]+)*,?$|^\\*$",
               "type": "string"
             },
             {
               "items": {
-                "enum": [
-                  "HKLM",
-                  "HKCU",
-                  "HKU",
-                  "HKCR",
-                  "HKCC"
-                ],
+                "pattern": "^[A-Za-z]+(,[A-Za-z]+)*,?$|^\\*$",
                 "type": "string"
               },
+              "minItems": 1,
               "type": "array"
             }
           ]
@@ -1539,23 +2821,31 @@
         },
         "query": {
           "description": "uAQL detection query.",
-          "type": "string"
+          "minLength": 1,
+          "type": [
+            "string",
+            "boolean"
+          ]
         },
         "risk-score": {
           "description": "Numeric risk score (0–100) assigned to detections from this rule.",
+          "maximum": 100,
           "minimum": 0,
           "type": "integer"
         },
         "rule-id": {
           "description": "Unique rule identifier (GUID).",
+          "minLength": 1,
           "type": "string"
         },
         "rule-name": {
           "description": "Human-readable rule name.",
+          "minLength": 1,
           "type": "string"
         },
         "tag": {
           "description": "Classification tag (e.g. MITRE ATT&CK technique ID).",
+          "minLength": 1,
           "type": "string"
         },
         "verbose-logging": {
@@ -1566,39 +2856,109 @@
       "required": [
         "rule-id",
         "rule-name",
-        "query"
+        "query",
+        "tag"
       ],
       "type": "object"
     },
     "threat-detection-rule-extension": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "rule-id",
+                  "event-type"
+                ]
+              },
+              {
+                "required": [
+                  "rule-id",
+                  "event-types"
+                ]
+              },
+              {
+                "required": [
+                  "rule-id",
+                  "tag"
+                ]
+              },
+              {
+                "required": [
+                  "event-type",
+                  "event-types"
+                ]
+              },
+              {
+                "required": [
+                  "event-type",
+                  "tag"
+                ]
+              },
+              {
+                "required": [
+                  "event-types",
+                  "tag"
+                ]
+              }
+            ]
+          }
+        }
+      ],
       "description": "Per-rule overrides and exclusions for threat detection rules. Each entry targets a rule by id, event-type, or tag and refines its outcome (ESA only).",
       "properties": {
         "altitude": {
-          "description": "Rule priority altitude.",
-          "minimum": 0,
-          "type": "integer"
+          "anyOf": [
+            {
+              "maximum": 100.0,
+              "minimum": 0.0,
+              "not": {
+                "anyOf": [
+                  {
+                    "exclusiveMinimum": 100.0
+                  },
+                  {
+                    "exclusiveMaximum": 0.0
+                  }
+                ]
+              },
+              "type": "number"
+            },
+            {
+              "pattern": "^[\\t\\n\\v\\f\\r ]*[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)",
+              "type": "string"
+            }
+          ],
+          "description": "Extension ordering altitude (0.0 to 100.0 inclusive; default 50.0)."
         },
         "event-type": {
           "description": "Event type override.",
+          "minLength": 1,
           "type": "string"
         },
         "event-types": {
           "description": "Event types override.",
           "oneOf": [
             {
+              "minLength": 1,
               "type": "string"
             },
             {
               "items": {
+                "minLength": 1,
                 "type": "string"
               },
+              "maxItems": 1,
+              "minItems": 1,
               "type": "array"
             }
           ]
         },
         "name": {
           "description": "Extension name.",
+          "minLength": 1,
           "type": "string"
         },
         "platform": {
@@ -1607,14 +2967,20 @@
         },
         "query": {
           "description": "Override uAQL query.",
-          "type": "string"
+          "minLength": 1,
+          "type": [
+            "string",
+            "boolean"
+          ]
         },
         "rule-id": {
           "description": "Rule ID (GUID) of the rule to extend.",
+          "minLength": 1,
           "type": "string"
         },
         "tag": {
           "description": "Tag override.",
+          "minLength": 1,
           "type": "string"
         }
       },
@@ -1626,18 +2992,30 @@
     },
     "threat-detection-rule-filter-entry": {
       "additionalProperties": false,
-      "description": "Filter for threat detection rules. Allow or deny rules by regex pattern on rule name.",
+      "description": "Filter for threat detection rules. Allow or deny rules by a regular expression matched against the full rule ID.",
       "properties": {
         "action": {
           "description": "Filter action.",
-          "enum": [
-            "allow",
-            "deny"
-          ],
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "allow",
+                "deny"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:allow|deny)$"
+              },
+              "pattern": "^(?:[aA][lL][lL][oO][wW]|[dD][eE][nN][yY])$",
+              "type": "string"
+            }
+          ]
         },
         "regex": {
-          "description": "Rule name regex pattern.",
+          "description": "Regular expression matched against the full rule ID (not the rule name); matching rules are allowed or denied by action.",
+          "minLength": 1,
           "type": "string"
         }
       },
@@ -1663,6 +3041,74 @@
               ]
             }
           ]
+        },
+        {
+          "if": {
+            "properties": {
+              "platform": {
+                "anyOf": [
+                  {
+                    "pattern": "^(?:[mM][aA][cC][oO][sS]|[lL][iI][nN][uU][xX])$",
+                    "type": "string"
+                  },
+                  {
+                    "items": {
+                      "pattern": "^(?:[mM][aA][cC][oO][sS]|[lL][iI][nN][uU][xX])$",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                ]
+              },
+              "script-context": {
+                "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]\\-0\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR])$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "script-context",
+              "platform"
+            ]
+          },
+          "then": {
+            "properties": {
+              "script-context": false
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "platform": {
+                "anyOf": [
+                  {
+                    "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS])$",
+                    "type": "string"
+                  },
+                  {
+                    "items": {
+                      "pattern": "^(?:[wW][iI][nN][dD][oO][wW][sS])$",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                ]
+              },
+              "script-context": {
+                "pattern": "^(?:[rR][oO][oO][tT]|[uU][sS][eE][rR])$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "script-context",
+              "platform"
+            ]
+          },
+          "then": {
+            "properties": {
+              "script-context": false
+            }
+          }
         }
       ],
       "description": "Collection timers. Each timer wakes up periodically, computes configured metrics, and sends results to receivers.",
@@ -1686,8 +3132,19 @@
           ]
         },
         "event-trigger": {
-          "description": "Name of an event-trigger that additionally fires this timer.",
-          "type": "string"
+          "description": "Name of an event-trigger that additionally fires this timer, or a list of them.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "type": "array"
+            }
+          ]
         },
         "interval": {
           "$ref": "#/$defs/duration",
@@ -1695,6 +3152,7 @@
         },
         "name": {
           "description": "Timer name. Must be unique across all timers.",
+          "minLength": 1,
           "type": "string"
         },
         "perf-counters": {
@@ -1735,14 +3193,25 @@
         },
         "script-context": {
           "description": "Execution context for all scripts of this timer. Windows: session-0-as-system, user-session-as-system, user-session-as-user. macOS and Linux: root, user.",
-          "enum": [
-            "session-0-as-system",
-            "user-session-as-system",
-            "user-session-as-user",
-            "root",
-            "user"
-          ],
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "session-0-as-system",
+                "user-session-as-system",
+                "user-session-as-user",
+                "root",
+                "user"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:session\\-0\\-as\\-system|user\\-session\\-as\\-system|user\\-session\\-as\\-user|root|user)$"
+              },
+              "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]\\-0\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR]|[rR][oO][oO][tT]|[uU][sS][eE][rR])$",
+              "type": "string"
+            }
+          ]
         },
         "script-timeout": {
           "$ref": "#/$defs/duration",
@@ -1773,11 +3242,11 @@
           "description": "One or more uberAgent metric names to collect.",
           "oneOf": [
             {
-              "$ref": "#/$defs/ua-metric-name"
+              "$ref": "#/$defs/timer-ua-metric-name"
             },
             {
               "items": {
-                "$ref": "#/$defs/ua-metric-name"
+                "$ref": "#/$defs/timer-ua-metric-name"
               },
               "type": "array"
             }
@@ -1789,8 +3258,8 @@
       ],
       "type": "object"
     },
-    "ua-metric-name": {
-      "description": "A valid uberAgent metric name.",
+    "timer-ua-metric-name": {
+      "description": "A valid uberAgent timer metric name.",
       "oneOf": [
         {
           "const": "ActivityMonitoring",
@@ -1801,20 +3270,8 @@
           "description": "Maps application process IDs to application names for lookups"
         },
         {
-          "const": "ApplicationErrors",
-          "description": "Detects application crashes, hangs, and error events"
-        },
-        {
           "const": "ApplicationInventory",
           "description": "Software inventory including name, version, and installation info"
-        },
-        {
-          "const": "ApplicationUIDelay",
-          "description": "Detects application UI unresponsiveness and input delays"
-        },
-        {
-          "const": "BootDetail",
-          "description": "Computer startup duration and phase timing breakdown"
         },
         {
           "const": "BrowserPerformanceChrome",
@@ -1905,14 +3362,6 @@
           "description": "Custom machine tags from AD, environment, or registry"
         },
         {
-          "const": "LogonDetail",
-          "description": "User logon timing, group policies, and process performance data"
-        },
-        {
-          "const": "LogonProcesses",
-          "description": "Process performance and I/O during user logon"
-        },
-        {
           "const": "MachineInventory",
           "description": "OS, hardware, BIOS, and Active Directory information"
         },
@@ -1923,10 +3372,6 @@
         {
           "const": "NetworkTargetPerformanceProcess",
           "description": "Process network communication performance and latency metrics"
-        },
-        {
-          "const": "OutlookPerformanceEvents",
-          "description": "Outlook plugin load duration and performance metrics"
         },
         {
           "const": "ProcessDetailFull",
@@ -1949,10 +3394,6 @@
           "description": "Process termination details and lifetime measurement (ESA)"
         },
         {
-          "const": "ScheduledTaskMonitoring",
-          "description": "Scheduled task configuration, triggers, and actions (ESA)"
-        },
-        {
           "const": "SecurityInventory",
           "description": "Security configuration compliance tests and risk scores (ESA)"
         },
@@ -1961,24 +3402,12 @@
           "description": "User session ID, protocol, latency, and application metrics"
         },
         {
-          "const": "SessionProfile",
-          "description": "User session profile information and attributes"
-        },
-        {
-          "const": "ShutdownDetail",
-          "description": "Computer shutdown duration and phase timing breakdown"
-        },
-        {
           "const": "SMBClientSharePerformance",
           "description": "SMB share I/O performance, latency, and throughput metrics"
         },
         {
           "const": "SoftwareUpdateInventory",
           "description": "Installed patches, updates, and software inventory"
-        },
-        {
-          "const": "StandbyDetail",
-          "description": "Standby/resume timing, wake sources, and duration metrics"
         },
         {
           "const": "SystemPerformanceSummary",
@@ -2003,10 +3432,30 @@
     },
     "user-host-tag": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "not": {
+              "propertyNames": {
+                "const": "platform"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "name",
+              "type",
+              "source",
+              "value"
+            ]
+          }
+        }
+      ],
       "description": "Company-defined metadata tags for hosts or users (Windows-only).",
       "properties": {
         "name": {
           "description": "Tag name.",
+          "minLength": 1,
           "type": "string"
         },
         "platform": {
@@ -2015,14 +3464,46 @@
         },
         "source": {
           "description": "Tag source.",
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "registry",
+                "environment",
+                "ad"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:registry|environment|ad)$"
+              },
+              "pattern": "^(?:[rR][eE][gG][iI][sS][tT][rR][yY]|[eE][nN][vV][iI][rR][oO][nN][mM][eE][nN][tT]|[aA][dD])$",
+              "type": "string"
+            }
+          ]
         },
         "type": {
           "description": "Tag type.",
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "host",
+                "user"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:host|user)$"
+              },
+              "pattern": "^(?:[hH][oO][sS][tT]|[uU][sS][eE][rR])$",
+              "type": "string"
+            }
+          ]
         },
         "value": {
           "description": "Tag value.",
+          "minLength": 1,
           "type": "string"
         }
       },
@@ -2037,6 +3518,7 @@
     "application-mapping-ignored-processes": {
       "description": "List of regex patterns for processes to ignore in application lookup.",
       "items": {
+        "minLength": 1,
         "type": "string"
       },
       "type": "array"
@@ -2077,9 +3559,22 @@
       "type": "array"
     },
     "config-version": {
-      "description": "The configuration format version this file is written against. Currently 1. Required in the top-level configuration file; an included file may omit it, but must match when it declares one.",
-      "minimum": 0,
-      "type": "integer"
+      "anyOf": [
+        {
+          "enum": [
+            9.0
+          ],
+          "type": "number"
+        },
+        {
+          "pattern": "^(?:(?:0{0,8}9)\\.(?:0{0,8}0))(?![\\s\\S])",
+          "type": "string"
+        }
+      ],
+      "description": "The configuration format version this file is written against: the agent release as major.minor, for example 9.0, the first release that reads YAML configuration. An agent loads every version from 9.0 up to its own release and rejects a newer one. Required in the top-level configuration file; an included file may omit it, but must declare a supported version when it declares one.",
+      "examples": [
+        "9.0"
+      ]
     },
     "configuration-settings": {
       "$ref": "#/$defs/configuration-settings"
@@ -2099,7 +3594,7 @@
       "type": "array"
     },
     "event-triggers": {
-      "description": "Event triggers that can additionally trigger timers on specific events.",
+      "description": "Event triggers that can additionally trigger timers on specific events (Windows only).",
       "items": {
         "$ref": "#/$defs/event-trigger"
       },
@@ -2111,6 +3606,7 @@
     "ignore-logon-monitoring-processes": {
       "description": "List of process name patterns to ignore during logon monitoring (Windows-only).",
       "items": {
+        "minLength": 1,
         "type": "string"
       },
       "type": "array"
@@ -2216,7 +3712,7 @@
       "type": "array"
     },
     "threat-detection-rule-filter": {
-      "description": "Filter for threat detection rules. Allow or deny rules by regex pattern on rule name.",
+      "description": "Filter for threat detection rules. Allow or deny rules by a regular expression matched against the full rule ID.",
       "items": {
         "$ref": "#/$defs/threat-detection-rule-filter-entry"
       },

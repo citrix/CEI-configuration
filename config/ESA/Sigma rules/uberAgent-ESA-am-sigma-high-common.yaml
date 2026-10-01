@@ -1,0 +1,12 @@
+config-version: 9.0
+threat-detection-rules:
+  - rule-id: 881834a4-6659-4773-821e-1c151789d873
+    rule-name: Equation Group C2 Communication
+    tag: equation-group-c2-communication
+    risk-score: 75
+    annotation: "{\"mitre_attack\": [\"T1041\"], \"author\": \"Florian Roth (Nextron Systems)\"}"
+    query: Net.Target.Ip in ["69.42.98.86", "89.185.234.145"] or Net.Source.Ip in ["69.42.98.86", "89.185.234.145"]
+    event-type: Net.Any
+    generic-properties:
+      - Net.Target.Ip
+      - Net.Source.Ip

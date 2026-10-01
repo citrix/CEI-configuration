@@ -1,0 +1,846 @@
+config-version: 9.0
+event-data-filters:
+  - action: deny
+    query: not contains(DnsRequest, ".")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".localhost")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: isnull(DnsResponseStatus) == false and DnsResponseStatus in [87, 9701, 9003, 1460]
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".arpa.")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".arpa")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".msftncsi.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "..localmachine"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "localhost"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, "-pushp.svc.ms")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".b-msedge.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".bing.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".hotmail.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".live.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".live.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".s-microsoft.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".microsoft.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".microsoftonline.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".microsoftstore.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".ms-acdc.office.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".msedge.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".msn.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".msocdn.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".skype.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".skype.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".windows.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".windows.net.nsatc.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".windowsupdate.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".xboxlive.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "login.windows.net"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".activedirectory.windowsazure.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".aria.microsoft.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".msauth.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".msftauth.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".office.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".opinsights.azure.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".res.office365.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "acdc-direct.office.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "atm-fp-direct.office.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "loki.delve.office.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "management.azure.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "messaging.office.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "outlook.office365.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "portal.azure.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "protection.outlook.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "substrate.office.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".measure.office.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adobe.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adobe.io")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".mozaws.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".mozilla.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".mozilla.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".mozilla.org")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".spotify.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".spotify.map.fastly.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".wbx2.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".webex.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "clients1.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "clients2.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "clients3.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "clients4.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "clients5.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "clients6.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "safebrowsing.googleapis.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".akadns.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".netflix.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, "aspnetcdn.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ajax.googleapis.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "cdnjs.cloudflare.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "fonts.googleapis.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".typekit.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "cdnjs.cloudflare.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".stackassets.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".steamcontent.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "play.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "content-autofill.googleapis.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".disqus.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".fontawesome.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "disqus.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".1rx.io")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".2mdn.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".3lift.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adadvisor.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adap.tv")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".addthis.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adform.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adnxs.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adroll.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adrta.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adsafeprotected.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adsrvr.org")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".adsymptotic.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".advertising.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".agkn.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".amazon-adsystem.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".amazon-adsystem.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".analytics.yahoo.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".aol.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".betrad.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".bidswitch.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".casalemedia.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".chartbeat.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".cnn.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".convertro.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".criteo.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".criteo.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".crwdcntrl.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".demdex.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".domdex.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".dotomi.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".doubleclick.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".doubleverify.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".emxdgt.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".everesttech.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".exelator.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".google-analytics.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".googleadservices.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".googlesyndication.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".googletagmanager.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".googlevideo.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".gstatic.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".gvt1.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".gvt2.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".ib-ibi.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".jivox.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".krxd.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".lijit.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".mathtag.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".moatads.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".moatpixel.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".mookie1.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".myvisualiq.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".netmng.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".nexac.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".openx.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".optimizely.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".outbrain.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".pardot.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".phx.gbl")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".pinterest.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".pubmatic.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".quantcount.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".quantserve.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".revsci.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".rfihub.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".rlcdn.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".rubiconproject.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".scdn.co")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".scorecardresearch.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".serving-sys.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".sharethrough.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".simpli.fi")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".sitescout.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".smartadserver.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".snapads.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".spotxchange.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".taboola.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".taboola.map.fastly.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".tapad.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".tidaltv.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".trafficmanager.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".tremorhub.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".tribalfusion.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".turn.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".twimg.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".tynt.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".w55c.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".ytimg.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".zorosrv.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "1rx.io"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "adservice.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ampcid.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "clientservices.googleapis.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "googleadapis.l.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "imasdk.googleapis.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "l.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ml314.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "mtalk.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "update.googleapis.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "www.googletagservices.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".pscp.tv")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".amazontrust.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".digicert.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".globalsign.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".globalsign.net")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".intel.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".symcb.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".symcd.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".thawte.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".usertrust.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".verisign.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, "ocsp.identrust.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, "pki.goog")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "msocsp.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.comodoca.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.entrust.net"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.godaddy.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.int-x3.letsencrypt.org"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.msocsp.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, "pki.goog")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.godaddy.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, "amazontrust.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.sectigo.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "pki-goog.l.google.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, ".usertrust.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.comodoca.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.verisign.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.entrust.net"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: iendswith(DnsRequest, "ocsp.identrust.com")
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "status.rapidssl.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "status.thawte.com"
+    sourcetypes:
+      - Process:DnsQuery
+  - action: deny
+    query: DnsRequest == "ocsp.int-x3.letsencrypt.org"
+    sourcetypes:
+      - Process:DnsQuery

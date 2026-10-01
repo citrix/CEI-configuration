@@ -1,0 +1,350 @@
+config-version: 9.0
+threat-detection-rules:
+  - platform: macos
+    rule-id: 7c3b43d8-d794-47d2-800a-d277715aa460
+    rule-name: Scheduled Cron Task/Job - MacOs
+    tag: proc-start-scheduled-cron-task/job-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1053.003\"], \"author\": \"Alejandro Ortuno, oscd.community\"}"
+    query: iendswith(Process.Path, "/crontab") and icontains(Process.CommandLine, "/tmp/")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: a753a6af-3126-426d-8bd0-26ebbcb92254
+    rule-name: Osacompile Execution By Potentially Suspicious Applet/Osascript
+    tag: proc-start-osacompile-execution-by-potentially-suspicious-applet/osascript
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1059.002\"], \"author\": \"Sohan G (D4rkCiph3r), Red Canary (Idea)\"}"
+    query: (iendswith(Parent.Path, "/applet") or iendswith(Parent.Path, "/osascript")) and icontains(Process.CommandLine, "osacompile")
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: b120b587-a4c2-4b94-875d-99c9807d6955
+    rule-name: Credentials from Password Stores - Keychain
+    tag: proc-start-credentials-from-password-stores-keychain
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1555.001\"], \"author\": \"Tim Ismilyaev, oscd.community, Florian Roth (Nextron Systems)\"}"
+    query: Process.Path == "/usr/bin/security" and (icontains(Process.CommandLine, "find-certificate") or icontains(Process.CommandLine, " export ")) or icontains(Process.CommandLine, " dump-keychain ") or icontains(Process.CommandLine, " login-keychain ")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 1bc2e6c5-0885-472b-bed6-be5ea8eace55
+    rule-name: MacOS Scripting Interpreter AppleScript
+    tag: proc-start-macos-scripting-interpreter-applescript
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1059.002\"], \"author\": \"Alejandro Ortuno, oscd.community\"}"
+    query: iendswith(Process.Path, "/osascript") and (icontains(Process.CommandLine, " -e ") or icontains(Process.CommandLine, ".scpt") or icontains(Process.CommandLine, ".js")) and not (iendswith(Parent.Path, "opencode") and icontains(Process.CommandLine, "osascript") and icontains(Process.CommandLine, " -e ") and icontains(Process.CommandLine, "set imageData to the clipboard") and icontains(Process.CommandLine, "set fileRef"))
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: 13db8d2e-7723-4c2c-93c1-a4d36994f7ef
+    rule-name: Potential In-Memory Download And Compile Of Payloads
+    tag: proc-start-potential-in-memory-download-and-compile-of-payloads
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1059.007\", \"T1105\"], \"author\": \"Sohan G (D4rkCiph3r), Red Canary (idea)\"}"
+    query: icontains(Process.CommandLine, "osacompile") and icontains(Process.CommandLine, "curl")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: ff39f1a6-84ac-476f-a1af-37fcdf53d7c0
+    rule-name: Disable Security Tools
+    tag: proc-start-disable-security-tools
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1685\"], \"author\": \"Daniil Yugoslavskiy, oscd.community\"}"
+    query: Process.Path == "/bin/launchctl" and icontains(Process.CommandLine, "unload") and (icontains(Process.CommandLine, "com.objective-see.lulu.plist") or icontains(Process.CommandLine, "com.objective-see.blockblock.plist") or icontains(Process.CommandLine, "com.google.santad.plist") or icontains(Process.CommandLine, "com.carbonblack.defense.daemon.plist") or icontains(Process.CommandLine, "com.carbonblack.daemon.plist") or icontains(Process.CommandLine, "at.obdev.littlesnitchd.plist") or icontains(Process.CommandLine, "com.tenablesecurity.nessusagent.plist") or icontains(Process.CommandLine, "com.opendns.osx.RoamingClientConfigUpdater.plist") or icontains(Process.CommandLine, "com.crowdstrike.falcond.plist") or icontains(Process.CommandLine, "com.crowdstrike.userdaemon.plist") or icontains(Process.CommandLine, "osquery") or icontains(Process.CommandLine, "filebeat") or icontains(Process.CommandLine, "auditbeat") or icontains(Process.CommandLine, "packetbeat") or icontains(Process.CommandLine, "td-agent")) or Process.Path == "/usr/sbin/spctl" and icontains(Process.CommandLine, "disable")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 2c95fa8a-8b8d-4787-afce-7117ceb8e3da
+    rule-name: Time Machine Backup Disabled Via Tmutil - MacOS
+    tag: proc-start-time-machine-backup-disabled-via-tmutil-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1490\"], \"author\": \"Pratinav Chandra\"}"
+    query: (iendswith(Process.Path, "/tmutil") or icontains(Process.CommandLine, "tmutil")) and icontains(Process.CommandLine, "disable")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 23c43900-e732-45a4-8354-63e4a6c187ce
+    rule-name: MacOS Emond Launch Daemon
+    tag: macos-emond-launch-daemon
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1546.014\"], \"author\": \"Alejandro Ortuno, oscd.community\"}"
+    query: icontains(File.Path, "/etc/emond.d/rules/") and iendswith(File.Path, ".plist") or icontains(File.Path, "/private/var/db/emondClients/")
+    event-type: File.Create
+    generic-properties:
+      - File.Path
+  - platform: macos
+    rule-id: 2316929c-01aa-438c-970f-099145ab1ee6
+    rule-name: JAMF MDM Potential Suspicious Child Process
+    tag: proc-start-jamf-mdm-potential-suspicious-child-process
+    risk-score: 50
+    annotation: "{\"author\": \"Nasreddine Bencherchali (Nextron Systems)\"}"
+    query: iendswith(Parent.Path, "/jamf") and (iendswith(Process.Path, "/bash") or iendswith(Process.Path, "/sh"))
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: 5de06a6f-673a-4fc0-8d48-bcfe3837b033
+    rule-name: System Information Discovery Using sw_vers
+    tag: proc-start-system-information-discovery-using-sw_vers
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1082\"], \"author\": \"Joseliyo Sanchez, @Joseliyo_Jstnk\"}"
+    query: iendswith(Process.Path, "/sw\_vers") and (icontains(Process.CommandLine, "-buildVersion") or icontains(Process.CommandLine, "-productName") or icontains(Process.CommandLine, "-productVersion"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 47d65ac0-c06f-4ba2-a2e3-d263139d0f51
+    rule-name: Potential XCSSET Malware Infection
+    tag: proc-start-potential-xcsset-malware-infection
+    risk-score: 50
+    annotation: "{\"author\": \"Tim Rauch (rule), Elastic (idea)\"}"
+    query: iendswith(Parent.Path, "/bash") and iendswith(Process.Path, "/curl") and (icontains(Process.CommandLine, "/sys/log.php") or icontains(Process.CommandLine, "/sys/prepod.php") or icontains(Process.CommandLine, "/sys/bin/Pods")) and icontains(Process.CommandLine, "https://") or iendswith(Parent.Path, "/bash") and iendswith(Process.Path, "/osacompile") and icontains(Process.CommandLine, "/Users/") and icontains(Process.CommandLine, "/Library/Group Containers/") or iendswith(Parent.Path, "/bash") and iendswith(Process.Path, "/plutil") and icontains(Process.CommandLine, "LSUIElement") and icontains(Process.CommandLine, "/Users/") and icontains(Process.CommandLine, "/Library/Group Containers/") or iendswith(Process.Path, "/zip") and icontains(Process.CommandLine, "-r") and icontains(Process.CommandLine, "/Users/") and icontains(Process.CommandLine, "/Library/Group Containers/")
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: 85de3a19-b675-4a51-bfc6-b11a5186c971
+    rule-name: Potential Discovery Activity Using Find - MacOS
+    tag: proc-start-potential-discovery-activity-using-find-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1083\"], \"author\": \"Nasreddine Bencherchali (Nextron Systems)\"}"
+    query: iendswith(Process.Path, "/find") and (icontains(Process.CommandLine, "-perm -4000") or icontains(Process.CommandLine, "-perm -2000") or icontains(Process.CommandLine, "-perm 0777") or icontains(Process.CommandLine, "-perm -222") or icontains(Process.CommandLine, "-perm -o w") or icontains(Process.CommandLine, "-perm -o x") or icontains(Process.CommandLine, "-perm -u=s") or icontains(Process.CommandLine, "-perm -g=s"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 3b2c1059-ae5f-40b6-b5d4-6106d3ac20fe
+    rule-name: Hidden Flag Set On File/Directory Via Chflags - MacOS
+    tag: proc-start-hidden-flag-set-on-file/directory-via-chflags-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1218\", \"T1564.004\", \"T1552.001\", \"T1105\"], \"author\": \"Omar Khaled (@beacon_exe)\"}"
+    query: iendswith(Process.Path, "/chflags") and icontains(Process.CommandLine, "hidden ")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: d8af0da1-2959-40f9-a3e4-37a6aa1228b7
+    rule-name: Clipboard Data Collection Via Pbpaste
+    tag: proc-start-clipboard-data-collection-via-pbpaste
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1115\"], \"author\": \"Daniel Cortez\"}"
+    query: iendswith(Process.Path, "/pbpaste")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 508a9374-ad52-4789-b568-fc358def2c65
+    rule-name: Suspicious History File Operations
+    tag: proc-start-suspicious-history-file-operations
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1552.003\"], \"author\": \"Mikhail Larin, oscd.community\"}"
+    query: icontains(Process.CommandLine, ".bash\_history") or icontains(Process.CommandLine, ".zsh\_history") or icontains(Process.CommandLine, ".zhistory") or icontains(Process.CommandLine, ".history") or icontains(Process.CommandLine, ".sh\_history") or icontains(Process.CommandLine, "fish\_history")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: ae9d710f-dcd1-4f75-a0a5-93a73b5dda0e
+    rule-name: Launch Agent/Daemon Execution Via Launchctl
+    tag: proc-start-launch-agent/daemon-execution-via-launchctl
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1569.001\", \"T1543.001\", \"T1543.004\"], \"author\": \"Pratinav Chandra\"}"
+    query: iendswith(Process.Path, "/launchctl") and (icontains(Process.CommandLine, "submit") or icontains(Process.CommandLine, "load") or icontains(Process.CommandLine, "start"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: e0cfaecd-602d-41af-988d-f6ccebb2af26
+    rule-name: Suspicious Installer Package Child Process
+    tag: proc-start-suspicious-installer-package-child-process
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1059\", \"T1059.007\", \"T1071\", \"T1071.001\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: (iendswith(Parent.Path, "/package\_script\_service") or iendswith(Parent.Path, "/installer")) and (iendswith(Process.Path, "/sh") or iendswith(Process.Path, "/bash") or iendswith(Process.Path, "/dash") or iendswith(Process.Path, "/python") or iendswith(Process.Path, "/ruby") or iendswith(Process.Path, "/perl") or iendswith(Process.Path, "/php") or iendswith(Process.Path, "/javascript") or iendswith(Process.Path, "/osascript") or iendswith(Process.Path, "/tclsh") or iendswith(Process.Path, "/curl") or iendswith(Process.Path, "/wget")) and (icontains(Process.CommandLine, "preinstall") or icontains(Process.CommandLine, "postinstall"))
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: 0ed75b9c-c73b-424d-9e7d-496cd565fbe0
+    rule-name: Security Software Discovery - MacOs
+    tag: proc-start-security-software-discovery-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1518.001\"], \"author\": \"Daniil Yugoslavskiy, oscd.community\"}"
+    query: Process.Path == "/usr/bin/grep" and (icontains(Process.CommandLine, "nessusd") or icontains(Process.CommandLine, "santad") or icontains(Process.CommandLine, "CbDefense") or icontains(Process.CommandLine, "falcond") or icontains(Process.CommandLine, "td-agent") or icontains(Process.CommandLine, "packetbeat") or icontains(Process.CommandLine, "filebeat") or icontains(Process.CommandLine, "auditbeat") or icontains(Process.CommandLine, "osqueryd") or icontains(Process.CommandLine, "BlockBlock") or icontains(Process.CommandLine, "LuLu") or icontains(Process.CommandLine, "Little") and icontains(Process.CommandLine, "Snitch"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 821bcf4d-46c7-4b87-bc57-9509d3ba7c11
+    rule-name: Root Account Enable Via Dsenableroot
+    tag: proc-start-root-account-enable-via-dsenableroot
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1078\", \"T1078.001\", \"T1078.003\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: iendswith(Process.Path, "/dsenableroot") and not icontains(Process.CommandLine, " -d ")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 22c45af6-f590-4d44-bab3-b5b2d2a2b6d9
+    rule-name: Remote Access Tool - Potential MeshAgent Execution - MacOS
+    tag: proc-start-remote-access-tool-potential-meshagent-execution-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1219.002\"], \"author\": \"Norbert Ja\\u015bniewicz (AlphaSOC)\"}"
+    query: icontains(Process.CommandLine, "--meshServiceName")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 4809c683-059b-4935-879d-36835986f8cf
+    rule-name: System Information Discovery Using System_Profiler
+    tag: proc-start-system-information-discovery-using-system_profiler
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1082\", \"T1497.001\"], \"author\": \"Stephen Lincoln `@slincoln_aiq` (AttackIQ)\"}"
+    query: (iendswith(Process.Path, "/system\_profiler") or icontains(Process.CommandLine, "system\_profiler")) and (icontains(Process.CommandLine, "SPApplicationsDataType") or icontains(Process.CommandLine, "SPHardwareDataType") or icontains(Process.CommandLine, "SPNetworkDataType") or icontains(Process.CommandLine, "SPUSBDataType"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 88c0f9d8-30a8-4120-bb6b-ebb54abcf2a0
+    rule-name: File Time Attribute Change
+    tag: proc-start-file-time-attribute-change
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1070.006\"], \"author\": \"Igor Fits, Mikhail Larin, oscd.community\"}"
+    query: iendswith(Process.Path, "/touch") and (icontains(Process.CommandLine, "-t") or icontains(Process.CommandLine, "-acmr") or icontains(Process.CommandLine, "-d") or icontains(Process.CommandLine, "-r"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 0250638a-2b28-4541-86fc-ea4c558fa0c6
+    rule-name: Suspicious Browser Child Process - MacOS
+    tag: proc-start-suspicious-browser-child-process-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1189\", \"T1203\", \"T1059\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: (icontains(Parent.Path, "com.apple.WebKit.WebContent") or icontains(Parent.Path, "firefox") or icontains(Parent.Path, "Google Chrome Helper") or icontains(Parent.Path, "Google Chrome") or icontains(Parent.Path, "Microsoft Edge") or icontains(Parent.Path, "Opera") or icontains(Parent.Path, "Safari") or icontains(Parent.Path, "Tor Browser")) and (iendswith(Process.Path, "/bash") or iendswith(Process.Path, "/curl") or iendswith(Process.Path, "/dash") or iendswith(Process.Path, "/ksh") or iendswith(Process.Path, "/osascript") or iendswith(Process.Path, "/perl") or iendswith(Process.Path, "/php") or iendswith(Process.Path, "/pwsh") or iendswith(Process.Path, "/python") or iendswith(Process.Path, "/sh") or iendswith(Process.Path, "/tcsh") or iendswith(Process.Path, "/wget") or iendswith(Process.Path, "/zsh")) and not (icontains(Process.CommandLine, "--defaults-torrc") or Process.CommandLine like r"%/Library/Application Support/Microsoft/MAU%/Microsoft AutoUpdate.app/Contents/MacOS/msupdate%" or (icontains(Parent.Path, "Google Chrome Helper") or icontains(Parent.Path, "Google Chrome")) and (Process.CommandLine like r"%/Volumes/Google Chrome/Google Chrome.app/Contents/Frameworks/%/Resources/install.sh%" or Process.CommandLine like r"%/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/%/Resources/keystone\_promote\_preflight.sh%" or Process.CommandLine like r"%/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/%/Resources/keystone\_promote\_postflight.sh%") or icontains(Parent.Path, "Microsoft Edge") and (icontains(Process.CommandLine, "IOPlatformExpertDevice") or icontains(Process.CommandLine, "hw.model")) or (icontains(Parent.Path, "Google Chrome Helper") or icontains(Parent.Path, "Google Chrome")) and icontains(Process.CommandLine, "/Users/") and icontains(Process.CommandLine, "/Library/Application Support/Google/Chrome/recovery/") and icontains(Process.CommandLine, "/ChromeRecovery")) and not (isnull(Process.CommandLine) or Process.CommandLine == "")
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: 6ff08e55-ea53-4f27-94a1-eff92e6d9d5c
+    rule-name: System Information Discovery Via Sysctl - MacOS
+    tag: proc-start-system-information-discovery-via-sysctl-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1497.001\", \"T1082\"], \"author\": \"Pratinav Chandra\"}"
+    query: (iendswith(Process.Path, "/sysctl") or icontains(Process.CommandLine, "sysctl")) and (icontains(Process.CommandLine, "hw.") or icontains(Process.CommandLine, "kern.") or icontains(Process.CommandLine, "machdep."))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 5d0fdb62-f225-42fb-8402-3dfe64da468a
+    rule-name: User Added To Admin Group Via DseditGroup
+    tag: proc-start-user-added-to-admin-group-via-dseditgroup
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1078.003\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: iendswith(Process.Path, "/dseditgroup") and icontains(Process.CommandLine, " -o edit ") and icontains(Process.CommandLine, " -a ") and icontains(Process.CommandLine, " -t user") and icontains(Process.CommandLine, "admin")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 234dc5df-40b5-49d1-bf53-0d44ce778eca
+    rule-name: Payload Decoded and Decrypted via Built-in Utilities
+    tag: proc-start-payload-decoded-and-decrypted-via-built-in-utilities
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1059\", \"T1204\", \"T1140\"], \"author\": \"Tim Rauch (rule), Elastic (idea)\"}"
+    query: iendswith(Process.Path, "/openssl") and icontains(Process.CommandLine, "/Volumes/") and icontains(Process.CommandLine, "enc") and icontains(Process.CommandLine, "-base64") and icontains(Process.CommandLine, " -d ")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 7794fa3c-edea-4cff-bec7-267dd4770fd7
+    rule-name: Clipboard Access Via OSAScript
+    tag: proc-start-clipboard-access-via-osascript
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1115\", \"T1059.002\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: iendswith(Process.Path, "/osascript") and icontains(Process.CommandLine, " -e ") and icontains(Process.CommandLine, "clipboard") and not (iendswith(Parent.Path, "opencode") and icontains(Process.CommandLine, "osascript") and icontains(Process.CommandLine, " -e ") and icontains(Process.CommandLine, "set imageData to the clipboard") and icontains(Process.CommandLine, "set fileRef"))
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: 9acf45ed-3a26-4062-bf08-56857613eb52
+    rule-name: New File Exclusion Added To Time Machine Via Tmutil - MacOS
+    tag: proc-start-new-file-exclusion-added-to-time-machine-via-tmutil-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1490\"], \"author\": \"Pratinav Chandra\"}"
+    query: (iendswith(Process.Path, "/tmutil") or icontains(Process.CommandLine, "tmutil")) and icontains(Process.CommandLine, "addexclusion")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 452df256-da78-427a-866f-49fa04417d74
+    rule-name: Time Machine Backup Deletion Attempt Via Tmutil - MacOS
+    tag: proc-start-time-machine-backup-deletion-attempt-via-tmutil-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1490\"], \"author\": \"Pratinav Chandra\"}"
+    query: (iendswith(Process.Path, "/tmutil") or icontains(Process.CommandLine, "tmutil")) and icontains(Process.CommandLine, "delete")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 2d5e7a8b-f484-4a24-945d-7f0efd52eab0
+    rule-name: System Information Discovery Using Ioreg
+    tag: proc-start-system-information-discovery-using-ioreg
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1082\"], \"author\": \"Joseliyo Sanchez, @Joseliyo_Jstnk\"}"
+    query: (iendswith(Process.Path, "/ioreg") or icontains(Process.CommandLine, "ioreg")) and (icontains(Process.CommandLine, "-l") or icontains(Process.CommandLine, "-c")) and (icontains(Process.CommandLine, "AppleAHCIDiskDriver") or icontains(Process.CommandLine, "IOPlatformExpertDevice") or icontains(Process.CommandLine, "Oracle") or icontains(Process.CommandLine, "Parallels") or icontains(Process.CommandLine, "USB Vendor Name") or icontains(Process.CommandLine, "VirtualBox") or icontains(Process.CommandLine, "VMware"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: b22a5b36-2431-493a-8be1-0bae56c28ef3
+    rule-name: Hidden User Creation
+    tag: proc-start-hidden-user-creation
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1564.002\"], \"author\": \"Daniil Yugoslavskiy, oscd.community\"}"
+    query: iendswith(Process.Path, "/dscl") and icontains(Process.CommandLine, "create") and icontains(Process.CommandLine, "UniqueID") and Process.CommandLine regex "([0-9]|[1-9][0-9]|[1-4][0-9]{2})" or iendswith(Process.Path, "/dscl") and icontains(Process.CommandLine, "create") and icontains(Process.CommandLine, "IsHidden") and (icontains(Process.CommandLine, "true") or icontains(Process.CommandLine, "yes") or icontains(Process.CommandLine, "1"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 6e4dcdd1-e48b-42f7-b2d8-3b413fc58cb4
+    rule-name: Suspicious Execution via macOS Script Editor
+    tag: proc-start-suspicious-execution-via-macos-script-editor
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1566\", \"T1566.002\", \"T1059\", \"T1059.002\", \"T1204\", \"T1204.001\", \"T1553\"], \"author\": \"Tim Rauch (rule), Elastic (idea)\"}"
+    query: iendswith(Parent.Path, "/Script Editor") and (iendswith(Process.Path, "/curl") or iendswith(Process.Path, "/bash") or iendswith(Process.Path, "/sh") or iendswith(Process.Path, "/zsh") or iendswith(Process.Path, "/dash") or iendswith(Process.Path, "/fish") or iendswith(Process.Path, "/osascript") or iendswith(Process.Path, "/mktemp") or iendswith(Process.Path, "/chmod") or iendswith(Process.Path, "/php") or iendswith(Process.Path, "/nohup") or iendswith(Process.Path, "/openssl") or iendswith(Process.Path, "/plutil") or iendswith(Process.Path, "/PlistBuddy") or iendswith(Process.Path, "/xattr") or iendswith(Process.Path, "/sqlite") or iendswith(Process.Path, "/funzip") or iendswith(Process.Path, "/popen") or icontains(Process.Path, "python") or icontains(Process.Path, "perl"))
+    event-type: Process.Start
+    generic-properties:
+      - Parent.Path
+  - platform: macos
+    rule-id: 652c098d-dc11-4ba6-8566-c20e89042f2b
+    rule-name: User Added To Admin Group Via Sysadminctl
+    tag: proc-start-user-added-to-admin-group-via-sysadminctl
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1078.003\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: iendswith(Process.Path, "/sysadminctl") and icontains(Process.CommandLine, " -addUser ") and icontains(Process.CommandLine, " -admin ")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: bf241472-f014-4f01-a869-96f99330ca8c
+    rule-name: Disk Image Mounting Via Hdiutil - MacOS
+    tag: proc-start-disk-image-mounting-via-hdiutil-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1566.001\", \"T1560.001\"], \"author\": \"Omar Khaled (@beacon_exe)\"}"
+    query: iendswith(Process.Path, "/hdiutil") and (icontains(Process.CommandLine, "attach ") or icontains(Process.CommandLine, "mount "))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 3603f18a-ec15-43a1-9af2-d196c8a7fec6
+    rule-name: System Integrity Protection (SIP) Disabled
+    tag: proc-start-system-integrity-protection-(sip)-disabled
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1518.001\"], \"author\": \"Joseliyo Sanchez, @Joseliyo_Jstnk\"}"
+    query: iendswith(Process.Path, "/csrutil") and icontains(Process.CommandLine, "disable")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 1cf98dc2-fcb0-47c9-8aea-654c9284d1ae
+    rule-name: Disk Image Creation Via Hdiutil - MacOS
+    tag: proc-start-disk-image-creation-via-hdiutil-macos
+    risk-score: 50
+    annotation: "{\"author\": \"Omar Khaled (@beacon_exe)\"}"
+    query: iendswith(Process.Path, "/hdiutil") and icontains(Process.CommandLine, "create")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: b743623c-2776-40e0-87b1-682b975d0ca5
+    rule-name: User Added To Admin Group Via Dscl
+    tag: proc-start-user-added-to-admin-group-via-dscl
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1078.003\"], \"author\": \"Sohan G (D4rkCiph3r)\"}"
+    query: iendswith(Process.Path, "/dscl") and icontains(Process.CommandLine, " -append ") and icontains(Process.CommandLine, " /Groups/admin ") and icontains(Process.CommandLine, " GroupMembership ")
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 7ed2c9f7-c59d-4c82-a7e2-f859aa676099
+    rule-name: Suspicious MacOS Firmware Activity
+    tag: proc-start-suspicious-macos-firmware-activity
+    risk-score: 50
+    annotation: "{\"author\": \"Austin Songer @austinsonger\"}"
+    query: Process.Path == "/usr/sbin/firmwarepasswd" and (icontains(Process.CommandLine, "setpasswd") or icontains(Process.CommandLine, "full") or icontains(Process.CommandLine, "delete") or icontains(Process.CommandLine, "check"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: acf61bd8-d814-4272-81f0-a7a269aa69aa
+    rule-name: Indicator Removal on Host - Clear Mac System Logs
+    tag: proc-start-indicator-removal-on-host-clear-mac-system-logs
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1685.006\"], \"author\": \"remotephone, oscd.community\"}"
+    query: (iendswith(Process.Path, "/rm") or iendswith(Process.Path, "/unlink") or iendswith(Process.Path, "/shred")) and (icontains(Process.CommandLine, "/var/log") or icontains(Process.CommandLine, "/Users/") and icontains(Process.CommandLine, "/Library/Logs/"))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 6d8a7cf1-8085-423b-b87d-7e880faabbdf
+    rule-name: File Download Via Nscurl - MacOS
+    tag: proc-start-file-download-via-nscurl-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1105\"], \"author\": \"Daniel Cortez\"}"
+    query: iendswith(Process.Path, "/nscurl") and (icontains(Process.CommandLine, "--download ") or icontains(Process.CommandLine, "--download-directory ") or icontains(Process.CommandLine, "--output ") or icontains(Process.CommandLine, "-dir ") or icontains(Process.CommandLine, "-dl ") or icontains(Process.CommandLine, "-ld") or icontains(Process.CommandLine, "-o "))
+    event-type: Process.Start
+  - platform: macos
+    rule-id: 4f394635-13ef-4599-b677-3353e0f84f55
+    rule-name: Python Path Configuration File Creation - MacOS
+    tag: python-path-configuration-file-creation-macos
+    risk-score: 50
+    annotation: "{\"mitre_attack\": [\"T1059.006\"], \"author\": \"Andreas Braathen (mnemonic.io)\"}"
+    query: File.Path regex "(?i)/lib/python3\\.([5-9]|[0-9]{2})/site-packages/" and iendswith(File.Path, ".pth")
+    event-type: File.Create
+    generic-properties:
+      - File.Path

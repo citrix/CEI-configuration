@@ -1,0 +1,37 @@
+config-version: 9.0
+threat-detection-rules:
+  - platform: windows
+    rule-id: 63332011-f057-496c-ad8d-d2b6afb27f96
+    rule-name: Suspicious Tasklist Discovery Command
+    tag: proc-start-suspicious-tasklist-discovery-command
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1057\"], \"author\": \"frack113\"}"
+    query: icontains(Process.CommandLine, "tasklist") or iendswith(Process.Path, "\\tasklist.exe") or Process.Name == "tasklist.exe"
+    event-type: Process.Start
+  - platform: windows
+    rule-id: 60936b49-fca0-4f32-993d-7415edcf9a5d
+    rule-name: New Application in AppCompat
+    tag: new-application-in-appcompat
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1204.002\"], \"author\": \"Roberto Rodriguez (Cyb3rWard0g), OTR (Open Threat Research)\"}"
+    query: icontains(Reg.TargetObject, "\\AppCompatFlags\\Compatibility Assistant\\Store\\")
+    hive:
+      - HKLM
+      - HKU
+    event-types:
+      - Reg.Value.Write
+      - Reg.Key.Rename
+      - Reg.Key.Restore
+      - Reg.Key.Replace
+    generic-properties:
+      - Reg.TargetObject
+  - platform: windows
+    rule-id: 02fb90de-c321-4e63-a6b9-25f4b03dfd14
+    rule-name: Windows Spooler Service Suspicious Binary Load
+    tag: windows-spooler-service-suspicious-binary-load
+    risk-score: 1
+    annotation: "{\"mitre_attack\": [\"T1574\"], \"author\": \"FPT.EagleEye, Thomas Patzke (improvements)\"}"
+    query: iendswith(Process.Path, "\\spoolsv.exe") and (icontains(Image.Path, "\\Windows\\System32\\spool\\drivers\\x64\\3\\") or icontains(Image.Path, "\\Windows\\System32\\spool\\drivers\\x64\\4\\")) and iendswith(Image.Path, ".dll")
+    event-type: Image.Load
+    generic-properties:
+      - Image.Path
