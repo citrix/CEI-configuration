@@ -109,6 +109,12 @@ timers:
     interval: 5m
     ua-metrics:
       - ProcessStatistics
+  - platform: windows
+    name: Citrix session gateway details
+    comment: Collect the per-hop network latency Citrix Gateway measures for a session. The gateway reports roughly once a minute, so a shorter interval does not produce fresher data.
+    interval: 1m
+    ua-metrics:
+      - CitrixSessionGatewayDetail
 event-triggers:
   - platform: windows
     name: TriggerCitrixSessionConfig

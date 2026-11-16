@@ -231,7 +231,7 @@ function Get-vlLAPSSettings {
       If the chosen root is missing any settings, the settings are assigned their default values.
       #>
 
-      $hkeys = @{
+      $hkeys = [ordered]@{
          'LAPS CSP'                 = 'Software\Microsoft\Policies\LAPS'
          'LAPS Group Policy'        = 'Software\Microsoft\Windows\CurrentVersion\Policies\LAPS'
          'LAPS Local Configuration' = 'Software\Microsoft\Windows\CurrentVersion\LAPS\Config'
@@ -250,7 +250,7 @@ function Get-vlLAPSSettings {
          # check if $hkey exists and contains any values
          $lapsRegSettings = Get-vlRegistryKeyValues -Hive "HKLM" -Path $hkey.Value
 
-         if ($null -ne $lapsRegSettings -and $lapsRegSettings.PSObject.Properties.Count -ge 0) {
+         if ($null -ne $lapsRegSettings -and @($lapsRegSettings.PSObject.Properties).Count -gt 0) {
             $lapsSettings = [PSCustomObject]@{
                Mode               = $hkey.Key
                Enabled            = $true
@@ -260,16 +260,18 @@ function Get-vlLAPSSettings {
 
             if ($hkey.Key -eq "Legacy Microsoft LAPS") {
                $lapsSettings.Enabled = if ( $lapsRegSettings.PSObject.Properties.Name -contains "AdmPwdEnabled") { $lapsRegSettings.AdmPwdEnabled -eq 1 } else { $false }
-
-               if ($lapsSettings.Enabled -eq $true) {
-                  return New-vlResultObject -result $lapsSettings -score 10 -riskScore $riskScore
-               }
-               else {
-                  return New-vlResultObject -result $lapsSettings -score 6 -riskScore $riskScore
-               }
+            }
+            else {
+               # BackupDirectory defaults to 0, which disables Windows LAPS
+               $lapsSettings.Enabled = if ( $lapsRegSettings.PSObject.Properties.Name -contains "BackupDirectory") { $lapsRegSettings.BackupDirectory -ne 0 } else { $false }
             }
 
-            return New-vlResultObject -result $lapsSettings -score 10 -riskScore $riskScore
+            if ($lapsSettings.Enabled -eq $true) {
+               return New-vlResultObject -result $lapsSettings -score 10 -riskScore $riskScore
+            }
+            else {
+               return New-vlResultObject -result $lapsSettings -score 6 -riskScore $riskScore
+            }
          }
       }
 
@@ -466,8 +468,8 @@ Write-Output (Get-vlLocalUsersAndGroupsCheck | ConvertTo-Json -Compress)
 # SIG # Begin signature block
 # MIIoxgYJKoZIhvcNAQcCoIIotzCCKLMCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCB+tzl1UBLbUTnv
-# zi5gwkkfG4Ct/diO6z6mVOANisA7GaCCDbkwggawMIIEmKADAgECAhAIrUCyYNKc
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCBdYz+aZBy+CkhC
+# hMNurak39/KhL1J/3ztD1VTQx4/3dqCCDbkwggawMIIEmKADAgECAhAIrUCyYNKc
 # TJ9ezam9k67ZMA0GCSqGSIb3DQEBDAUAMGIxCzAJBgNVBAYTAlVTMRUwEwYDVQQK
 # EwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xITAfBgNV
 # BAMTGERpZ2lDZXJ0IFRydXN0ZWQgUm9vdCBHNDAeFw0yMTA0MjkwMDAwMDBaFw0z
@@ -545,22 +547,22 @@ Write-Output (Get-vlLocalUsersAndGroupsCheck | ConvertTo-Json -Compress)
 # AxM4RGlnaUNlcnQgVHJ1c3RlZCBHNCBDb2RlIFNpZ25pbmcgUlNBNDA5NiBTSEEz
 # ODQgMjAyMSBDQTECEA/jsqLSKYSprcwjW2RvMd4wDQYJYIZIAWUDBAIBBQCggb4w
 # GQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYBBAGCNwIBCzEOMAwGCisG
-# AQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEIKnx2NFKfdi3k33FxCMKIpMBLrPtyn/E
-# 2A9Z5zeWYZc8MFIGCisGAQQBgjcCAQwxRDBCoECAPgBMAG8AYwBhAGwAVQBzAGUA
+# AQQBgjcCARUwLwYJKoZIhvcNAQkEMSIEIOw7kEzCyHLIs7aU5nAYPqwdMlZF7Vif
+# 2wzty5cHZe//MFIGCisGAQQBgjcCAQwxRDBCoECAPgBMAG8AYwBhAGwAVQBzAGUA
 # cgBzAEEAbgBkAEcAcgBvAHUAcABzAC0ATQBhAGMAaABpAG4AZQAuAHAAcwAxMA0G
-# CSqGSIb3DQEBAQUABIIBgF7jBXlt33j233LHP1SXFMEOMkaPgvtdmIyAHxv1dDCL
-# shLJRNVLw5n9x2UdFPpqgr7oYvAWseCHYYQRo9RHAjjGHaCwFqlDriSx1NH0Ftkg
-# HwfLOrnFb97xx6sTezYY8EYNkN019j2G+OItIaNh6XrNy4aZ5sCCmB3vmSTWo7en
-# 2Xu87k+UIszNZu0YGxvDCVjir24Ti25xcj6ALdgzasQZ79aD33/fQnPdN03ZcGW/
-# 6EFHhpiY2NJ+Cosa3AeD2f8DHdylgV+nMFYemzYgpHO5osrv0CuuE5wGj+cpBWg5
-# l7vu0lDpc3oIXRre5Kp/P4uHbZm3C1geZGJ7ZGAxGxQ4uKWoPMeoG+cN+fqv5NwF
-# fu6d2SABHhEUfnCgYsQuSd6016oXOcij/NeZFIS2bSt11RDLW6ECB5UYGVMXYtWq
-# rxOlfbmilx/THFIR8IJHgfA3UEZ2XsloGY/gYqHS05fb2FHG71TRNoU6YDYxHMlf
-# P1g0oa4b/dvtLdLnoD6Xs6GCF3YwghdyBgorBgEEAYI3AwMBMYIXYjCCF14GCSqG
+# CSqGSIb3DQEBAQUABIIBgC1dH6zrBMpAHK3VAyT3wu028afc/7bSHwhcgWwojitV
+# ceUPWo8adme58yh1aB4kTBsdPYQsWmqWEjerFOL9hCnJnSuQw195MMvkOtVCeLxN
+# d3qILhHb5Mh6c7zZHaVp/MYAogETM7pNzBUBxHCwLer2tkHTo2WoW2w+9iG9OV9+
+# 0fmZ5wMqs4vq6+piynm6nVgww1kTG9Xe4OAWgc92K+oNG6VNn6Wvk/2hgdO/p+23
+# pr68Zyq1yX4gAqok/Pj42AI0Qxf4BpOPVZQ1KiTLrnmDD7O+HpdYBFAGuEXAQ6at
+# iysF+fsQz7XFo4n6+zmZ0pwGycOyMW/93Yc+p3nYBXSnZFWmYqt3uRA67Z1OukDZ
+# l5vSk+0Fev8DI7kfeP1EHNQyUjy6AkvJfjoOd5nWdQN+wj9hR6etYGvpA3Ys8dGm
+# 8RXigS3/S4383u+APxbXlxphpgJcAIYCUd9uVpWvn9WVJDYqaHpxwZWtYCwLsAjt
+# 8P3zxethOKOPJLBanO04LaGCF3YwghdyBgorBgEEAYI3AwMBMYIXYjCCF14GCSqG
 # SIb3DQEHAqCCF08wghdLAgEDMQ8wDQYJYIZIAWUDBAIBBQAwdwYLKoZIhvcNAQkQ
-# AQSgaARmMGQCAQEGCWCGSAGG/WwHATAxMA0GCWCGSAFlAwQCAQUABCCOXeiyuDiZ
-# pmEsucTg96s3qH5rHH1P1IYVhD1hoKWZ2AIQdai9g/6FK3l6x1nOkXhfDBgPMjAy
-# NjEwMDExMTU5MTBaoIITOjCCBu0wggTVoAMCAQICEAhP3DNPfkVO28MPj/mSGDUw
+# AQSgaARmMGQCAQEGCWCGSAGG/WwHATAxMA0GCWCGSAFlAwQCAQUABCDQmvlO5jBF
+# rFwsVLupULKemYrN100jBSAP17d41ErnsQIQBsI2o1s62kAZgk4qv+9/6RgPMjAy
+# NjExMTYwNjU3MDVaoIITOjCCBu0wggTVoAMCAQICEAhP3DNPfkVO28MPj/mSGDUw
 # DQYJKoZIhvcNAQELBQAwaTELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDkRpZ2lDZXJ0
 # LCBJbmMuMUEwPwYDVQQDEzhEaWdpQ2VydCBUcnVzdGVkIEc0IFRpbWVTdGFtcGlu
 # ZyBSU0E0MDk2IFNIQTI1NiAyMDI1IENBMTAeFw0yNjA4MDUwMDAwMDBaFw0zNzEx
@@ -667,19 +669,19 @@ Write-Output (Get-vlLocalUsersAndGroupsCheck | ConvertTo-Json -Compress)
 # QTA/BgNVBAMTOERpZ2lDZXJ0IFRydXN0ZWQgRzQgVGltZVN0YW1waW5nIFJTQTQw
 # OTYgU0hBMjU2IDIwMjUgQ0ExAhAIT9wzT35FTtvDD4/5khg1MA0GCWCGSAFlAwQC
 # AQUAoIHRMBoGCSqGSIb3DQEJAzENBgsqhkiG9w0BCRABBDAcBgkqhkiG9w0BCQUx
-# DxcNMjYxMDAxMTE1OTEwWjArBgsqhkiG9w0BCRACDDEcMBowGDAWBBRR2avaA0lz
-# 2E9CZqykgkjms2nEOTAvBgkqhkiG9w0BCQQxIgQghrAOnxUrTBrP5tLobODatrs8
-# cBTSePJRq4DaI/COY7AwNwYLKoZIhvcNAQkQAi8xKDAmMCQwIgQgLaCdp/QTH5/n
-# LbbF5unJZWdVrwQ/HqdCzA0hIOFB6/wwDQYJKoZIhvcNAQEBBQAEggIAsuRtVbY4
-# rE0KjAkJMN5dZs/ZKr24RtW5gXnb4LdYDwKmuyOooM0zdgqYySXXcsTNxgDSLAjN
-# mAGQB3qU9MOwT0IjrePrSbu9DujnYNU5/8Wv18r9ZAVAub9YfyZ8CqCBjeu+Hh5F
-# MmA2+ADtkbY03p2utMvVG6/DZMX8T+ViwigDkKa+D4QmH01nRfN/punoWv4Q5JmR
-# PxXq4cBQwxYaUaC5SU1weaRPXnphzwX7nbv/+Xco3jUnCwpBL0wUo9EYFqJZBK/o
-# 2GlpYKXQxG20iGDxhtlOo5/u3G/uvf3oMrrUKNhsYatOPBA48yuHfP+WP63vkiv8
-# U5XpK9BtvuggSq7erFxCivgPsynbmjDVjxSR4xRv0EgoHzZsOJPCshCp6ddpNE29
-# cfqMNNayKQv2ja6MLuPGRTWAu5PRs1QS44rGRnyVHafv7ckQERmtZUSLBwVGvKdY
-# nveLrReEoqVNA5jGzzvbEsSq1w2c/sPB05QJdmfgxE56QretlE5J+Ky2HWHWBGqd
-# k9uvEMXlPaEp5Pa91p3bxeS7dTxaAK/grU1xeoeKXW8pei9Ou19NStKPoxn5jQOw
-# XtzfinRi6JgqcnnxpDulQrXxQZE4U/QUkYq3Ant4nx9d93Zw5ByHpued7Vnm87+C
-# piLB3EayPFVeormMCVUCnKXQqNzRAo2Yr7c=
+# DxcNMjYxMTE2MDY1NzA1WjArBgsqhkiG9w0BCRACDDEcMBowGDAWBBRR2avaA0lz
+# 2E9CZqykgkjms2nEOTAvBgkqhkiG9w0BCQQxIgQgMKUSIRBU8efwp5YtGbuOPX/O
+# NBpfApZ2FR1FFo+/oIkwNwYLKoZIhvcNAQkQAi8xKDAmMCQwIgQgLaCdp/QTH5/n
+# LbbF5unJZWdVrwQ/HqdCzA0hIOFB6/wwDQYJKoZIhvcNAQEBBQAEggIASK36YEY3
+# tnEhRE7f6/0hAS7J7X6LaQp/3R0X8Uq8M9WMROgdPl2FGwwOnGlbqcuGKPN5MbDH
+# dMUd6GwkwsTw4ULpPnhWs12KnvfItmJV6b9DYNSUPMqmw/D5uzMnCuCF81Mlr0cP
+# iwo3gTzTF1pgApaNtfiX/nD3Bt5oZqvfI2sQeEBZIn3wPlGIAEoX/LzdqbzWjGHs
+# 0hhRZKhmV44YVBQRl9B4U7pdfR2OWrp8XiquKmVSq0vOP2jIrFLaHg8mi2VhKaZZ
+# mm4WMYSXuO9po4QJvnBOPXUQki2JXaf3+tlwalb0WLNXixQKY0JGfj0nSyhn1LrG
+# Fm1spyAENpu3mzBmA8joUYhbL+8HAgLtMH2dBT5KxMQBJSXN/Zm2G2cwrPG/uAJY
+# cmY5F3zBZLu04vOq7ZDZCnOX/42tRY7/nIcM9nKWigpIrlV5lYmuII30MT+ZrW9c
+# upzY43wLX6czAEkgTeiIO5XEBgEJ+qkD4f3m/NHRaT8Vwoxs/67IHnngMdjRTxJx
+# L9KxX2HSdAWYjf23+O6TU/bqS/cTRWDUA2VXxWvTff7KMAyJUxbsmlg9JwfQ1LWW
+# nWz7lRNE8t2dXM66KbTfse/+ZCm1W6hQ6Z49LoHrq3vePa5NDJyN5LwVVmKIe07I
+# IP+uZaTXtOr4LZyUVaezvoho8XYTRytaXkA=
 # SIG # End signature block

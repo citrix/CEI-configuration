@@ -1,5 +1,22 @@
 {
   "$defs": {
+    "application-mapping-ignored-process-entry": {
+      "additionalProperties": false,
+      "description": "List of regex patterns for processes to ignore in application lookup. An entry is a regex string, or a mapping with regex and an optional platform gate.",
+      "properties": {
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
+        "regex": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "regex"
+      ],
+      "type": "object"
+    },
     "azure-event-hubs-configuration": {
       "additionalProperties": false,
       "allOf": [
@@ -125,8 +142,10 @@
           "description": "Component detail spec for URLs that match the entry's regex: host[:path[(depth)]][:query[(parameters)]], case-insensitive. path(2) keeps the first two path segments; query(id,page) keeps only the query parameters whose names match one of these comma-separated regular expressions. Two specs separated by ';' apply to tab URLs and to request URLs respectively.",
           "minLength": 1,
           "pattern": "^[hH][oO][sS][tT](?::[pP][aA][tT][hH](?:\\([0-9]+\\)?)?)?(?::[qQ][uU][eE][rR][yY](?:\\([^)]+\\)?)?)?(?:;[hH][oO][sS][tT](?::[pP][aA][tT][hH](?:\\([0-9]+\\)?)?)?(?::[qQ][uU][eE][rR][yY](?:\\([^)]+\\)?)?)?)?$",
-          "type": "string",
-          "x-uberagent-pattern-ignore-case": true
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         },
         "regex": {
           "description": "URL regex pattern.",
@@ -163,6 +182,9 @@
             }
           ]
         },
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
         "regex": {
           "description": "URL regex pattern.",
           "minLength": 1,
@@ -193,19 +215,7 @@
           "then": {
             "properties": {
               "collect-adc-information-machines": {
-                "anyOf": [
-                  {
-                    "pattern": "[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]",
-                    "type": "string"
-                  },
-                  {
-                    "contains": {
-                      "pattern": "[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]",
-                      "type": "string"
-                    },
-                    "type": "array"
-                  }
-                ]
+                "minItems": 1
               }
             },
             "required": [
@@ -261,20 +271,13 @@
           ]
         },
         "collect-adc-information-machines": {
-          "description": "Machine list for ADC information collection (when scope is MachineList).",
-          "oneOf": [
-            {
-              "minLength": 1,
-              "type": "string"
-            },
-            {
-              "items": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ]
+          "description": "Machine list for ADC information collection (when scope is MachineList), one machine per entry.",
+          "items": {
+            "minLength": 1,
+            "pattern": "^[^,]*[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u180E\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF][^,]*$",
+            "type": "string"
+          },
+          "type": "array"
         },
         "https": {
           "description": "Use HTTPS for NetScaler communication.",
@@ -290,17 +293,20 @@
           "description": "Restrict to specific platforms."
         },
         "servers": {
-          "description": "NetScaler server endpoints.",
+          "description": "The Citrix ADC (NetScaler) appliances of one HA pair (two entries) or one standalone appliance (one entry), as host names or IP addresses. The order does not matter: uberAgent asks each appliance for its HA state. Use one citrix-adc-configs entry for each pair.",
           "oneOf": [
             {
               "minLength": 1,
+              "pattern": "^[^,;]*[^,;\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u180E\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF][^,;]*$",
               "type": "string"
             },
             {
               "items": {
                 "minLength": 1,
+                "pattern": "^[^,;]*[^,;\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u180E\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF][^,;]*$",
                 "type": "string"
               },
+              "maxItems": 2,
               "minItems": 1,
               "type": "array"
             }
@@ -331,19 +337,7 @@
           "then": {
             "properties": {
               "collect-citrix-cloud-information-machines": {
-                "anyOf": [
-                  {
-                    "pattern": "[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]",
-                    "type": "string"
-                  },
-                  {
-                    "contains": {
-                      "pattern": "[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]",
-                      "type": "string"
-                    },
-                    "type": "array"
-                  }
-                ]
+                "minItems": 1
               }
             },
             "required": [
@@ -415,20 +409,13 @@
           ]
         },
         "collect-citrix-cloud-information-machines": {
-          "description": "Machine list for Citrix Cloud information collection.",
-          "oneOf": [
-            {
-              "minLength": 1,
-              "type": "string"
-            },
-            {
-              "items": {
-                "minLength": 1,
-                "type": "string"
-              },
-              "type": "array"
-            }
-          ]
+          "description": "Machine list for Citrix Cloud information collection, one machine per entry.",
+          "items": {
+            "minLength": 1,
+            "pattern": "^[^,]*[^,\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u180E\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000\\uFEFF][^,]*$",
+            "type": "string"
+          },
+          "type": "array"
         },
         "customer-id": {
           "description": "Citrix Cloud customer ID.",
@@ -457,6 +444,9 @@
         "license-cache-poll-interval": {
           "$ref": "#/$defs/duration",
           "description": "Interval at which the license cache is polled for changes."
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         },
         "version": {
           "description": "Configuration version identifier.",
@@ -1002,9 +992,9 @@
                 },
                 {
                   "not": {
-                    "pattern": "^(?:user\\-logon|session\\-connection\\-state\\-change|session\\-roaming)$"
+                    "pattern": "^(?:user-logon|session-connection-state-change|session-roaming)$"
                   },
-                  "pattern": "^(?:[uU][sS][eE][rR]\\-[lL][oO][gG][oO][nN]|[sS][eE][sS][sS][iI][oO][nN]\\-[cC][oO][nN][nN][eE][cC][tT][iI][oO][nN]\\-[sS][tT][aA][tT][eE]\\-[cC][hH][aA][nN][gG][eE]|[sS][eE][sS][sS][iI][oO][nN]\\-[rR][oO][aA][mM][iI][nN][gG])$",
+                  "pattern": "^(?:[uU][sS][eE][rR]-[lL][oO][gG][oO][nN]|[sS][eE][sS][sS][iI][oO][nN]-[cC][oO][nN][nN][eE][cC][tT][iI][oO][nN]-[sS][tT][aA][tT][eE]-[cC][hH][aA][nN][gG][eE]|[sS][eE][sS][sS][iI][oO][nN]-[rR][oO][aA][mM][iI][nN][gG])$",
                   "type": "string"
                 }
               ]
@@ -1022,9 +1012,9 @@
                   },
                   {
                     "not": {
-                      "pattern": "^(?:user\\-logon|session\\-connection\\-state\\-change|session\\-roaming)$"
+                      "pattern": "^(?:user-logon|session-connection-state-change|session-roaming)$"
                     },
-                    "pattern": "^(?:[uU][sS][eE][rR]\\-[lL][oO][gG][oO][nN]|[sS][eE][sS][sS][iI][oO][nN]\\-[cC][oO][nN][nN][eE][cC][tT][iI][oO][nN]\\-[sS][tT][aA][tT][eE]\\-[cC][hH][aA][nN][gG][eE]|[sS][eE][sS][sS][iI][oO][nN]\\-[rR][oO][aA][mM][iI][nN][gG])$",
+                    "pattern": "^(?:[uU][sS][eE][rR]-[lL][oO][gG][oO][nN]|[sS][eE][sS][sS][iI][oO][nN]-[cC][oO][nN][nN][eE][cC][tT][iI][oO][nN]-[sS][tT][aA][tT][eE]-[cC][hH][aA][nN][gG][eE]|[sS][eE][sS][sS][iI][oO][nN]-[rR][oO][aA][mM][iI][nN][gG])$",
                     "type": "string"
                   }
                 ]
@@ -1073,9 +1063,9 @@
                 },
                 {
                   "not": {
-                    "pattern": "^(?:disks|network\\-shares|named\\-pipes|mailslots)$"
+                    "pattern": "^(?:disks|network-shares|named-pipes|mailslots)$"
                   },
-                  "pattern": "^(?:[dD][iI][sS][kK][sS]|[nN][eE][tT][wW][oO][rR][kK]\\-[sS][hH][aA][rR][eE][sS]|[nN][aA][mM][eE][dD]\\-[pP][iI][pP][eE][sS]|[mM][aA][iI][lL][sS][lL][oO][tT][sS])$",
+                  "pattern": "^(?:[dD][iI][sS][kK][sS]|[nN][eE][tT][wW][oO][rR][kK]-[sS][hH][aA][rR][eE][sS]|[nN][aA][mM][eE][dD]-[pP][iI][pP][eE][sS]|[mM][aA][iI][lL][sS][lL][oO][tT][sS])$",
                   "type": "string"
                 }
               ]
@@ -1094,9 +1084,9 @@
                   },
                   {
                     "not": {
-                      "pattern": "^(?:disks|network\\-shares|named\\-pipes|mailslots)$"
+                      "pattern": "^(?:disks|network-shares|named-pipes|mailslots)$"
                     },
-                    "pattern": "^(?:[dD][iI][sS][kK][sS]|[nN][eE][tT][wW][oO][rR][kK]\\-[sS][hH][aA][rR][eE][sS]|[nN][aA][mM][eE][dD]\\-[pP][iI][pP][eE][sS]|[mM][aA][iI][lL][sS][lL][oO][tT][sS])$",
+                    "pattern": "^(?:[dD][iI][sS][kK][sS]|[nN][eE][tT][wW][oO][rR][kK]-[sS][hH][aA][rR][eE][sS]|[nN][aA][mM][eE][dD]-[pP][iI][pP][eE][sS]|[mM][aA][iI][lL][sS][lL][oO][tT][sS])$",
                     "type": "string"
                   }
                 ]
@@ -1104,8 +1094,50 @@
               "type": "array"
             }
           ]
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
+        "queue-priority": {
+          "description": "Scheduling priority of the macOS filesystem event queue. Defaults to background (QOS_CLASS_BACKGROUND). Use default (QOS_CLASS_DEFAULT) or higher to reduce event loss under CPU load. Requires an agent restart. Applies to macOS only.",
+          "oneOf": [
+            {
+              "enum": [
+                "background",
+                "utility",
+                "default",
+                "user-initiated",
+                "user-interactive"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:background|utility|default|user-initiated|user-interactive)$"
+              },
+              "pattern": "^(?:[bB][aA][cC][kK][gG][rR][oO][uU][nN][dD]|[uU][tT][iI][lL][iI][tT][yY]|[dD][eE][fF][aA][uU][lL][tT]|[uU][sS][eE][rR]-[iI][nN][iI][tT][iI][aA][tT][eE][dD]|[uU][sS][eE][rR]-[iI][nN][tT][eE][rR][aA][cC][tT][iI][vV][eE])$",
+              "type": "string"
+            }
+          ]
         }
       },
+      "type": "object"
+    },
+    "ignore-logon-monitoring-process-entry": {
+      "additionalProperties": false,
+      "description": "List of process name patterns to ignore during logon monitoring (Windows-only). An entry is a regex string, or a mapping with regex and an optional platform gate.",
+      "properties": {
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
+        "regex": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "regex"
+      ],
       "type": "object"
     },
     "include-entry": {
@@ -1152,9 +1184,28 @@
             },
             {
               "not": {
-                "pattern": "^(?:do\\-nothing|enable|disable)$"
+                "pattern": "^(?:do-nothing|enable|disable)$"
               },
-              "pattern": "^(?:[dD][oO]\\-[nN][oO][tT][hH][iI][nN][gG]|[eE][nN][aA][bB][lL][eE]|[dD][iI][sS][aA][bB][lL][eE])$",
+              "pattern": "^(?:[dD][oO]-[nN][oO][tT][hH][iI][nN][gG]|[eE][nN][aA][bB][lL][eE]|[dD][iI][sS][aA][bB][lL][eE])$",
+              "type": "string"
+            }
+          ]
+        },
+        "citrix-monitor-odata-protocol": {
+          "description": "Protocol uberAgent uses for the Citrix Monitor Service OData API on a Delivery Controller. Set this to https on a site hardened to HTTPS-only. Applies to Windows only.",
+          "oneOf": [
+            {
+              "enum": [
+                "http",
+                "https"
+              ],
+              "type": "string"
+            },
+            {
+              "not": {
+                "pattern": "^(?:http|https)$"
+              },
+              "pattern": "^(?:[hH][tT][tT][pP]|[hH][tT][tT][pP][sS])$",
               "type": "string"
             }
           ]
@@ -1190,6 +1241,10 @@
             "disable-browser-integrity-check": {
               "type": "boolean"
             },
+            "disable-citrix-nsap-integrity-check": {
+              "description": "Applies to Windows only.",
+              "type": "boolean"
+            },
             "disable-set-file-permissions-on-exec": {
               "type": "boolean"
             },
@@ -1200,6 +1255,9 @@
               "type": "boolean"
             },
             "force-citrix-metrics-determination": {
+              "type": "boolean"
+            },
+            "http-redirect-restrictions-disabled": {
               "type": "boolean"
             },
             "ie-ignore-frames": {
@@ -1329,6 +1387,9 @@
           "minimum": 1,
           "type": "integer"
         },
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
         "register-ie-addon": {
           "description": "Register or deregister uberAgent's Internet Explorer add-on through the service. Applies to Windows only.",
           "oneOf": [
@@ -1342,9 +1403,9 @@
             },
             {
               "not": {
-                "pattern": "^(?:do\\-nothing|register|deregister)$"
+                "pattern": "^(?:do-nothing|register|deregister)$"
               },
-              "pattern": "^(?:[dD][oO]\\-[nN][oO][tT][hH][iI][nN][gG]|[rR][eE][gG][iI][sS][tT][eE][rR]|[dD][eE][rR][eE][gG][iI][sS][tT][eE][rR])$",
+              "pattern": "^(?:[dD][oO]-[nN][oO][tT][hH][iI][nN][gG]|[rR][eE][gG][iI][sS][tT][eE][rR]|[dD][eE][rR][eE][gG][iI][sS][tT][eE][rR])$",
               "type": "string"
             }
           ]
@@ -1403,9 +1464,9 @@
             },
             {
               "not": {
-                "pattern": "^(?:process\\-id|process\\-name)$"
+                "pattern": "^(?:process-id|process-name)$"
               },
-              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\-[iI][dD]|[pP][rR][oO][cC][eE][sS][sS]\\-[nN][aA][mM][eE]|[iI][dD]|[nN][aA][mM][eE])$",
+              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]-[iI][dD]|[pP][rR][oO][cC][eE][sS][sS]-[nN][aA][mM][eE]|[iI][dD]|[nN][aA][mM][eE])$",
               "type": "string"
             }
           ]
@@ -1417,6 +1478,9 @@
         "network-driver-legacy-api": {
           "description": "Use legacy network driver API. Applies to Windows only.",
           "type": "boolean"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         },
         "test-compare-network-driver-and-etw": {
           "description": "Compare network driver and ETW data (diagnostic). Applies to Windows only.",
@@ -1436,6 +1500,9 @@
         "frame-agent-detection-path": {
           "description": "Registry key below HKLM whose presence tells the agent that the Frame agent is installed (default SOFTWARE\\Nutanix\\Frame\\FGA).",
           "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         }
       },
       "type": "object"
@@ -1444,6 +1511,9 @@
       "additionalProperties": false,
       "description": "On-demand metrics configuration. Metrics collected outside periodic timer intervals.",
       "properties": {
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
         "receivers": {
           "description": "Receivers for on-demand metric results.",
           "oneOf": [
@@ -1594,6 +1664,9 @@
             }
           ]
         },
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
         "regex": {
           "description": "Process name regex pattern.",
           "minLength": 1,
@@ -1639,6 +1712,9 @@
             "type": "object"
           },
           "type": "array"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         }
       },
       "type": "object"
@@ -1666,9 +1742,9 @@
             },
             {
               "not": {
-                "pattern": "^(?:processes|libraries|processes\\-and\\-libraries)$"
+                "pattern": "^(?:processes|libraries|processes-and-libraries)$"
               },
-              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS][eE][sS]|[lL][iI][bB][rR][aA][rR][iI][eE][sS]|[pP][rR][oO][cC][eE][sS][sS][eE][sS]\\-[aA][nN][dD]\\-[lL][iI][bB][rR][aA][rR][iI][eE][sS])$",
+              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS][eE][sS]|[lL][iI][bB][rR][aA][rR][iI][eE][sS]|[pP][rR][oO][cC][eE][sS][sS][eE][sS]-[aA][nN][dD]-[lL][iI][bB][rR][aA][rR][iI][eE][sS])$",
               "type": "string"
             }
           ]
@@ -1713,9 +1789,9 @@
                 },
                 {
                   "not": {
-                    "pattern": "^(?:sha\\-1|sha\\-256|md5|imphash)$"
+                    "pattern": "^(?:sha-1|sha-256|md5|imphash)$"
                   },
-                  "pattern": "^(?:[sS][hH][aA]\\-1|[sS][hH][aA]\\-256|[mM][dD]5|[iI][mM][pP][hH][aA][sS][hH])$",
+                  "pattern": "^(?:[sS][hH][aA]-1|[sS][hH][aA]-256|[mM][dD]5|[iI][mM][pP][hH][aA][sS][hH])$",
                   "type": "string"
                 }
               ]
@@ -1734,9 +1810,9 @@
                   },
                   {
                     "not": {
-                      "pattern": "^(?:sha\\-1|sha\\-256|md5|imphash)$"
+                      "pattern": "^(?:sha-1|sha-256|md5|imphash)$"
                     },
-                    "pattern": "^(?:[sS][hH][aA]\\-1|[sS][hH][aA]\\-256|[mM][dD]5|[iI][mM][pP][hH][aA][sS][hH])$",
+                    "pattern": "^(?:[sS][hH][aA]-1|[sS][hH][aA]-256|[mM][dD]5|[iI][mM][pP][hH][aA][sS][hH])$",
                     "type": "string"
                   }
                 ]
@@ -1759,9 +1835,9 @@
             },
             {
               "not": {
-                "pattern": "^(?:processes|libraries|processes\\-and\\-libraries)$"
+                "pattern": "^(?:processes|libraries|processes-and-libraries)$"
               },
-              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS][eE][sS]|[lL][iI][bB][rR][aA][rR][iI][eE][sS]|[pP][rR][oO][cC][eE][sS][sS][eE][sS]\\-[aA][nN][dD]\\-[lL][iI][bB][rR][aA][rR][iI][eE][sS])$",
+              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS][eE][sS]|[lL][iI][bB][rR][aA][rR][iI][eE][sS]|[pP][rR][oO][cC][eE][sS][sS][eE][sS]-[aA][nN][dD]-[lL][iI][bB][rR][aA][rR][iI][eE][sS])$",
               "type": "string"
             }
           ]
@@ -1771,6 +1847,9 @@
           "maximum": 2000000,
           "minimum": 0,
           "type": "integer"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         }
       },
       "type": "object"
@@ -1783,6 +1862,9 @@
           "description": "Application name to assign to matching processes.",
           "minLength": 1,
           "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         },
         "regex": {
           "description": "Regex pattern matched against the full executable path.",
@@ -1803,6 +1885,9 @@
         "enable-esa": {
           "description": "Enable the Endpoint Security Analytics (ESA) component. ESA requires UXM.",
           "type": "boolean"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         }
       },
       "type": "object"
@@ -1814,6 +1899,9 @@
         "honor-environment-proxy": {
           "description": "Honor proxy settings from environment variables when no configured proxy route matches (all platforms).",
           "type": "boolean"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         }
       },
       "type": "object"
@@ -1879,7 +1967,7 @@
           "if": {
             "properties": {
               "type": {
-                "pattern": "^[aA][zZ][uU][rR][eE]\\-[eE][vV][eE][nN][tT]\\-[hH][uU][bB][sS]$",
+                "pattern": "^[aA][zZ][uU][rR][eE]-[eE][vV][eE][nN][tT]-[hH][uU][bB][sS]$",
                 "type": "string"
               }
             },
@@ -2070,7 +2158,7 @@
           "$ref": "#/$defs/platform"
         },
         "rest-token": {
-          "description": "Splunk HEC authentication token (splunk-http only).",
+          "description": "Splunk HEC authentication token (splunk-http) or Log Analytics workspace key (azure-monitor).",
           "not": {
             "pattern": "^[uU][aA][qQ][lL]\\((.+)\\)\\s*$",
             "type": "string"
@@ -2079,7 +2167,7 @@
           "type": "string"
         },
         "servers": {
-          "description": "One or more server endpoints in host:port format. Use an array for failover or load distribution.",
+          "description": "One or more server endpoints: host:port for splunk-tcp, an http:// or https:// URL for splunk-http, elasticsearch, kafka and azure-monitor. Use an array for failover or load distribution.",
           "oneOf": [
             {
               "type": "string"
@@ -2125,15 +2213,16 @@
                 "kafka",
                 "azure-event-hubs",
                 "uaes",
-                "etw"
+                "etw",
+                "azure-monitor"
               ],
               "type": "string"
             },
             {
               "not": {
-                "pattern": "^(?:splunk\\-tcp|splunk\\-http|elasticsearch|kafka|azure\\-event\\-hubs|uaes|etw)$"
+                "pattern": "^(?:splunk-tcp|splunk-http|elasticsearch|kafka|azure-event-hubs|uaes|etw|azure-monitor)$"
               },
-              "pattern": "^(?:[sS][pP][lL][uU][nN][kK]\\-[tT][cC][pP]|[sS][pP][lL][uU][nN][kK]\\-[hH][tT][tT][pP]|[eE][lL][aA][sS][tT][iI][cC][sS][eE][aA][rR][cC][hH]|[kK][aA][fF][kK][aA]|[aA][zZ][uU][rR][eE]\\-[eE][vV][eE][nN][tT]\\-[hH][uU][bB][sS]|[uU][aA][eE][sS]|[eE][tT][wW])$",
+              "pattern": "^(?:[sS][pP][lL][uU][nN][kK]-[tT][cC][pP]|[sS][pP][lL][uU][nN][kK]-[hH][tT][tT][pP]|[eE][lL][aA][sS][tT][iI][cC][sS][eE][aA][rR][cC][hH]|[kK][aA][fF][kK][aA]|[aA][zZ][uU][rR][eE]-[eE][vV][eE][nN][tT]-[hH][uU][bB][sS]|[uU][aA][eE][sS]|[eE][tT][wW]|[aA][zZ][uU][rR][eE]-[mM][oO][nN][iI][tT][oO][rR])$",
               "type": "string"
             }
           ]
@@ -2151,6 +2240,9 @@
         "config-file-path": {
           "description": "Path to the remote configuration file.",
           "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/platform"
         }
       },
       "type": "object"
@@ -2242,7 +2334,7 @@
                 "type": "string"
               },
               "script-context": {
-                "pattern": "^[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR]$",
+                "pattern": "^[uU][sS][eE][rR]-[sS][eE][sS][sS][iI][oO][nN]-[aA][sS]-[uU][sS][eE][rR]$",
                 "type": "string"
               }
             },
@@ -2276,7 +2368,7 @@
                 ]
               },
               "script-context": {
-                "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]\\-0\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR])$",
+                "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]-0-[aA][sS]-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]-[sS][eE][sS][sS][iI][oO][nN]-[aA][sS]-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]-[sS][eE][sS][sS][iI][oO][nN]-[aA][sS]-[uU][sS][eE][rR])$",
                 "type": "string"
               }
             },
@@ -2335,8 +2427,7 @@
         "integrity-level": {
           "description": "Required integrity level (Windows only).",
           "pattern": "^([lL][oO][wW]|[mM][eE][dD][iI][uU][mM]|[hH][iI][gG][hH])(?:\\s*[+-]\\s*[A-Za-z]+(?:=[0-9]+)?)*$",
-          "type": "string",
-          "x-uberagent-pattern-ignore-case": true
+          "type": "string"
         },
         "interpreter": {
           "description": "Script interpreter name.",
@@ -2389,9 +2480,9 @@
             },
             {
               "not": {
-                "pattern": "^(?:session\\-0\\-as\\-system|user\\-session\\-as\\-system|user\\-session\\-as\\-user|root|user)$"
+                "pattern": "^(?:session-0-as-system|user-session-as-system|user-session-as-user|root|user)$"
               },
-              "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]\\-0\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR]|[rR][oO][oO][tT]|[uU][sS][eE][rR])$",
+              "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]-0-[aA][sS]-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]-[sS][eE][sS][sS][iI][oO][nN]-[aA][sS]-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]-[sS][eE][sS][sS][iI][oO][nN]-[aA][sS]-[uU][sS][eE][rR]|[rR][oO][oO][tT]|[uU][sS][eE][rR])$",
               "type": "string"
             }
           ]
@@ -2412,6 +2503,9 @@
       "additionalProperties": false,
       "description": "Session detail metric configuration.",
       "properties": {
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
         "session-fg-window-title-max-length": {
           "description": "Maximum number of characters of the foreground window title to include in SessionDetail; 0 sends no window title.",
           "maximum": 2147483647,
@@ -2578,7 +2672,6 @@
                 "Reg_Key_Replace",
                 "Reg_Any",
                 "Dns.Query",
-                "DnsQuery",
                 "Process.CreateRemoteThread",
                 "Process.TamperingEvent",
                 "File.ChangeCreationTime",
@@ -2599,9 +2692,9 @@
             },
             {
               "not": {
-                "pattern": "^(?:Process\\.Start|ProcessStart|Process\\.Stop|ProcessStop|Image\\.Load|ImageLoad|Net\\.Connect|NetConnect|Net\\.Receive|NetReceive|Net\\.Reconnect|NetReconnect|Net\\.Retransmit|NetRetransmit|Net\\.Send|NetSend|Net\\.Any|NetAny|Reg\\.Key\\.Create|Reg\\.Value\\.Write|Reg\\.Delete|Reg\\.Key\\.Delete|Reg\\.Value\\.Delete|Reg\\.Key\\.SecurityChange|Reg\\.Key\\.Rename|Reg\\.Key\\.SetInformation|Reg\\.Key\\.Load|Reg\\.Key\\.Unload|Reg\\.Key\\.Restore|Reg\\.Key\\.Save|Reg\\.Key\\.Replace|Reg\\.Any|Reg_Key_Create|Reg_Value_Write|Reg_Delete|Reg_Key_Delete|Reg_Value_Delete|Reg_Key_SecurityChange|Reg_Key_Rename|Reg_Key_SetInformation|Reg_Key_Load|Reg_Key_Unload|Reg_Key_Restore|Reg_Key_Save|Reg_Key_Replace|Reg_Any|Dns\\.Query|DnsQuery|Process\\.CreateRemoteThread|Process\\.TamperingEvent|File\\.ChangeCreationTime|File\\.RawAccessRead|File\\.Create|File\\.CreateStream|File\\.PipeCreate|File\\.PipeConnected|File\\.Delete|File\\.Rename|File\\.Write|File\\.Read|File\\.SecurityChange|Driver\\.Load|DriverLoad)$"
+                "pattern": "^(?:Process\\.Start|ProcessStart|Process\\.Stop|ProcessStop|Image\\.Load|ImageLoad|Net\\.Connect|NetConnect|Net\\.Receive|NetReceive|Net\\.Reconnect|NetReconnect|Net\\.Retransmit|NetRetransmit|Net\\.Send|NetSend|Net\\.Any|NetAny|Reg\\.Key\\.Create|Reg\\.Value\\.Write|Reg\\.Delete|Reg\\.Key\\.Delete|Reg\\.Value\\.Delete|Reg\\.Key\\.SecurityChange|Reg\\.Key\\.Rename|Reg\\.Key\\.SetInformation|Reg\\.Key\\.Load|Reg\\.Key\\.Unload|Reg\\.Key\\.Restore|Reg\\.Key\\.Save|Reg\\.Key\\.Replace|Reg\\.Any|Reg_Key_Create|Reg_Value_Write|Reg_Delete|Reg_Key_Delete|Reg_Value_Delete|Reg_Key_SecurityChange|Reg_Key_Rename|Reg_Key_SetInformation|Reg_Key_Load|Reg_Key_Unload|Reg_Key_Restore|Reg_Key_Save|Reg_Key_Replace|Reg_Any|Dns\\.Query|Process\\.CreateRemoteThread|Process\\.TamperingEvent|File\\.ChangeCreationTime|File\\.RawAccessRead|File\\.Create|File\\.CreateStream|File\\.PipeCreate|File\\.PipeConnected|File\\.Delete|File\\.Rename|File\\.Write|File\\.Read|File\\.SecurityChange|Driver\\.Load|DriverLoad)$"
               },
-              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][oO][pP]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][oO][pP]|[iI][mM][aA][gG][eE]\\.[lL][oO][aA][dD]|[iI][mM][aA][gG][eE][lL][oO][aA][dD]|[nN][eE][tT]\\.[cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT][rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT]\\.[rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT][rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT]\\.[sS][eE][nN][dD]|[nN][eE][tT][sS][eE][nN][dD]|[nN][eE][tT]\\.[aA][nN][yY]|[nN][eE][tT][aA][nN][yY]|[rR][eE][gG]\\.[kK][eE][yY]\\.[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[wW][rR][iI][tT][eE]|[rR][eE][gG]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]\\.[kK][eE][yY]\\.[lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][aA][vV][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]\\.[aA][nN][yY]|[rR][eE][gG]_[kK][eE][yY]_[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[wW][rR][iI][tT][eE]|[rR][eE][gG]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]_[kK][eE][yY]_[lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][aA][vV][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]_[aA][nN][yY]|[dD][nN][sS]\\.[qQ][uU][eE][rR][yY]|[dD][nN][sS][qQ][uU][eE][rR][yY]|[pP][rR][oO][cC][eE][sS][sS]\\.[cC][rR][eE][aA][tT][eE][rR][eE][mM][oO][tT][eE][tT][hH][rR][eE][aA][dD]|[pP][rR][oO][cC][eE][sS][sS]\\.[tT][aA][mM][pP][eE][rR][iI][nN][gG][eE][vV][eE][nN][tT]|[fF][iI][lL][eE]\\.[cC][hH][aA][nN][gG][eE][cC][rR][eE][aA][tT][iI][oO][nN][tT][iI][mM][eE]|[fF][iI][lL][eE]\\.[rR][aA][wW][aA][cC][cC][eE][sS][sS][rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE][sS][tT][rR][eE][aA][mM]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][oO][nN][nN][eE][cC][tT][eE][dD]|[fF][iI][lL][eE]\\.[dD][eE][lL][eE][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][nN][aA][mM][eE]|[fF][iI][lL][eE]\\.[wW][rR][iI][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[dD][rR][iI][vV][eE][rR]\\.[lL][oO][aA][dD]|[dD][rR][iI][vV][eE][rR][lL][oO][aA][dD])$",
+              "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][oO][pP]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][oO][pP]|[iI][mM][aA][gG][eE]\\.[lL][oO][aA][dD]|[iI][mM][aA][gG][eE][lL][oO][aA][dD]|[nN][eE][tT]\\.[cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT][rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT]\\.[rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT][rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT]\\.[sS][eE][nN][dD]|[nN][eE][tT][sS][eE][nN][dD]|[nN][eE][tT]\\.[aA][nN][yY]|[nN][eE][tT][aA][nN][yY]|[rR][eE][gG]\\.[kK][eE][yY]\\.[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[wW][rR][iI][tT][eE]|[rR][eE][gG]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]\\.[kK][eE][yY]\\.[lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][aA][vV][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]\\.[aA][nN][yY]|[rR][eE][gG]_[kK][eE][yY]_[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[wW][rR][iI][tT][eE]|[rR][eE][gG]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]_[kK][eE][yY]_[lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][aA][vV][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]_[aA][nN][yY]|[dD][nN][sS]\\.[qQ][uU][eE][rR][yY]|[pP][rR][oO][cC][eE][sS][sS]\\.[cC][rR][eE][aA][tT][eE][rR][eE][mM][oO][tT][eE][tT][hH][rR][eE][aA][dD]|[pP][rR][oO][cC][eE][sS][sS]\\.[tT][aA][mM][pP][eE][rR][iI][nN][gG][eE][vV][eE][nN][tT]|[fF][iI][lL][eE]\\.[cC][hH][aA][nN][gG][eE][cC][rR][eE][aA][tT][iI][oO][nN][tT][iI][mM][eE]|[fF][iI][lL][eE]\\.[rR][aA][wW][aA][cC][cC][eE][sS][sS][rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE][sS][tT][rR][eE][aA][mM]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][oO][nN][nN][eE][cC][tT][eE][dD]|[fF][iI][lL][eE]\\.[dD][eE][lL][eE][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][nN][aA][mM][eE]|[fF][iI][lL][eE]\\.[wW][rR][iI][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[dD][rR][iI][vV][eE][rR]\\.[lL][oO][aA][dD]|[dD][rR][iI][vV][eE][rR][lL][oO][aA][dD])$",
               "type": "string"
             }
           ]
@@ -2660,7 +2753,6 @@
                     "Reg.Any",
                     "Reg_Any",
                     "Dns.Query",
-                    "DnsQuery",
                     "Process.CreateRemoteThread",
                     "Process.TamperingEvent",
                     "File.ChangeCreationTime",
@@ -2681,9 +2773,9 @@
                 },
                 {
                   "not": {
-                    "pattern": "^(?:Process\\.Start|ProcessStart|Process\\.Stop|ProcessStop|Image\\.Load|ImageLoad|Net\\.Connect|NetConnect|Net\\.Receive|NetReceive|Net\\.Reconnect|NetReconnect|Net\\.Retransmit|NetRetransmit|Net\\.Send|NetSend|Net\\.Any|NetAny|Reg\\.Key\\.Create|Reg_Key_Create|Reg\\.Value\\.Write|Reg_Value_Write|Reg\\.Delete|Reg_Delete|Reg\\.Key\\.Delete|Reg_Key_Delete|Reg\\.Value\\.Delete|Reg_Value_Delete|Reg\\.Key\\.SecurityChange|Reg_Key_SecurityChange|Reg\\.Key\\.Rename|Reg_Key_Rename|Reg\\.Key\\.SetInformation|Reg_Key_SetInformation|Reg\\.Key\\.Load|Reg_Key_Load|Reg\\.Key\\.Unload|Reg_Key_Unload|Reg\\.Key\\.Restore|Reg_Key_Restore|Reg\\.Key\\.Save|Reg_Key_Save|Reg\\.Key\\.Replace|Reg_Key_Replace|Reg\\.Any|Reg_Any|Dns\\.Query|DnsQuery|Process\\.CreateRemoteThread|Process\\.TamperingEvent|File\\.ChangeCreationTime|File\\.RawAccessRead|File\\.Create|File\\.CreateStream|File\\.PipeCreate|File\\.PipeConnected|File\\.Delete|File\\.Rename|File\\.Write|File\\.Read|File\\.SecurityChange|Driver\\.Load|DriverLoad)$"
+                    "pattern": "^(?:Process\\.Start|ProcessStart|Process\\.Stop|ProcessStop|Image\\.Load|ImageLoad|Net\\.Connect|NetConnect|Net\\.Receive|NetReceive|Net\\.Reconnect|NetReconnect|Net\\.Retransmit|NetRetransmit|Net\\.Send|NetSend|Net\\.Any|NetAny|Reg\\.Key\\.Create|Reg_Key_Create|Reg\\.Value\\.Write|Reg_Value_Write|Reg\\.Delete|Reg_Delete|Reg\\.Key\\.Delete|Reg_Key_Delete|Reg\\.Value\\.Delete|Reg_Value_Delete|Reg\\.Key\\.SecurityChange|Reg_Key_SecurityChange|Reg\\.Key\\.Rename|Reg_Key_Rename|Reg\\.Key\\.SetInformation|Reg_Key_SetInformation|Reg\\.Key\\.Load|Reg_Key_Load|Reg\\.Key\\.Unload|Reg_Key_Unload|Reg\\.Key\\.Restore|Reg_Key_Restore|Reg\\.Key\\.Save|Reg_Key_Save|Reg\\.Key\\.Replace|Reg_Key_Replace|Reg\\.Any|Reg_Any|Dns\\.Query|Process\\.CreateRemoteThread|Process\\.TamperingEvent|File\\.ChangeCreationTime|File\\.RawAccessRead|File\\.Create|File\\.CreateStream|File\\.PipeCreate|File\\.PipeConnected|File\\.Delete|File\\.Rename|File\\.Write|File\\.Read|File\\.SecurityChange|Driver\\.Load|DriverLoad)$"
                   },
-                  "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][oO][pP]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][oO][pP]|[iI][mM][aA][gG][eE]\\.[lL][oO][aA][dD]|[iI][mM][aA][gG][eE][lL][oO][aA][dD]|[nN][eE][tT]\\.[cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT][rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT]\\.[rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT][rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT]\\.[sS][eE][nN][dD]|[nN][eE][tT][sS][eE][nN][dD]|[nN][eE][tT]\\.[aA][nN][yY]|[nN][eE][tT][aA][nN][yY]|[rR][eE][gG]\\.[kK][eE][yY]\\.[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[wW][rR][iI][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[wW][rR][iI][tT][eE]|[rR][eE][gG]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]\\.[kK][eE][yY]\\.[lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][aA][vV][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][aA][vV][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]\\.[aA][nN][yY]|[rR][eE][gG]_[aA][nN][yY]|[dD][nN][sS]\\.[qQ][uU][eE][rR][yY]|[dD][nN][sS][qQ][uU][eE][rR][yY]|[pP][rR][oO][cC][eE][sS][sS]\\.[cC][rR][eE][aA][tT][eE][rR][eE][mM][oO][tT][eE][tT][hH][rR][eE][aA][dD]|[pP][rR][oO][cC][eE][sS][sS]\\.[tT][aA][mM][pP][eE][rR][iI][nN][gG][eE][vV][eE][nN][tT]|[fF][iI][lL][eE]\\.[cC][hH][aA][nN][gG][eE][cC][rR][eE][aA][tT][iI][oO][nN][tT][iI][mM][eE]|[fF][iI][lL][eE]\\.[rR][aA][wW][aA][cC][cC][eE][sS][sS][rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE][sS][tT][rR][eE][aA][mM]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][oO][nN][nN][eE][cC][tT][eE][dD]|[fF][iI][lL][eE]\\.[dD][eE][lL][eE][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][nN][aA][mM][eE]|[fF][iI][lL][eE]\\.[wW][rR][iI][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[dD][rR][iI][vV][eE][rR]\\.[lL][oO][aA][dD]|[dD][rR][iI][vV][eE][rR][lL][oO][aA][dD])$",
+                  "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][oO][pP]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][oO][pP]|[iI][mM][aA][gG][eE]\\.[lL][oO][aA][dD]|[iI][mM][aA][gG][eE][lL][oO][aA][dD]|[nN][eE][tT]\\.[cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT][rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT]\\.[rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT][rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT]\\.[sS][eE][nN][dD]|[nN][eE][tT][sS][eE][nN][dD]|[nN][eE][tT]\\.[aA][nN][yY]|[nN][eE][tT][aA][nN][yY]|[rR][eE][gG]\\.[kK][eE][yY]\\.[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[wW][rR][iI][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[wW][rR][iI][tT][eE]|[rR][eE][gG]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]\\.[kK][eE][yY]\\.[lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][aA][vV][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][aA][vV][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]\\.[aA][nN][yY]|[rR][eE][gG]_[aA][nN][yY]|[dD][nN][sS]\\.[qQ][uU][eE][rR][yY]|[pP][rR][oO][cC][eE][sS][sS]\\.[cC][rR][eE][aA][tT][eE][rR][eE][mM][oO][tT][eE][tT][hH][rR][eE][aA][dD]|[pP][rR][oO][cC][eE][sS][sS]\\.[tT][aA][mM][pP][eE][rR][iI][nN][gG][eE][vV][eE][nN][tT]|[fF][iI][lL][eE]\\.[cC][hH][aA][nN][gG][eE][cC][rR][eE][aA][tT][iI][oO][nN][tT][iI][mM][eE]|[fF][iI][lL][eE]\\.[rR][aA][wW][aA][cC][cC][eE][sS][sS][rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE][sS][tT][rR][eE][aA][mM]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][oO][nN][nN][eE][cC][tT][eE][dD]|[fF][iI][lL][eE]\\.[dD][eE][lL][eE][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][nN][aA][mM][eE]|[fF][iI][lL][eE]\\.[wW][rR][iI][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[dD][rR][iI][vV][eE][rR]\\.[lL][oO][aA][dD]|[dD][rR][iI][vV][eE][rR][lL][oO][aA][dD])$",
                   "type": "string"
                 }
               ]
@@ -2740,7 +2832,6 @@
                       "Reg.Any",
                       "Reg_Any",
                       "Dns.Query",
-                      "DnsQuery",
                       "Process.CreateRemoteThread",
                       "Process.TamperingEvent",
                       "File.ChangeCreationTime",
@@ -2761,9 +2852,9 @@
                   },
                   {
                     "not": {
-                      "pattern": "^(?:Process\\.Start|ProcessStart|Process\\.Stop|ProcessStop|Image\\.Load|ImageLoad|Net\\.Connect|NetConnect|Net\\.Receive|NetReceive|Net\\.Reconnect|NetReconnect|Net\\.Retransmit|NetRetransmit|Net\\.Send|NetSend|Net\\.Any|NetAny|Reg\\.Key\\.Create|Reg_Key_Create|Reg\\.Value\\.Write|Reg_Value_Write|Reg\\.Delete|Reg_Delete|Reg\\.Key\\.Delete|Reg_Key_Delete|Reg\\.Value\\.Delete|Reg_Value_Delete|Reg\\.Key\\.SecurityChange|Reg_Key_SecurityChange|Reg\\.Key\\.Rename|Reg_Key_Rename|Reg\\.Key\\.SetInformation|Reg_Key_SetInformation|Reg\\.Key\\.Load|Reg_Key_Load|Reg\\.Key\\.Unload|Reg_Key_Unload|Reg\\.Key\\.Restore|Reg_Key_Restore|Reg\\.Key\\.Save|Reg_Key_Save|Reg\\.Key\\.Replace|Reg_Key_Replace|Reg\\.Any|Reg_Any|Dns\\.Query|DnsQuery|Process\\.CreateRemoteThread|Process\\.TamperingEvent|File\\.ChangeCreationTime|File\\.RawAccessRead|File\\.Create|File\\.CreateStream|File\\.PipeCreate|File\\.PipeConnected|File\\.Delete|File\\.Rename|File\\.Write|File\\.Read|File\\.SecurityChange|Driver\\.Load|DriverLoad)$"
+                      "pattern": "^(?:Process\\.Start|ProcessStart|Process\\.Stop|ProcessStop|Image\\.Load|ImageLoad|Net\\.Connect|NetConnect|Net\\.Receive|NetReceive|Net\\.Reconnect|NetReconnect|Net\\.Retransmit|NetRetransmit|Net\\.Send|NetSend|Net\\.Any|NetAny|Reg\\.Key\\.Create|Reg_Key_Create|Reg\\.Value\\.Write|Reg_Value_Write|Reg\\.Delete|Reg_Delete|Reg\\.Key\\.Delete|Reg_Key_Delete|Reg\\.Value\\.Delete|Reg_Value_Delete|Reg\\.Key\\.SecurityChange|Reg_Key_SecurityChange|Reg\\.Key\\.Rename|Reg_Key_Rename|Reg\\.Key\\.SetInformation|Reg_Key_SetInformation|Reg\\.Key\\.Load|Reg_Key_Load|Reg\\.Key\\.Unload|Reg_Key_Unload|Reg\\.Key\\.Restore|Reg_Key_Restore|Reg\\.Key\\.Save|Reg_Key_Save|Reg\\.Key\\.Replace|Reg_Key_Replace|Reg\\.Any|Reg_Any|Dns\\.Query|Process\\.CreateRemoteThread|Process\\.TamperingEvent|File\\.ChangeCreationTime|File\\.RawAccessRead|File\\.Create|File\\.CreateStream|File\\.PipeCreate|File\\.PipeConnected|File\\.Delete|File\\.Rename|File\\.Write|File\\.Read|File\\.SecurityChange|Driver\\.Load|DriverLoad)$"
                     },
-                    "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][oO][pP]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][oO][pP]|[iI][mM][aA][gG][eE]\\.[lL][oO][aA][dD]|[iI][mM][aA][gG][eE][lL][oO][aA][dD]|[nN][eE][tT]\\.[cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT][rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT]\\.[rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT][rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT]\\.[sS][eE][nN][dD]|[nN][eE][tT][sS][eE][nN][dD]|[nN][eE][tT]\\.[aA][nN][yY]|[nN][eE][tT][aA][nN][yY]|[rR][eE][gG]\\.[kK][eE][yY]\\.[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[wW][rR][iI][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[wW][rR][iI][tT][eE]|[rR][eE][gG]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]\\.[kK][eE][yY]\\.[lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][aA][vV][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][aA][vV][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]\\.[aA][nN][yY]|[rR][eE][gG]_[aA][nN][yY]|[dD][nN][sS]\\.[qQ][uU][eE][rR][yY]|[dD][nN][sS][qQ][uU][eE][rR][yY]|[pP][rR][oO][cC][eE][sS][sS]\\.[cC][rR][eE][aA][tT][eE][rR][eE][mM][oO][tT][eE][tT][hH][rR][eE][aA][dD]|[pP][rR][oO][cC][eE][sS][sS]\\.[tT][aA][mM][pP][eE][rR][iI][nN][gG][eE][vV][eE][nN][tT]|[fF][iI][lL][eE]\\.[cC][hH][aA][nN][gG][eE][cC][rR][eE][aA][tT][iI][oO][nN][tT][iI][mM][eE]|[fF][iI][lL][eE]\\.[rR][aA][wW][aA][cC][cC][eE][sS][sS][rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE][sS][tT][rR][eE][aA][mM]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][oO][nN][nN][eE][cC][tT][eE][dD]|[fF][iI][lL][eE]\\.[dD][eE][lL][eE][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][nN][aA][mM][eE]|[fF][iI][lL][eE]\\.[wW][rR][iI][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[dD][rR][iI][vV][eE][rR]\\.[lL][oO][aA][dD]|[dD][rR][iI][vV][eE][rR][lL][oO][aA][dD])$",
+                    "pattern": "^(?:[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][aA][rR][tT]|[pP][rR][oO][cC][eE][sS][sS]\\.[sS][tT][oO][pP]|[pP][rR][oO][cC][eE][sS][sS][sS][tT][oO][pP]|[iI][mM][aA][gG][eE]\\.[lL][oO][aA][dD]|[iI][mM][aA][gG][eE][lL][oO][aA][dD]|[nN][eE][tT]\\.[cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT][rR][eE][cC][eE][iI][vV][eE]|[nN][eE][tT]\\.[rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT][rR][eE][cC][oO][nN][nN][eE][cC][tT]|[nN][eE][tT]\\.[rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT][rR][eE][tT][rR][aA][nN][sS][mM][iI][tT]|[nN][eE][tT]\\.[sS][eE][nN][dD]|[nN][eE][tT][sS][eE][nN][dD]|[nN][eE][tT]\\.[aA][nN][yY]|[nN][eE][tT][aA][nN][yY]|[rR][eE][gG]\\.[kK][eE][yY]\\.[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[cC][rR][eE][aA][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[wW][rR][iI][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[wW][rR][iI][tT][eE]|[rR][eE][gG]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[kK][eE][yY]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[vV][aA][lL][uU][eE]\\.[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]_[vV][aA][lL][uU][eE]_[dD][eE][lL][eE][tT][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][nN][aA][mM][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]_[kK][eE][yY]_[sS][eE][tT][iI][nN][fF][oO][rR][mM][aA][tT][iI][oO][nN]|[rR][eE][gG]\\.[kK][eE][yY]\\.[lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]_[kK][eE][yY]_[uU][nN][lL][oO][aA][dD]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][sS][tT][oO][rR][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[sS][aA][vV][eE]|[rR][eE][gG]_[kK][eE][yY]_[sS][aA][vV][eE]|[rR][eE][gG]\\.[kK][eE][yY]\\.[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]_[kK][eE][yY]_[rR][eE][pP][lL][aA][cC][eE]|[rR][eE][gG]\\.[aA][nN][yY]|[rR][eE][gG]_[aA][nN][yY]|[dD][nN][sS]\\.[qQ][uU][eE][rR][yY]|[pP][rR][oO][cC][eE][sS][sS]\\.[cC][rR][eE][aA][tT][eE][rR][eE][mM][oO][tT][eE][tT][hH][rR][eE][aA][dD]|[pP][rR][oO][cC][eE][sS][sS]\\.[tT][aA][mM][pP][eE][rR][iI][nN][gG][eE][vV][eE][nN][tT]|[fF][iI][lL][eE]\\.[cC][hH][aA][nN][gG][eE][cC][rR][eE][aA][tT][iI][oO][nN][tT][iI][mM][eE]|[fF][iI][lL][eE]\\.[rR][aA][wW][aA][cC][cC][eE][sS][sS][rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[cC][rR][eE][aA][tT][eE][sS][tT][rR][eE][aA][mM]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][rR][eE][aA][tT][eE]|[fF][iI][lL][eE]\\.[pP][iI][pP][eE][cC][oO][nN][nN][eE][cC][tT][eE][dD]|[fF][iI][lL][eE]\\.[dD][eE][lL][eE][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][nN][aA][mM][eE]|[fF][iI][lL][eE]\\.[wW][rR][iI][tT][eE]|[fF][iI][lL][eE]\\.[rR][eE][aA][dD]|[fF][iI][lL][eE]\\.[sS][eE][cC][uU][rR][iI][tT][yY][cC][hH][aA][nN][gG][eE]|[dD][rR][iI][vV][eE][rR]\\.[lL][oO][aA][dD]|[dD][rR][iI][vV][eE][rR][lL][oO][aA][dD])$",
                     "type": "string"
                   }
                 ]
@@ -3013,6 +3104,9 @@
             }
           ]
         },
+        "platform": {
+          "$ref": "#/$defs/platform"
+        },
         "regex": {
           "description": "Regular expression matched against the full rule ID (not the rule name); matching rules are allowed or denied by action.",
           "minLength": 1,
@@ -3061,7 +3155,7 @@
                 ]
               },
               "script-context": {
-                "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]\\-0\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR])$",
+                "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]-0-[aA][sS]-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]-[sS][eE][sS][sS][iI][oO][nN]-[aA][sS]-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]-[sS][eE][sS][sS][iI][oO][nN]-[aA][sS]-[uU][sS][eE][rR])$",
                 "type": "string"
               }
             },
@@ -3206,9 +3300,9 @@
             },
             {
               "not": {
-                "pattern": "^(?:session\\-0\\-as\\-system|user\\-session\\-as\\-system|user\\-session\\-as\\-user|root|user)$"
+                "pattern": "^(?:session-0-as-system|user-session-as-system|user-session-as-user|root|user)$"
               },
-              "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]\\-0\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]\\-[sS][eE][sS][sS][iI][oO][nN]\\-[aA][sS]\\-[uU][sS][eE][rR]|[rR][oO][oO][tT]|[uU][sS][eE][rR])$",
+              "pattern": "^(?:[sS][eE][sS][sS][iI][oO][nN]-0-[aA][sS]-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]-[sS][eE][sS][sS][iI][oO][nN]-[aA][sS]-[sS][yY][sS][tT][eE][mM]|[uU][sS][eE][rR]-[sS][eE][sS][sS][iI][oO][nN]-[aA][sS]-[uU][sS][eE][rR]|[rR][oO][oO][tT]|[uU][sS][eE][rR])$",
               "type": "string"
             }
           ]
@@ -3344,6 +3438,10 @@
         {
           "const": "CitrixSessionConfig",
           "description": "Citrix session configuration, HDX policies, and settings"
+        },
+        {
+          "const": "CitrixSessionGatewayDetail",
+          "description": "Per-hop network latency of Citrix sessions as measured by Citrix Gateway"
         },
         {
           "const": "CitrixSessionVirtualChannelDetail",
@@ -3516,10 +3614,18 @@
   "description": "JSON Schema for uberAgent YAML configuration files. Generated from the configuration contract.",
   "properties": {
     "application-mapping-ignored-processes": {
-      "description": "List of regex patterns for processes to ignore in application lookup.",
+      "description": "List of regex patterns for processes to ignore in application lookup. An entry is a regex string, or a mapping with regex and an optional platform gate.",
       "items": {
-        "minLength": 1,
-        "type": "string"
+        "else": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "if": {
+          "type": "object"
+        },
+        "then": {
+          "$ref": "#/$defs/application-mapping-ignored-process-entry"
+        }
       },
       "type": "array"
     },
@@ -3577,7 +3683,18 @@
       ]
     },
     "configuration-settings": {
-      "$ref": "#/$defs/configuration-settings"
+      "else": {
+        "$ref": "#/$defs/configuration-settings"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/configuration-settings"
+        },
+        "minItems": 1
+      }
     },
     "event-data-filters": {
       "description": "Per-sourcetype event-shaping filters. Each entry drops, allows, redacts, or defers events whose payload matches a uAQL query.",
@@ -3601,13 +3718,32 @@
       "type": "array"
     },
     "filesystem-monitoring": {
-      "$ref": "#/$defs/filesystem-monitoring"
+      "else": {
+        "$ref": "#/$defs/filesystem-monitoring"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/filesystem-monitoring"
+        },
+        "minItems": 1
+      }
     },
     "ignore-logon-monitoring-processes": {
-      "description": "List of process name patterns to ignore during logon monitoring (Windows-only).",
+      "description": "List of process name patterns to ignore during logon monitoring (Windows-only). An entry is a regex string, or a mapping with regex and an optional platform gate.",
       "items": {
-        "minLength": 1,
-        "type": "string"
+        "else": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "if": {
+          "type": "object"
+        },
+        "then": {
+          "$ref": "#/$defs/ignore-logon-monitoring-process-entry"
+        }
       },
       "type": "array"
     },
@@ -3619,16 +3755,60 @@
       "type": "array"
     },
     "miscellaneous": {
-      "$ref": "#/$defs/miscellaneous"
+      "else": {
+        "$ref": "#/$defs/miscellaneous"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/miscellaneous"
+        },
+        "minItems": 1
+      }
     },
     "network-target-performance-process-config": {
-      "$ref": "#/$defs/network-target-performance-process-config"
+      "else": {
+        "$ref": "#/$defs/network-target-performance-process-config"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/network-target-performance-process-config"
+        },
+        "minItems": 1
+      }
     },
     "nutanix-frame": {
-      "$ref": "#/$defs/nutanix-frame"
+      "else": {
+        "$ref": "#/$defs/nutanix-frame"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/nutanix-frame"
+        },
+        "minItems": 1
+      }
     },
     "on-demand": {
-      "$ref": "#/$defs/on-demand"
+      "else": {
+        "$ref": "#/$defs/on-demand"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/on-demand"
+        },
+        "minItems": 1
+      }
     },
     "process-detail-send-commandline": {
       "description": "Optionally add the command line to the ProcessDetail metrics. Use allow/deny lists to control which processes include command lines.",
@@ -3638,10 +3818,32 @@
       "type": "array"
     },
     "process-startup-duration-wait-interval-override": {
-      "$ref": "#/$defs/process-startup-duration-wait-interval-override"
+      "else": {
+        "$ref": "#/$defs/process-startup-duration-wait-interval-override"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/process-startup-duration-wait-interval-override"
+        },
+        "minItems": 1
+      }
     },
     "process-startup-settings": {
-      "$ref": "#/$defs/process-startup-settings"
+      "else": {
+        "$ref": "#/$defs/process-startup-settings"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/process-startup-settings"
+        },
+        "minItems": 1
+      }
     },
     "process-to-application-mapping": {
       "description": "Override uberAgent's automatic application identification. Each entry maps a regex pattern (matched against the full executable path) to an application name.",
@@ -3651,10 +3853,32 @@
       "type": "array"
     },
     "product-components": {
-      "$ref": "#/$defs/product-components"
+      "else": {
+        "$ref": "#/$defs/product-components"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/product-components"
+        },
+        "minItems": 1
+      }
     },
     "proxy": {
-      "$ref": "#/$defs/proxy"
+      "else": {
+        "$ref": "#/$defs/proxy"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/proxy"
+        },
+        "minItems": 1
+      }
     },
     "proxy-credentials": {
       "description": "Proxy authentication credentials. Each entry maps a proxy endpoint to a credential (plaintext, XOR/Base64, or platform credential store reference).",
@@ -3678,7 +3902,18 @@
       "type": "array"
     },
     "remote-configuration": {
-      "$ref": "#/$defs/remote-configuration"
+      "else": {
+        "$ref": "#/$defs/remote-configuration"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/remote-configuration"
+        },
+        "minItems": 1
+      }
     },
     "script-interpreters": {
       "description": "Script interpreter definitions for Security & Compliance Inventory test execution. Each entry maps a name to an executable and an argv template.",
@@ -3695,7 +3930,18 @@
       "type": "array"
     },
     "session-detail-config": {
-      "$ref": "#/$defs/session-detail-config"
+      "else": {
+        "$ref": "#/$defs/session-detail-config"
+      },
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#/$defs/session-detail-config"
+        },
+        "minItems": 1
+      }
     },
     "threat-detection-expressions": {
       "description": "Reusable named uAQL functions referenced from threat-detection-rules and other expressions (ESA only).",

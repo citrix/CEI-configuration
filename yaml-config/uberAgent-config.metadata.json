@@ -44,7 +44,8 @@
             "kafka",
             "azure-event-hubs",
             "uaes",
-            "etw"
+            "etw",
+            "azure-monitor"
           ],
           "key": "type",
           "kind": "enum-string",
@@ -328,10 +329,23 @@
           "key": "receivers",
           "kind": "string-or-string-array",
           "required": false
+        },
+        {
+          "confKey": "OnDemand.Platform",
+          "diagnosticCode": "UA-YAML-ON-DEMAND-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "on-demand",
       "kind": "object",
+      "platformBlocks": true,
       "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp"
     },
     {
@@ -675,6 +689,20 @@
           "required": false
         },
         {
+          "confKey": "CitrixMonitorODataProtocol",
+          "diagnosticCode": "UA-YAML-MISCELLANEOUS-CITRIX-MONITOR-ODATA-PROTOCOL",
+          "enumValues": [
+            "http",
+            "https"
+          ],
+          "key": "citrix-monitor-odata-protocol",
+          "kind": "enum-string",
+          "platforms": [
+            "windows"
+          ],
+          "required": false
+        },
+        {
           "confKey": "ConfigFlags",
           "diagnosticCode": "UA-YAML-MISCELLANEOUS-CONFIG-FLAGS",
           "fields": [
@@ -738,6 +766,13 @@
               "required": false
             },
             {
+              "confKey": "ConfigFlags.HttpRedirectRestrictionsDisabled",
+              "diagnosticCode": "UA-YAML-CONFIG-FLAGS-HTTP-REDIRECT-RESTRICTIONS-DISABLED",
+              "key": "http-redirect-restrictions-disabled",
+              "kind": "boolean",
+              "required": false
+            },
+            {
               "confKey": "ConfigFlags.ForceCitrixMetricsDetermination",
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-FORCE-CITRIX-METRICS-DETERMINATION",
               "key": "force-citrix-metrics-determination",
@@ -784,6 +819,16 @@
               "diagnosticCode": "UA-YAML-CONFIG-FLAGS-DISABLE-BROWSER-INTEGRITY-CHECK",
               "key": "disable-browser-integrity-check",
               "kind": "boolean",
+              "required": false
+            },
+            {
+              "confKey": "ConfigFlags.DisableCitrixNsapIntegrityCheck",
+              "diagnosticCode": "UA-YAML-CONFIG-FLAGS-DISABLE-CITRIX-NSAP-INTEGRITY-CHECK",
+              "key": "disable-citrix-nsap-integrity-check",
+              "kind": "boolean",
+              "platforms": [
+                "windows"
+              ],
               "required": false
             },
             {
@@ -1069,10 +1114,23 @@
           "key": "config-flags",
           "kind": "object",
           "required": false
+        },
+        {
+          "confKey": "Miscellaneous.Platform",
+          "diagnosticCode": "UA-YAML-MISCELLANEOUS-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "miscellaneous",
       "kind": "object",
+      "platformBlocks": true,
       "source": "Agent/Shared/Configuration/YamlCore/ConfigurationYamlCore.cpp"
     },
     {
@@ -1371,10 +1429,23 @@
           "key": "honor-environment-proxy",
           "kind": "boolean",
           "required": false
+        },
+        {
+          "confKey": "Proxy.Platform",
+          "diagnosticCode": "UA-YAML-PROXY-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "proxy",
       "kind": "object",
+      "platformBlocks": true,
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1476,10 +1547,23 @@
           "key": "frame-agent-detection-path",
           "kind": "string",
           "required": false
+        },
+        {
+          "confKey": "NutanixFrame.Platform",
+          "diagnosticCode": "UA-YAML-NUTANIX-FRAME-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "nutanix-frame",
       "kind": "object",
+      "platformBlocks": true,
       "platforms": [
         "windows"
       ],
@@ -1495,10 +1579,23 @@
           "key": "config-file-path",
           "kind": "string",
           "required": false
+        },
+        {
+          "confKey": "RemoteConfiguration.Platform",
+          "diagnosticCode": "UA-YAML-REMOTE-CONFIGURATION-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "remote-configuration",
       "kind": "object",
+      "platformBlocks": true,
       "platforms": [
         "macos",
         "linux"
@@ -1542,10 +1639,23 @@
           "key": "enable-esa",
           "kind": "boolean",
           "required": false
+        },
+        {
+          "confKey": "ProductComponents.Platform",
+          "diagnosticCode": "UA-YAML-PRODUCT-COMPONENTS-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "product-components",
       "kind": "object",
+      "platformBlocks": true,
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1596,10 +1706,23 @@
           "key": "version",
           "kind": "string",
           "required": false
+        },
+        {
+          "confKey": "Configuration_Settings.Platform",
+          "diagnosticCode": "UA-YAML-CONFIGURATION-SETTINGS-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "configuration-settings",
       "kind": "object",
+      "platformBlocks": true,
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1616,10 +1739,23 @@
           "key": "session-fg-window-title-max-length",
           "kind": "unsigned-integer",
           "required": false
+        },
+        {
+          "confKey": "SessionDetail_Config.Platform",
+          "diagnosticCode": "UA-YAML-SESSION-DETAIL-CONFIG-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "session-detail-config",
       "kind": "object",
+      "platformBlocks": true,
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1637,6 +1773,24 @@
           "diagnosticCode": "UA-YAML-FILESYSTEM-MONITORING-HOTPLUG",
           "key": "hotplug",
           "kind": "boolean",
+          "required": false
+        },
+        {
+          "confKey": "FilesystemMonitoring.QueuePriority",
+          "description": "Scheduling priority of the macOS filesystem event queue. Defaults to background (QOS_CLASS_BACKGROUND). Use default (QOS_CLASS_DEFAULT) or higher to reduce event loss under CPU load. Requires an agent restart. Applies to macOS only.",
+          "diagnosticCode": "UA-YAML-FILESYSTEM-MONITORING-QUEUE-PRIORITY",
+          "enumValues": [
+            "background",
+            "utility",
+            "default",
+            "user-initiated",
+            "user-interactive"
+          ],
+          "key": "queue-priority",
+          "kind": "enum-string",
+          "platforms": [
+            "macos"
+          ],
           "required": false
         },
         {
@@ -1669,10 +1823,23 @@
           "key": "monitor",
           "kind": "enum-string-or-array",
           "required": false
+        },
+        {
+          "confKey": "FilesystemMonitoring.Platform",
+          "diagnosticCode": "UA-YAML-FILESYSTEM-MONITORING-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "filesystem-monitoring",
       "kind": "object",
+      "platformBlocks": true,
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1809,10 +1976,23 @@
             "windows"
           ],
           "required": false
+        },
+        {
+          "confKey": "ProcessStartupSettings.Platform",
+          "diagnosticCode": "UA-YAML-PROCESS-STARTUP-SETTINGS-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "process-startup-settings",
       "kind": "object",
+      "platformBlocks": true,
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1854,10 +2034,23 @@
           "key": "per-process",
           "kind": "object-array",
           "required": false
+        },
+        {
+          "confKey": "ProcessStartupDurationWaitIntervalOverride.Platform",
+          "diagnosticCode": "UA-YAML-PROCESS-STARTUP-DURATION-WAIT-INTERVAL-OVERRIDE-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "process-startup-duration-wait-interval-override",
       "kind": "object",
+      "platformBlocks": true,
       "platforms": [
         "windows"
       ],
@@ -1929,10 +2122,23 @@
             "windows"
           ],
           "required": false
+        },
+        {
+          "confKey": "NetworkTargetPerformanceProcess_Config.Platform",
+          "diagnosticCode": "UA-YAML-NETWORK-TARGET-PERFORMANCE-PROCESS-CONFIG-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "network-target-performance-process-config",
       "kind": "object",
+      "platformBlocks": true,
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1958,6 +2164,18 @@
           "kind": "string",
           "nonEmpty": true,
           "required": true
+        },
+        {
+          "confKey": "ProcessToApplicationMapping.Platform",
+          "diagnosticCode": "UA-YAML-PROCESS-TO-APPLICATION-MAPPING-ENTRY-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "process-to-application-mapping",
@@ -1966,9 +2184,36 @@
     },
     {
       "diagnosticCodePrefix": "UA-YAML-APPLICATION-MAPPING-IGNORED-PROCESSES",
-      "fields": [],
+      "fields": [
+        {
+          "confKey": "ApplicationMappingIgnoredProcesses.Regex",
+          "diagnosticCode": "UA-YAML-APPLICATION-MAPPING-IGNORED-PROCESSES-ENTRY-REGEX",
+          "key": "regex",
+          "kind": "string",
+          "nonEmpty": true,
+          "regex": {
+            "engine": "boost-regex",
+            "ignoreCase": true,
+            "syntax": "perl"
+          },
+          "required": true
+        },
+        {
+          "confKey": "ApplicationMappingIgnoredProcesses.Platform",
+          "diagnosticCode": "UA-YAML-APPLICATION-MAPPING-IGNORED-PROCESSES-ENTRY-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
+        }
+      ],
       "key": "application-mapping-ignored-processes",
-      "kind": "string-array",
+      "kind": "object-array",
+      "scalarItemField": "regex",
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -1997,6 +2242,18 @@
           "key": "action",
           "kind": "enum-string",
           "required": true
+        },
+        {
+          "confKey": "BrowserWebAppUrlFilter.Platform",
+          "diagnosticCode": "UA-YAML-BROWSER-WEB-APP-URL-FILTER-ENTRY-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "browser-web-app-url-filter",
@@ -2028,6 +2285,18 @@
           "nonEmpty": true,
           "pattern": "^host(?::path(?:\\([0-9]+\\)?)?)?(?::query(?:\\([^)]+\\)?)?)?(?:;host(?::path(?:\\([0-9]+\\)?)?)?(?::query(?:\\([^)]+\\)?)?)?)?$",
           "required": true
+        },
+        {
+          "confKey": "BrowserWebAppUrlComponentDetail.Platform",
+          "diagnosticCode": "UA-YAML-BROWSER-WEB-APP-URL-COMPONENT-DETAIL-ENTRY-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "browser-web-app-url-component-detail",
@@ -2060,6 +2329,18 @@
           "key": "action",
           "kind": "enum-string",
           "required": true
+        },
+        {
+          "confKey": "ProcessDetailSendCommandline.Platform",
+          "diagnosticCode": "UA-YAML-PROCESS-DETAIL-SEND-COMMANDLINE-ENTRY-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "process-detail-send-commandline",
@@ -2094,6 +2375,18 @@
           "key": "action",
           "kind": "enum-string",
           "required": true
+        },
+        {
+          "confKey": "ThreatDetectionRuleFilter.Platform",
+          "diagnosticCode": "UA-YAML-THREAT-DETECTION-RULE-FILTER-ENTRY-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
         }
       ],
       "key": "threat-detection-rule-filter",
@@ -2102,12 +2395,39 @@
     },
     {
       "diagnosticCodePrefix": "UA-YAML-IGNORE-LOGON-MONITORING-PROCESSES",
-      "fields": [],
+      "fields": [
+        {
+          "confKey": "IgnoreLogonMonitoringProcesses.Regex",
+          "diagnosticCode": "UA-YAML-IGNORE-LOGON-MONITORING-PROCESSES-ENTRY-REGEX",
+          "key": "regex",
+          "kind": "string",
+          "nonEmpty": true,
+          "regex": {
+            "engine": "boost-regex",
+            "ignoreCase": true,
+            "syntax": "perl"
+          },
+          "required": true
+        },
+        {
+          "confKey": "IgnoreLogonMonitoringProcesses.Platform",
+          "diagnosticCode": "UA-YAML-IGNORE-LOGON-MONITORING-PROCESSES-ENTRY-PLATFORM",
+          "enumValues": [
+            "windows",
+            "macos",
+            "linux"
+          ],
+          "key": "platform",
+          "kind": "enum-string-or-array",
+          "required": false
+        }
+      ],
       "key": "ignore-logon-monitoring-processes",
-      "kind": "string-array",
+      "kind": "object-array",
       "platforms": [
         "windows"
       ],
+      "scalarItemField": "regex",
       "source": "Agent/Shared/Configuration/Yaml/"
     },
     {
@@ -2118,9 +2438,12 @@
           "diagnosticCode": "UA-YAML-CITRIX-ADC-CONFIG-SERVERS",
           "key": "servers",
           "kind": "string-or-string-array",
+          "maxItems": 2,
+          "nameSeparators": ",;",
           "nonEmpty": true,
           "rejectsEmptyList": true,
-          "required": false
+          "required": false,
+          "shapeHint": "Write one appliance, or the two appliances of one HA pair as a list, for example adc1.local or [adc1.local, adc1b.local], and write each further pair as its own citrix-adc-configs entry."
         },
         {
           "confKey": "CitrixADCConfig.Username",
@@ -2159,13 +2482,14 @@
           "required": false
         },
         {
-          "commaSeparatedItems": true,
           "confKey": "CitrixADCConfig.CollectADCInformationMachines",
           "diagnosticCode": "UA-YAML-CITRIX-ADC-CONFIG-COLLECT-ADC-INFORMATION-MACHINES",
           "key": "collect-adc-information-machines",
-          "kind": "string-or-string-array",
+          "kind": "string-array",
+          "nameSeparators": ",",
           "nonEmpty": true,
-          "required": false
+          "required": false,
+          "shapeHint": "List each machine as its own entry, for example [DDC01, DDC02]."
         },
         {
           "confKey": "CitrixADCConfig.Platform",
@@ -2250,13 +2574,14 @@
           "required": false
         },
         {
-          "commaSeparatedItems": true,
           "confKey": "CitrixCloudConfig.CollectCitrixCloudInformationMachines",
           "diagnosticCode": "UA-YAML-CITRIX-CLOUD-CONFIG-COLLECT-CITRIX-CLOUD-INFORMATION-MACHINES",
           "key": "collect-citrix-cloud-information-machines",
-          "kind": "string-or-string-array",
+          "kind": "string-array",
+          "nameSeparators": ",",
           "nonEmpty": true,
-          "required": false
+          "required": false,
+          "shapeHint": "List each machine as its own entry, for example [DDC01, DDC02]."
         },
         {
           "confKey": "CitrixCloudConfig.Platform",
@@ -2595,7 +2920,6 @@
             "Reg_Key_Replace",
             "Reg_Any",
             "Dns.Query",
-            "DnsQuery",
             "Process.CreateRemoteThread",
             "Process.TamperingEvent",
             "File.ChangeCreationTime",
@@ -2667,7 +2991,6 @@
             "Reg.Any",
             "Reg_Any",
             "Dns.Query",
-            "DnsQuery",
             "Process.CreateRemoteThread",
             "Process.TamperingEvent",
             "File.ChangeCreationTime",
