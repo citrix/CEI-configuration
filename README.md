@@ -15,12 +15,13 @@ This repository is the home for the [Citrix Experience Insights (CEI)](https://w
 
 This repository is organized in such a way that CEI releases are represented by Git branches. Each Git branch contains the configuration that is compatible with the matching CEI release.
 
-| CEI version | Git branch                            |
-| ----------- | ------------------------------------- |
-| `8.1.x`     | [version/8.1](../../tree/version/8.1) |
-| `8.0`       | [version/8.0](../../tree/version/8.0) |
-| `7.5.x`     | [version/7.5](../../tree/version/7.5) |
-| `7.4.x`     | [version/7.4](../../tree/version/7.4) |
+| CEI version | Git branch                                                                  |
+| ----------- | --------------------------------------------------------------------------- |
+| `9.0.x`     | [version/9.0](https://github.com/citrix/CEI-configuration/tree/version/9.0) |
+| `8.1.x`     | [version/8.1](https://github.com/citrix/CEI-configuration/tree/version/8.1) |
+| `8.0`       | [version/8.0](https://github.com/citrix/CEI-configuration/tree/version/8.0) |
+| `7.5.x`     | [version/7.5](https://github.com/citrix/CEI-configuration/tree/version/7.5) |
+| `7.4.x`     | [version/7.4](https://github.com/citrix/CEI-configuration/tree/version/7.4) |
 
 The `main` branch does not carry a configuration. It only serves as the template the version branches are created from.
 
